@@ -5,13 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -20,6 +14,8 @@ import com.mohamedrejeb.calf.permissions.Permission
 import com.mohamedrejeb.calf.permissions.isGranted
 import com.mohamedrejeb.calf.permissions.rememberPermissionState
 import kotlinx.coroutines.launch
+import you.yearof.app.camera.CameraPreview
+import you.yearof.app.camera.rememberCameraController
 
 @Composable
 fun App() {
@@ -57,16 +53,24 @@ fun Camera() {
     val scope = rememberCoroutineScope()
 
     val controller = rememberCameraController()
-    var lens by remember { mutableStateOf(CameraLens.Back) }
+    val isReady by controller.isReady.collectAsState()
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            CameraPreview(
-                modifier = Modifier.fillMaxSize(),
-                controller = controller,
-                lens = lens,
-            )
+    DisposableEffect(Unit) {
+        scope.launch {
+            controller.attach()
         }
+
+        onDispose {
+            controller.detach()
+        }
+    }
+
+    Text("Ready: $isReady")
+    Box(modifier = Modifier.fillMaxSize()) {
+        CameraPreview(
+            modifier = Modifier.fillMaxSize(),
+            controller = controller,
+        )
 
         Box(
             modifier = Modifier
@@ -81,14 +85,18 @@ fun Camera() {
                 horizontalArrangement = Arrangement.SpaceAround
             ) {
                 Button(onClick = {
-                    lens = lens.opposite()
+                    scope.launch {
+                        controller.updateConfiguration {
+                            it.copy(position = it.position.opposite())
+                        }
+                    }
                 }) {
                     Text("Switch")
                 }
 
                 Button(onClick = {
                     scope.launch {
-                        val photo = controller.takePhoto()
+                        controller.takePhoto()
                     }
                 }) {
                     Text("Capture")
