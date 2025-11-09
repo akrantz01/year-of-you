@@ -4,5 +4,5 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
 @Composable
-actual fun CameraPreview(modifier: Modifier, lens: CameraLens) {
+actual fun CameraPreview(modifier: Modifier, controller: CameraController, lens: CameraLens) {
 }

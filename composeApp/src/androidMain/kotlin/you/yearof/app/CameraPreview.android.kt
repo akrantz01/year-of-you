@@ -2,6 +2,9 @@ package you.yearof.app
 
 import androidx.camera.compose.CameraXViewfinder
 import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageCapture
+import androidx.camera.core.ImageCaptureException
+import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.core.SurfaceRequest
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -13,11 +16,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import java.util.concurrent.Executors
 
 @Composable
-actual fun CameraPreview(modifier: Modifier, lens: CameraLens) {
+actual fun CameraPreview(modifier: Modifier, controller: CameraController, lens: CameraLens) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
+
+    val executor = remember { Executors.newSingleThreadExecutor() }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            executor.shutdown()
+        }
+    }
 
     val surfaceRequests = remember { MutableStateFlow<SurfaceRequest?>(null) }
     val surfaceRequest by surfaceRequests.collectAsState(initial = null)
@@ -27,6 +40,12 @@ actual fun CameraPreview(modifier: Modifier, lens: CameraLens) {
             CameraLens.Front -> CameraSelector.DEFAULT_FRONT_CAMERA
             CameraLens.Back -> CameraSelector.DEFAULT_BACK_CAMERA
         }
+    }
+
+    val capture = remember {
+        ImageCapture.Builder()
+            .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+            .build()
     }
 
     val provider by produceState<ProcessCameraProvider?>(null, context) {
@@ -42,11 +61,37 @@ actual fun CameraPreview(modifier: Modifier, lens: CameraLens) {
                 }
             }
             p.unbindAll()
-            p.bindToLifecycle(lifecycleOwner, selector, preview)
+            p.bindToLifecycle(lifecycleOwner, selector, preview, capture)
         }
 
         onDispose {
             provider?.unbindAll()
+        }
+    }
+
+    LaunchedEffect(controller, capture) {
+        controller.requests.collectLatest { deferred ->
+            capture.takePicture(
+                executor,
+                object : ImageCapture.OnImageCapturedCallback() {
+                    override fun onCaptureSuccess(image: ImageProxy) {
+                        try {
+                            val buffer = image.planes[0].buffer
+                            val bytes = ByteArray(buffer.remaining()).also { buffer.get(it) }
+                            val rotation = image.imageInfo.rotationDegrees
+                            deferred.complete(PhotoResult(bytes, rotation))
+                        } catch (t: Throwable) {
+                            deferred.completeExceptionally(t)
+                        } finally {
+                            image.close()
+                        }
+                    }
+
+                    override fun onError(exception: ImageCaptureException) {
+                        deferred.completeExceptionally(exception)
+                    }
+                }
+            )
         }
     }
 

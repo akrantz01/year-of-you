@@ -19,6 +19,7 @@ import com.mohamedrejeb.calf.permissions.ExperimentalPermissionsApi
 import com.mohamedrejeb.calf.permissions.Permission
 import com.mohamedrejeb.calf.permissions.isGranted
 import com.mohamedrejeb.calf.permissions.rememberPermissionState
+import kotlinx.coroutines.launch
 
 @Composable
 fun App() {
@@ -53,12 +54,16 @@ fun EnsureCameraPermissions(content: @Composable () -> Unit) {
 
 @Composable
 fun Camera() {
+    val scope = rememberCoroutineScope()
+
+    val controller = rememberCameraController()
     var lens by remember { mutableStateOf(CameraLens.Back) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Box(modifier = Modifier.fillMaxSize()) {
             CameraPreview(
                 modifier = Modifier.fillMaxSize(),
+                controller = controller,
                 lens = lens,
             )
         }
@@ -70,10 +75,24 @@ fun Camera() {
                 .align(Alignment.BottomCenter),
             contentAlignment = Alignment.BottomCenter
         ) {
-            Button(onClick = {
-                lens = lens.opposite()
-            }) {
-                Text("Switch Camera")
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceAround
+            ) {
+                Button(onClick = {
+                    lens = lens.opposite()
+                }) {
+                    Text("Switch")
+                }
+
+                Button(onClick = {
+                    scope.launch {
+                        val photo = controller.takePhoto()
+                    }
+                }) {
+                    Text("Capture")
+                }
             }
         }
     }
