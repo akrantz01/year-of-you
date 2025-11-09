@@ -4,7 +4,6 @@ import androidx.camera.compose.CameraXViewfinder
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
-import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.core.SurfaceRequest
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -17,6 +16,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import java.io.ByteArrayOutputStream
 import java.util.concurrent.Executors
 
 @Composable
@@ -71,20 +71,14 @@ actual fun CameraPreview(modifier: Modifier, controller: CameraController, lens:
 
     LaunchedEffect(controller, capture) {
         controller.requests.collectLatest { deferred ->
+            val outputStream = ByteArrayOutputStream()
+
             capture.takePicture(
+                ImageCapture.OutputFileOptions.Builder(outputStream).build(),
                 executor,
-                object : ImageCapture.OnImageCapturedCallback() {
-                    override fun onCaptureSuccess(image: ImageProxy) {
-                        try {
-                            val buffer = image.planes[0].buffer
-                            val bytes = ByteArray(buffer.remaining()).also { buffer.get(it) }
-                            val rotation = image.imageInfo.rotationDegrees
-                            deferred.complete(PhotoResult(bytes, rotation))
-                        } catch (t: Throwable) {
-                            deferred.completeExceptionally(t)
-                        } finally {
-                            image.close()
-                        }
+                object : ImageCapture.OnImageSavedCallback {
+                    override fun onImageSaved(output: ImageCapture.OutputFileResults) {
+                        deferred.complete(PhotoResult(outputStream.toByteArray()))
                     }
 
                     override fun onError(exception: ImageCaptureException) {

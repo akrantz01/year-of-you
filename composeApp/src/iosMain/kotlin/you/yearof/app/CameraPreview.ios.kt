@@ -119,7 +119,7 @@ private class CaptureDelegate : NSObject(), AVCapturePhotoCaptureDelegateProtoco
         if (error != null) throw RuntimeException(error.localizedDescription)
 
         val data = didFinishProcessingPhoto.fileDataRepresentation()?.toByteArray()
-        if (data != null) onCapture?.invoke(PhotoResult(data, 0))
+        if (data != null) onCapture?.invoke(PhotoResult(data))
     }
 }
 

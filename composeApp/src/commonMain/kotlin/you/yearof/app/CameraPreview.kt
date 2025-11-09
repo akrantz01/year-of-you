@@ -16,8 +16,7 @@ enum class CameraLens {
 }
 
 data class PhotoResult(
-    val bytes: ByteArray,
-    val rotation: Int
+    val bytes: ByteArray
 )
 
 class CameraController internal constructor() {
