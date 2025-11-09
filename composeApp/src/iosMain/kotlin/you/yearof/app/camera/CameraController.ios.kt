@@ -21,16 +21,7 @@ import platform.posix.memcpy
 actual fun rememberCameraController(): CameraController = remember { CameraController() }
 
 @OptIn(ExperimentalForeignApi::class)
-actual class CameraController {
-    private val _configuration = MutableStateFlow(CameraConfiguration())
-    actual val configuration: StateFlow<CameraConfiguration> = _configuration.asStateFlow()
-
-    private val _captureState = MutableStateFlow(CaptureState.Idle)
-    actual val captureState: StateFlow<CaptureState> = _captureState.asStateFlow()
-
-    private val _isReady = MutableStateFlow(false)
-    actual val isReady: StateFlow<Boolean> = _isReady.asStateFlow()
-
+actual class CameraController : AbstractCameraController() {
     internal val session = AVCaptureSession()
     private val output = AVCapturePhotoOutput()
     private val captureDelegate = CaptureDelegate()
@@ -40,10 +31,10 @@ actual class CameraController {
         session.addOutput(output)
         session.startRunning()
 
-        configuration.collectLatest { config ->
-            _isReady.value = false
+        currentConfiguration.collectLatest { config ->
+            isReady.value = false
             configureSession(config)
-            _isReady.value = true
+            isReady.value = true
         }
     }
 
@@ -64,41 +55,12 @@ actual class CameraController {
     }
 
     actual suspend fun updateConfiguration(update: (CameraConfiguration) -> CameraConfiguration) {
-        _captureState.first { it == CaptureState.Idle }
-        _configuration.update(update)
-    }
-
-    actual suspend fun takeDualPhoto(): Map<CameraPosition, Photo> {
-        _captureState.first { it == CaptureState.Idle }
-        _isReady.first { it }
-
-        val config = _configuration.value
-
-        // capture first photo
-        _captureState.value = CaptureState.First
-        val firstPosition = config.position
-        val first = takePhoto()
-
-        // swap lenses
-        _captureState.value = CaptureState.Switching
-        val secondPosition = config.position.opposite()
-        _configuration.value = config.copy(position = secondPosition)
-        _isReady.first { it }
-
-        // capture second photo
-        _captureState.value = CaptureState.Second
-        val second = takePhoto()
-
-        // restore original config
-        _configuration.value = config
-        _isReady.first { it }
-        _captureState.value = CaptureState.Idle
-
-        return mapOf(firstPosition to first, secondPosition to second)
+        captureState.first { it == CaptureState.Idle }
+        configuration.update(update)
     }
 
     actual suspend fun takePhoto(): Photo {
-        _isReady.first { it }
+        isReady.first { it }
         return suspendCancellableCoroutine { cont ->
             captureDelegate.onCapture = { result ->
                 cont.resumeWith(Result.success(result))
@@ -108,7 +70,7 @@ actual class CameraController {
                 AVVideoCodecKey to AVVideoCodecTypeJPEG
             ))
 
-            settings.flashMode = when (_configuration.value.flashMode) {
+            settings.flashMode = when (configuration.value.flashMode) {
                 FlashMode.Off -> AVCaptureFlashModeOff
                 FlashMode.Auto -> AVCaptureFlashModeAuto
                 FlashMode.On -> AVCaptureFlashModeOn

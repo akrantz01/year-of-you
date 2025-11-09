@@ -31,16 +31,7 @@ actual fun rememberCameraController(): CameraController {
 actual class CameraController(
     private val context: Context,
     private val lifecycleOwner: LifecycleOwner,
-) {
-    private val _configuration = MutableStateFlow(CameraConfiguration())
-    actual val configuration = _configuration.asStateFlow()
-
-    private val _captureState = MutableStateFlow(CaptureState.Idle)
-    actual val captureState = _captureState.asStateFlow()
-
-    private val _isReady = MutableStateFlow(false)
-    actual val isReady: StateFlow<Boolean> = _isReady.asStateFlow()
-
+) : AbstractCameraController() {
     private var executor = Executors.newSingleThreadExecutor()
 
     internal val surfaceRequests = MutableStateFlow<SurfaceRequest?>(null)
@@ -50,15 +41,14 @@ actual class CameraController(
 
     actual suspend fun attach() {
         cameraProvider = ProcessCameraProvider.awaitInstance(context)
-        configuration.collectLatest { config ->
+        currentConfiguration.collectLatest { config ->
             coroutineScope {
-                _isReady.value = false
-                val camera = bindCamera(config)
+                isReady.value = false
+                val camera = bindCamera(config) ?: return@coroutineScope
 
                 launch {
-                    camera?.cameraInfo?.cameraState?.asFlow()
-                        ?.first { it.type == CameraState.Type.OPEN }
-                    _isReady.value = true
+                    camera.cameraInfo.cameraState.asFlow().first { it.type == CameraState.Type.OPEN }
+                    isReady.value = true
                 }
             }
         }
@@ -99,41 +89,12 @@ actual class CameraController(
     }
 
     actual suspend fun updateConfiguration(update: (CameraConfiguration) -> CameraConfiguration) {
-        _captureState.first { it == CaptureState.Idle }
-        _configuration.update(update)
-    }
-
-    actual suspend fun takeDualPhoto(): Map<CameraPosition, Photo> {
-        _captureState.first { it == CaptureState.Idle }
-        _isReady.first { it }
-
-        val config = _configuration.value
-
-        // capture first photo
-        _captureState.value = CaptureState.First
-        val firstPosition = config.position
-        val first = takePhoto()
-
-        // swap lenses
-        _captureState.value = CaptureState.Switching
-        val secondPosition = config.position.opposite()
-        _configuration.value = config.copy(position = secondPosition)
-        _isReady.first { it }
-
-        // capture second photo
-        _captureState.value = CaptureState.Second
-        val second = takePhoto()
-
-        // restore original config
-        _configuration.value = config
-        _isReady.first { it }
-        _captureState.value = CaptureState.Idle
-
-        return mapOf(firstPosition to first, secondPosition to second)
+        waitIdle()
+        configuration.update(update)
     }
 
     actual suspend fun takePhoto(): Photo {
-        _isReady.first { it }
+        waitReady()
 
         return suspendCancellableCoroutine { cont ->
             val capture = imageCapture ?: run {
