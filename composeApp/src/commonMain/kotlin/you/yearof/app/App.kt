@@ -1,24 +1,24 @@
 package you.yearof.app
 
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
-import com.kashif.cameraK.controller.CameraController
-import com.kashif.cameraK.enums.*
-import com.kashif.cameraK.permissions.providePermissions
-import com.kashif.cameraK.ui.CameraPreview
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import com.mohamedrejeb.calf.permissions.ExperimentalPermissionsApi
+import com.mohamedrejeb.calf.permissions.Permission
+import com.mohamedrejeb.calf.permissions.isGranted
+import com.mohamedrejeb.calf.permissions.rememberPermissionState
 
 @Composable
 fun App() {
@@ -30,61 +30,36 @@ fun App() {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text("Compose: $greeting")
-            Camera()
+            EnsureCameraPermissions {
+                Camera()
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+fun EnsureCameraPermissions(content: @Composable () -> Unit) {
+    val cameraPermission = rememberPermissionState(Permission.Camera)
+
+    if (cameraPermission.status.isGranted) {
+        content()
+    } else {
+        LaunchedEffect(Unit) {
+            cameraPermission.launchPermissionRequest()
         }
     }
 }
 
 @Composable
 fun Camera() {
-    val permissions = providePermissions()
-    var cameraPermissionState by remember { mutableStateOf(permissions.hasCameraPermission()) }
-
-    if (cameraPermissionState) {
-        ShowCamera()
-    } else {
-        permissions.RequestCameraPermission(
-            onGranted = { cameraPermissionState = true },
-            onDenied = { println("Camera permission denied") })
-    }
-}
-
-@Composable
-fun ShowCamera() {
-    val scope = rememberCoroutineScope()
-
-    var cameraController by remember { mutableStateOf<CameraController?>(null) }
-
-    var overlayAngle by remember { mutableFloatStateOf(0f) }
-    val rotation by animateFloatAsState(
-        targetValue = overlayAngle,
-        animationSpec = tween(
-            durationMillis = 600,
-            easing = FastOutSlowInEasing,
-        ),
-        label = "cameraFlip"
-    )
+    var lens by remember { mutableStateOf(CameraLens.Back) }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .graphicsLayer {
-                    rotationY = rotation
-                    cameraDistance = 32 * density
-                },
-        ) {
+        Box(modifier = Modifier.fillMaxSize()) {
             CameraPreview(
                 modifier = Modifier.fillMaxSize(),
-                cameraConfiguration = {
-                    setCameraLens(CameraLens.BACK)
-                    setFlashMode(FlashMode.AUTO)
-                    setImageFormat(ImageFormat.JPEG)
-                    setDirectory(Directory.PICTURES)
-                    setTorchMode(TorchMode.OFF)
-                    setQualityPrioritization(QualityPrioritization.QUALITY)
-                },
-                onCameraControllerReady = { cameraController = it },
+                lens = lens,
             )
         }
 
@@ -96,14 +71,7 @@ fun ShowCamera() {
             contentAlignment = Alignment.BottomCenter
         ) {
             Button(onClick = {
-                cameraController?.let { controller ->
-                    scope.launch {
-                        overlayAngle += 180f
-
-                        delay(300)
-                        controller.toggleCameraLens()
-                    }
-                }
+                lens = lens.opposite()
             }) {
                 Text("Switch Camera")
             }
