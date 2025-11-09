@@ -18,6 +18,7 @@ import platform.AVFoundation.AVCaptureDeviceInput
 import platform.AVFoundation.AVCaptureDevicePositionBack
 import platform.AVFoundation.AVCaptureDevicePositionFront
 import platform.AVFoundation.AVCaptureDeviceTypeBuiltInWideAngleCamera
+import platform.AVFoundation.AVCaptureFocusModeContinuousAutoFocus
 import platform.AVFoundation.AVCaptureInput
 import platform.AVFoundation.AVCapturePhoto
 import platform.AVFoundation.AVCapturePhotoCaptureDelegateProtocol
@@ -32,6 +33,8 @@ import platform.AVFoundation.AVVideoCodecKey
 import platform.AVFoundation.AVVideoCodecTypeJPEG
 import platform.AVFoundation.defaultDeviceWithDeviceType
 import platform.AVFoundation.fileDataRepresentation
+import platform.AVFoundation.focusMode
+import platform.AVFoundation.isFocusModeSupported
 import platform.CoreGraphics.CGRectZero
 import platform.Foundation.NSData
 import platform.Foundation.NSError
@@ -55,14 +58,7 @@ actual fun CameraPreview(modifier: Modifier, controller: CameraController, lens:
                 session.removeInput(input as AVCaptureInput)
             }
 
-            val device = AVCaptureDevice.defaultDeviceWithDeviceType(
-                deviceType = AVCaptureDeviceTypeBuiltInWideAngleCamera,
-                mediaType = AVMediaTypeVideo,
-                position = lens.toDevicePosition(),
-            )!!
-
-            val input = AVCaptureDeviceInput.deviceInputWithDevice(device, null)!!
-            session.addInput(input)
+            session.addInput(createInputDevice(lens))
 
             session.commitConfiguration()
             session.startRunning()
@@ -86,14 +82,7 @@ actual fun CameraPreview(modifier: Modifier, controller: CameraController, lens:
             val session = AVCaptureSession().apply {
                 sessionPreset = AVCaptureSessionPresetPhoto
 
-                val device = AVCaptureDevice.defaultDeviceWithDeviceType(
-                    deviceType = AVCaptureDeviceTypeBuiltInWideAngleCamera,
-                    mediaType = AVMediaTypeVideo,
-                    position = lens.toDevicePosition(),
-                )!!
-
-                val input = AVCaptureDeviceInput.deviceInputWithDevice(device, null)!!
-                addInput(input)
+                addInput(createInputDevice(lens))
                 addOutput(output)
                 startRunning()
             }
@@ -132,6 +121,27 @@ private class CaptureDelegate : NSObject(), AVCapturePhotoCaptureDelegateProtoco
         val data = didFinishProcessingPhoto.fileDataRepresentation()?.toByteArray()
         if (data != null) onCapture?.invoke(PhotoResult(data, 0))
     }
+}
+
+@OptIn(ExperimentalForeignApi::class)
+private fun createInputDevice(lens: CameraLens): AVCaptureDeviceInput {
+    val device = AVCaptureDevice.defaultDeviceWithDeviceType(
+        deviceType = AVCaptureDeviceTypeBuiltInWideAngleCamera,
+        mediaType = AVMediaTypeVideo,
+        position = lens.toDevicePosition(),
+    )!!
+
+    if (device.isFocusModeSupported(AVCaptureFocusModeContinuousAutoFocus)) {
+        try {
+            device.lockForConfiguration(null)
+            device.focusMode = AVCaptureFocusModeContinuousAutoFocus
+            device.unlockForConfiguration()
+        } catch (t: Throwable) {
+            println("could not configure autofocus: ${t.message}")
+        }
+    }
+
+    return AVCaptureDeviceInput.deviceInputWithDevice(device, null)!!
 }
 
 private fun CameraLens.toDevicePosition() = when(this) {
