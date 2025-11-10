@@ -15,7 +15,7 @@ kotlin {
 
     androidTarget {
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
+            jvmTarget.set(JvmTarget.JVM_17)
         }
     }
     
@@ -53,6 +53,8 @@ kotlin {
             implementation(projects.shared)
             implementation(libs.camerak)
             implementation(libs.calf.permissions)
+            implementation(libs.kstatemachine)
+            implementation(libs.kstatemachine.coroutines)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

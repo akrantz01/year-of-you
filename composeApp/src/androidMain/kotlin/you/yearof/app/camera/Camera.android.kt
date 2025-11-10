@@ -16,32 +16,33 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.io.ByteArrayOutputStream
 import java.util.concurrent.Executors
+import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
 @Composable
-actual fun rememberCameraController(): CameraController {
+actual fun rememberCamera(): Camera {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
     return remember {
-        CameraController(context, lifecycleOwner)
+        Camera(context, lifecycleOwner)
     }
 }
 
-actual class CameraController(
+actual class Camera(
     private val context: Context,
     private val lifecycleOwner: LifecycleOwner,
-) : AbstractCameraController() {
+) : AbstractCamera() {
     private var executor = Executors.newSingleThreadExecutor()
 
     internal val surfaceRequests = MutableStateFlow<SurfaceRequest?>(null)
 
-    private var cameraProvider: ProcessCameraProvider? = null
+    private var provider: ProcessCameraProvider? = null
     private var imageCapture: ImageCapture? = null
 
     actual suspend fun attach() {
-        cameraProvider = ProcessCameraProvider.awaitInstance(context)
-        currentConfiguration.collectLatest { config ->
+        provider = ProcessCameraProvider.awaitInstance(context)
+        configuration.collectLatest { config ->
             coroutineScope {
                 isReady.value = false
                 val camera = bindCamera(config) ?: return@coroutineScope
@@ -55,12 +56,12 @@ actual class CameraController(
     }
 
     actual fun detach() {
-        cameraProvider?.unbindAll()
+        provider?.unbindAll()
         executor.shutdown()
     }
 
-    private fun bindCamera(config: CameraConfiguration): Camera? {
-        val provider = cameraProvider ?: return null
+    private fun bindCamera(config: CameraConfiguration): androidx.camera.core.Camera? {
+        val cameraProvider = provider ?: return null
 
         val selector = when (config.position) {
             CameraPosition.Front -> CameraSelector.DEFAULT_FRONT_CAMERA
@@ -84,39 +85,30 @@ actual class CameraController(
             }
         }
 
-        provider.unbindAll()
-        return provider.bindToLifecycle(lifecycleOwner, selector, preview, capture)
+        cameraProvider.unbindAll()
+        return cameraProvider.bindToLifecycle(lifecycleOwner, selector, preview, capture)
     }
 
-    actual suspend fun updateConfiguration(update: (CameraConfiguration) -> CameraConfiguration) {
-        waitIdle()
-        configuration.update(update)
-    }
-
-    actual suspend fun takePhoto(): Photo {
-        waitReady()
-
-        return suspendCancellableCoroutine { cont ->
-            val capture = imageCapture ?: run {
-                cont.resumeWithException(IllegalStateException("Camera not initialized"))
-                return@suspendCancellableCoroutine
-            }
-
-            val outputStream = ByteArrayOutputStream()
-
-            capture.takePicture(
-                ImageCapture.OutputFileOptions.Builder(outputStream).build(),
-                executor,
-                object : ImageCapture.OnImageSavedCallback {
-                    override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                        cont.resumeWith(Result.success(outputStream.toByteArray()))
-                    }
-
-                    override fun onError(exception: ImageCaptureException) {
-                        cont.resumeWithException(exception)
-                    }
-                }
-            )
+    actual suspend fun captureImage(): Photo = suspendCancellableCoroutine { cont ->
+        val capture = imageCapture ?: run {
+            cont.resumeWithException(IllegalStateException("Camera not initialized"))
+            return@suspendCancellableCoroutine
         }
+
+        val outputStream = ByteArrayOutputStream()
+
+        capture.takePicture(
+            ImageCapture.OutputFileOptions.Builder(outputStream).build(),
+            executor,
+            object : ImageCapture.OnImageSavedCallback {
+                override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
+                    cont.resume(outputStream.toByteArray())
+                }
+
+                override fun onError(exception: ImageCaptureException) {
+                    cont.resumeWithException(exception)
+                }
+            }
+        )
     }
 }

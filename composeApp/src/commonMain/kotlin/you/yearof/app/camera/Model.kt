@@ -1,16 +1,6 @@
 package you.yearof.app.camera
 
 /**
- * The capture state of the camera.
- *
- * Represents the state machine used for capturing photos from the front and
- * rear camera in sequence.
- */
-enum class CaptureState {
-    Idle, First, Switching, Second
-}
-
-/**
  * The position of the camera on the device
  */
 enum class CameraPosition {

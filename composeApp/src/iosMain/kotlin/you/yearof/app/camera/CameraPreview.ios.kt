@@ -16,7 +16,7 @@ actual fun CameraPreview(modifier: Modifier, controller: CameraController) {
     UIKitView(
         modifier = modifier,
         factory = {
-            val previewLayer = AVCaptureVideoPreviewLayer(session = controller.session).apply {
+            val previewLayer = AVCaptureVideoPreviewLayer(session = controller.camera.session).apply {
                 videoGravity = AVLayerVideoGravityResizeAspectFill
             }
 

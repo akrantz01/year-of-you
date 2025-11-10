@@ -11,6 +11,8 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 import platform.AVFoundation.*
 import platform.Foundation.NSData
 import platform.Foundation.NSError
@@ -18,10 +20,10 @@ import platform.darwin.NSObject
 import platform.posix.memcpy
 
 @Composable
-actual fun rememberCameraController(): CameraController = remember { CameraController() }
+actual fun rememberCamera(): Camera = remember { Camera() }
 
 @OptIn(ExperimentalForeignApi::class)
-actual class CameraController : AbstractCameraController() {
+actual class Camera : AbstractCamera() {
     internal val session = AVCaptureSession()
     private val output = AVCapturePhotoOutput()
     private val captureDelegate = CaptureDelegate()
@@ -31,7 +33,7 @@ actual class CameraController : AbstractCameraController() {
         session.addOutput(output)
         session.startRunning()
 
-        currentConfiguration.collectLatest { config ->
+        configuration.collectLatest { config ->
             isReady.value = false
             configureSession(config)
             isReady.value = true
@@ -54,21 +56,24 @@ actual class CameraController : AbstractCameraController() {
         session.commitConfiguration()
     }
 
-    actual suspend fun updateConfiguration(update: (CameraConfiguration) -> CameraConfiguration) {
-        captureState.first { it == CaptureState.Idle }
-        configuration.update(update)
-    }
-
-    actual suspend fun takePhoto(): Photo {
-        isReady.first { it }
-        return suspendCancellableCoroutine { cont ->
+    actual suspend fun captureImage(): Photo =
+        suspendCancellableCoroutine { cont ->
             captureDelegate.onCapture = { result ->
-                cont.resumeWith(Result.success(result))
+                captureDelegate.clear()
+                cont.resume(result)
+            }
+            captureDelegate.onError = { error ->
+                captureDelegate.clear()
+                cont.resumeWithException(error)
             }
 
-            val settings = AVCapturePhotoSettings.photoSettingsWithFormat(mapOf(
-                AVVideoCodecKey to AVVideoCodecTypeJPEG
-            ))
+            cont.invokeOnCancellation {
+                captureDelegate.clear()
+            }
+
+            val settings = AVCapturePhotoSettings.photoSettingsWithFormat(
+                mapOf(AVVideoCodecKey to AVVideoCodecTypeJPEG)
+            )
 
             settings.flashMode = when (configuration.value.flashMode) {
                 FlashMode.Off -> AVCaptureFlashModeOff
@@ -78,21 +83,33 @@ actual class CameraController : AbstractCameraController() {
 
             output.capturePhotoWithSettings(settings, captureDelegate)
         }
-    }
 }
 
 private class CaptureDelegate : NSObject(), AVCapturePhotoCaptureDelegateProtocol {
     var onCapture: ((Photo) -> Unit)? = null
+    var onError: ((Throwable) -> Unit)? = null
 
     override fun captureOutput(
         output: AVCapturePhotoOutput,
         didFinishProcessingPhoto: AVCapturePhoto,
         error: NSError?
     ) {
-        if (error != null) throw RuntimeException(error.localizedDescription)
+        if (error != null) {
+            onError?.invoke(RuntimeException(error.localizedDescription))
+            return
+        }
 
         val data = didFinishProcessingPhoto.fileDataRepresentation()?.toByteArray()
-        if (data != null) onCapture?.invoke(data)
+        if (data != null) {
+            onCapture?.invoke(data)
+        } else {
+            onError?.invoke(IllegalStateException("No photo data returned"))
+        }
+    }
+
+    fun clear() {
+        onCapture = null
+        onError = null
     }
 }
 

@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 
 @Composable
 actual fun CameraPreview(modifier: Modifier, controller: CameraController) {
-    val surfaceRequest by controller.surfaceRequests.collectAsState()
+    val surfaceRequest by controller.camera.surfaceRequests.collectAsState()
 
     Box(modifier = modifier.fillMaxSize()) {
         surfaceRequest?.let { req ->

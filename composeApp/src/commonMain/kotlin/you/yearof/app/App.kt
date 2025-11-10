@@ -16,7 +16,6 @@ import com.mohamedrejeb.calf.permissions.rememberPermissionState
 import kotlinx.coroutines.launch
 import you.yearof.app.camera.CameraPreview
 import you.yearof.app.camera.rememberCameraController
-import you.yearof.app.camera.takeDualPhoto
 
 @Composable
 fun App() {
@@ -54,21 +53,10 @@ fun Camera() {
     val scope = rememberCoroutineScope()
 
     val controller = rememberCameraController()
-    val isReady by controller.isReadyNow.collectAsState()
-    val state by controller.currentCaptureState.collectAsState()
-
-    DisposableEffect(Unit) {
-        scope.launch {
-            controller.attach()
-        }
-
-        onDispose {
-            controller.detach()
-        }
-    }
+    val isReady by controller.isReady.collectAsState()
 
     Text("Ready: $isReady")
-    Text("Capture: $state")
+//    Text("Capture: $state")
     Box(modifier = Modifier.fillMaxSize()) {
         CameraPreview(
             modifier = Modifier.fillMaxSize(),
@@ -89,8 +77,8 @@ fun Camera() {
             ) {
                 Button(onClick = {
                     scope.launch {
-                        controller.updateConfiguration {
-                            it.copy(position = it.position.opposite())
+                        controller.updateConfiguration { config ->
+                            config.copy(position = config.position.opposite())
                         }
                     }
                 }) {
@@ -99,18 +87,10 @@ fun Camera() {
 
                 Button(onClick = {
                     scope.launch {
-                        controller.takePhoto()
+                        controller.capture()
                     }
                 }) {
                     Text("Capture")
-                }
-
-                Button(onClick = {
-                    scope.launch {
-                        controller.takeDualPhoto()
-                    }
-                }) {
-                    Text("Dual Capture")
                 }
             }
         }
