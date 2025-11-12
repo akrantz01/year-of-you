@@ -9,6 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.mohamedrejeb.calf.permissions.ExperimentalPermissionsApi
 import com.mohamedrejeb.calf.permissions.Permission
@@ -20,6 +21,28 @@ import you.yearof.app.screens.CaptureScreen
 @Serializable
 data object Initialization
 
+@Serializable
+data object Onboarding
+
+@Serializable
+sealed interface OnboardingRoute {
+    @Serializable
+    data object Camera
+}
+
+@Serializable
+data object Main
+
+@Serializable
+sealed interface Route {
+    @Serializable
+    data object Feed : Route
+    @Serializable
+    data object Capture : Route
+    @Serializable
+    data object Profile : Route
+}
+
 @Composable
 fun App() {
     MaterialTheme {
@@ -28,6 +51,16 @@ fun App() {
         NavHost(navController = nav, startDestination = Initialization) {
             composable<Initialization> {
                 Testing()
+            }
+
+            navigation<Onboarding>(startDestination = OnboardingRoute.Camera) {
+                composable<OnboardingRoute.Camera> { TODO() }
+            }
+
+            navigation<Main>(startDestination = Route.Capture) { // TODO: switch to feed once implemented
+                composable<Route.Feed> { TODO() }
+                composable<Route.Capture> { CaptureScreen() }
+                composable<Route.Profile> { TODO() }
             }
         }
     }
