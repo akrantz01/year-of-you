@@ -6,7 +6,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -16,6 +18,7 @@ import ru.nsk.kstatemachine.event.defaultDataExtractor
 import ru.nsk.kstatemachine.state.*
 import ru.nsk.kstatemachine.statemachine.StateMachine
 import ru.nsk.kstatemachine.statemachine.createStateMachine
+import ru.nsk.kstatemachine.statemachine.onTransitionComplete
 
 @Composable
 fun rememberCameraController(): CameraController {
@@ -41,7 +44,9 @@ class CameraController(
     private var machine: StateMachine? = null
     private var lock = Mutex()
 
-    val isReady = camera.isReady.asStateFlow()
+    private val state = MutableStateFlow<CaptureState>(CaptureState.Idle)
+    val currentState = state.asStateFlow()
+    val isReady = currentState.map { state -> state == CaptureState.Idle }
 
     private suspend fun <T> withLock(block: suspend () -> T) = lock.withLock { block() }
 
@@ -171,6 +176,11 @@ class CameraController(
             transition<CaptureEvent.Failed> {
                 targetState = CaptureState.Cleaning
             }
+
+            onTransitionComplete { states, _ ->
+                check(states.size == 1) { "expected 1 active state, got $states" }
+                state.emit(states.first() as CaptureState)
+            }
         }
 
         machine = created
@@ -178,9 +188,9 @@ class CameraController(
     }
 }
 
-private enum class LensStage { First, Second }
+enum class LensStage { First, Second }
 
-private data class CaptureSession(
+data class CaptureSession(
     val configuration: CameraConfiguration,
     val position: CameraPosition = configuration.position,
     val stage: LensStage = LensStage.First,
@@ -189,7 +199,7 @@ private data class CaptureSession(
     val deferred: CompletableDeferred<Map<CameraPosition, Photo>>
 )
 
-private sealed interface CaptureState : State {
+sealed interface CaptureState : State {
     sealed class WithSession(name: String) : DefaultDataState<CaptureSession>(
         name = name,
         dataExtractor = defaultDataExtractor(),

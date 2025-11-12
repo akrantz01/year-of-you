@@ -53,10 +53,8 @@ fun Camera() {
     val scope = rememberCoroutineScope()
 
     val controller = rememberCameraController()
-    val isReady by controller.isReady.collectAsState()
+    val isReady by controller.isReady.collectAsState(false)
 
-    Text("Ready: $isReady")
-//    Text("Capture: $state")
     Box(modifier = Modifier.fillMaxSize()) {
         CameraPreview(
             modifier = Modifier.fillMaxSize(),
@@ -75,21 +73,27 @@ fun Camera() {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceAround
             ) {
-                Button(onClick = {
-                    scope.launch {
-                        controller.updateConfiguration { config ->
-                            config.copy(position = config.position.opposite())
+                Button(
+                    enabled = isReady,
+                    onClick = {
+                        scope.launch {
+                            controller.updateConfiguration { config ->
+                                config.copy(position = config.position.opposite())
+                            }
                         }
                     }
-                }) {
+                ) {
                     Text("Switch")
                 }
 
-                Button(onClick = {
-                    scope.launch {
-                        controller.capture()
+                Button(
+                    enabled = isReady,
+                    onClick = {
+                        scope.launch {
+                            controller.capture()
+                        }
                     }
-                }) {
+                ) {
                     Text("Capture")
                 }
             }
