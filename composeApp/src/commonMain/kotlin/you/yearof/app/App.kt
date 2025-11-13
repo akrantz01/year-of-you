@@ -1,12 +1,9 @@
 package you.yearof.app
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
@@ -44,13 +41,12 @@ sealed interface Route {
 
 @Composable
 fun App() {
+    // TODO: add Modifier.safeContentPadding() somewhere
     MaterialTheme {
         val nav = rememberNavController()
 
         NavHost(navController = nav, startDestination = Initialization) {
-            composable<Initialization> {
-                Testing()
-            }
+            composable<Initialization> { InitializationDecider(nav = nav) }
 
             navigation<Onboarding>(startDestination = OnboardingRoute.Camera) {
                 composable<OnboardingRoute.Camera> { TODO() }
@@ -66,29 +62,25 @@ fun App() {
 }
 
 @Composable
-fun Testing() {
-    val greeting = remember { Greeting().greet() }
-    Column(
-        modifier = Modifier.background(MaterialTheme.colorScheme.primaryContainer).safeContentPadding()
-            .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text("Compose: $greeting")
-        EnsureCameraPermissions {
-            CaptureScreen()
-        }
-    }
-}
-
-@Composable
-fun EnsureCameraPermissions(content: @Composable () -> Unit) {
+fun InitializationDecider(nav: NavController) {
     val cameraPermission = rememberPermissionState(Permission.Camera)
 
-    if (cameraPermission.status == PermissionStatus.Granted) {
-        content()
-    } else {
-        LaunchedEffect(Unit) {
-            cameraPermission.request()
+    LaunchedEffect(cameraPermission.status) {
+        val ready = cameraPermission.status != PermissionStatus.Loading
+        if (!ready) return@LaunchedEffect
+
+        val next = when {
+            cameraPermission.status != PermissionStatus.Granted -> OnboardingRoute.Camera
+            else -> null
+        }
+
+        if (next == null) {
+            nav.navigate(Main) { popUpTo(Initialization) { inclusive = true } }
+        } else {
+            nav.navigate(Onboarding) { popUpTo(Initialization) { inclusive = true } }
+            nav.navigate(next)
         }
     }
+
+    // TODO: show loading/black screen
 }
