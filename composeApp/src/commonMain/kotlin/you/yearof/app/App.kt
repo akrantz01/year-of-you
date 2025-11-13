@@ -11,11 +11,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
-import com.mohamedrejeb.calf.permissions.ExperimentalPermissionsApi
-import com.mohamedrejeb.calf.permissions.Permission
-import com.mohamedrejeb.calf.permissions.isGranted
-import com.mohamedrejeb.calf.permissions.rememberPermissionState
 import kotlinx.serialization.Serializable
+import you.yearof.app.permissions.Permission
+import you.yearof.app.permissions.PermissionStatus
+import you.yearof.app.permissions.rememberPermissionState
 import you.yearof.app.screens.CaptureScreen
 
 @Serializable
@@ -81,16 +80,15 @@ fun Testing() {
     }
 }
 
-@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun EnsureCameraPermissions(content: @Composable () -> Unit) {
     val cameraPermission = rememberPermissionState(Permission.Camera)
 
-    if (cameraPermission.status.isGranted) {
+    if (cameraPermission.status == PermissionStatus.Granted) {
         content()
     } else {
         LaunchedEffect(Unit) {
-            cameraPermission.launchPermissionRequest()
+            cameraPermission.request()
         }
     }
 }
