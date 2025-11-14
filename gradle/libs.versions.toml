@@ -17,6 +17,10 @@ logback = "1.5.20"
 camera = "1.5.1"
 kstatemachine = "0.35.0"
 navigation = "2.9.1"
+spotless = "8.0.0"
+detekt = "2.0.0-alpha.0"
+ktlint = "1.7.1"
+composeRuleset = "0.4.27"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -42,6 +46,11 @@ ktor-serverNetty = { module = "io.ktor:ktor-server-netty-jvm", version.ref = "kt
 ktor-serverTestHost = { module = "io.ktor:ktor-server-test-host-jvm", version.ref = "ktor" }
 kstatemachine = { module = "io.github.nsk90:kstatemachine", version.ref = "kstatemachine" }
 kstatemachine-coroutines = { module = "io.github.nsk90:kstatemachine-coroutines", version.ref = "kstatemachine" }
+spotless = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "spotless" }
+detekt = { module = "dev.detekt:detekt-gradle-plugin", version.ref = "detekt" }
+detekt-rules-compose = { module = "io.nlopez.compose.rules:detekt", version.ref = "composeRuleset" }
+ktlint = { module = "com.pinterest.ktlint:ktlint-cli", version.ref = "ktlint" }
+ktlint-rules-compose = { module = "io.nlopez.compose.rules:ktlint", version.ref = "composeRuleset" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -52,3 +61,5 @@ kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+javaGradlePlugin = { id = "java-gradle-plugin" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }

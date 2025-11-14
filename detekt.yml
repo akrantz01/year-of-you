@@ -1,0 +1,80 @@
+x-generated: &generated
+  - '**/build/generated/compose/**'
+
+config:
+  validation: true
+  excludes:
+    - x-generated
+
+processors:
+  active: true
+
+console-reports:
+  active: true
+
+comments:
+  active: true
+
+complexity:
+  active: true
+  LongParameterList:
+    allowedFunctionParameters: 10
+    ignoreDefaultParameters: true
+  TooManyFunctions:
+    ignoreAnnotated:
+      - Preview
+
+coroutines:
+  active: true
+
+exceptions:
+  active: true
+  TooGenericExceptionCaught:
+    active: false
+
+naming:
+  active: true
+  FunctionNaming:
+    ignoreAnnotated:
+      - Composable
+    excludes: *generated
+  MatchingDeclarationName:
+    active: false
+  TopLevelPropertyNaming:
+    constantPattern: '[A-Z][A-Za-z0-9]*'
+
+performance:
+  active: true
+
+potential-bugs:
+  active: true
+
+style:
+  active: true
+  ForbiddenComment:
+    active: false
+  MagicNumber:
+    ignoreCompanionObjectPropertyDeclaration: true
+    ignorePropertyDeclaration: true
+  MaxLineLength:
+    excludes: *generated
+  UnusedPrivateFunction:
+    ignoreAnnotated:
+      - Preview
+
+Compose:
+  active: true
+#  ComposableNaming:
+#    active: true
+#  ComposableParamOrder:
+#    active: true
+#  ContentEmitterReturningValues:
+#    active: true
+#  ContentTrailingLambda:
+#    active: true
+#  ContentSlotReused:
+#    active: true
+#  LambdaParameterEventTrailing:
+#    active: true
+#  LambdaParameterInRestartableEffect:
+#    active: true

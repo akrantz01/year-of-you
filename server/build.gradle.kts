@@ -1,4 +1,5 @@
 plugins {
+    id("you.yearof.build.codequality")
     alias(libs.plugins.kotlinJvm)
     alias(libs.plugins.ktor)
     application
@@ -8,7 +9,7 @@ group = "you.yearof.app"
 version = "1.0.0"
 application {
     mainClass.set("you.yearof.app.ApplicationKt")
-    
+
     val isDevelopment: Boolean = project.ext.has("development")
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
 }
