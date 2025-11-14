@@ -6,24 +6,24 @@ actual object Log {
     actual fun debug(
         tag: String,
         message: String,
-    ) = log("DEBUG", tag, message)
+    ) = write("DEBUG", tag, message)
 
     actual fun info(
         tag: String,
         message: String,
-    ) = log("INFO", tag, message)
+    ) = write("INFO", tag, message)
 
     actual fun warn(
         tag: String,
         message: String,
-    ) = log("WARN", tag, message)
+    ) = write("WARN", tag, message)
 
     actual fun error(
         tag: String,
         message: String,
-    ) = log("ERROR", tag, message)
+    ) = write("ERROR", tag, message)
 
-    private fun log(
+    private fun write(
         level: String,
         tag: String,
         message: String,

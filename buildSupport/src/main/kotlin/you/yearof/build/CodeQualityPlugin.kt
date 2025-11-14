@@ -3,8 +3,8 @@ package you.yearof.build
 import com.diffplug.gradle.spotless.BaseKotlinExtension
 import com.diffplug.gradle.spotless.SpotlessCheck
 import com.diffplug.gradle.spotless.SpotlessExtension
-import dev.detekt.gradle.Detekt
-import dev.detekt.gradle.extensions.DetektExtension
+import io.gitlab.arturbosch.detekt.Detekt
+import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.MinimalExternalModuleDependency
@@ -79,12 +79,12 @@ class CodeQualityPlugin : Plugin<Project> {
         applyPlugin(target, detekt)
 
         target.extensions.configure(DetektExtension::class.java) {
-            toolVersion.set(detekt.version)
-            buildUponDefaultConfig.set(true)
-            allRules.set(false)
+            toolVersion = checkNotNull(detekt.version)
+            buildUponDefaultConfig = true
+            allRules = false
 
             config.setFrom(target.rootProject.files("detekt.yml"))
-            baseline.set(target.rootProject.file("detekt-baseline.xml"))
+            baseline = target.rootProject.file("detekt-baseline.xml")
         }
 
         val composeRules = catalog.library("detekt-rules-compose")

@@ -3,8 +3,7 @@ x-generated: &generated
 
 config:
   validation: true
-  excludes:
-    - x-generated
+  excludes: 'x-generated'
 
 processors:
   active: true
@@ -18,7 +17,7 @@ comments:
 complexity:
   active: true
   LongParameterList:
-    allowedFunctionParameters: 10
+    functionThreshold: 10
     ignoreDefaultParameters: true
   TooManyFunctions:
     ignoreAnnotated:
@@ -58,7 +57,7 @@ style:
     ignorePropertyDeclaration: true
   MaxLineLength:
     excludes: *generated
-  UnusedPrivateFunction:
+  UnusedPrivateMember:
     ignoreAnnotated:
       - Preview
 

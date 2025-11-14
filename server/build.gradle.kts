@@ -1,9 +1,9 @@
 plugins {
-    id("you.yearof.build.codequality")
-    id("you.yearof.build.toolchain")
     alias(libs.plugins.kotlinJvm)
     alias(libs.plugins.ktor)
     application
+    id("you.yearof.build.codequality")
+    id("you.yearof.build.toolchain")
 }
 
 group = "you.yearof.app"

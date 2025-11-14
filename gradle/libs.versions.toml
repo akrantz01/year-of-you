@@ -18,7 +18,7 @@ camera = "1.5.1"
 kstatemachine = "0.35.0"
 navigation = "2.9.1"
 spotless = "8.0.0"
-detekt = "2.0.0-alpha.0"
+detekt = "1.23.8"
 ktlint = "1.7.1"
 composeRuleset = "0.4.27"
 
@@ -48,7 +48,7 @@ ktor-serverTestHost = { module = "io.ktor:ktor-server-test-host-jvm", version.re
 kstatemachine = { module = "io.github.nsk90:kstatemachine", version.ref = "kstatemachine" }
 kstatemachine-coroutines = { module = "io.github.nsk90:kstatemachine-coroutines", version.ref = "kstatemachine" }
 spotless = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "spotless" }
-detekt = { module = "dev.detekt:detekt-gradle-plugin", version.ref = "detekt" }
+detekt = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
 detekt-rules-compose = { module = "io.nlopez.compose.rules:detekt", version.ref = "composeRuleset" }
 ktlint = { module = "com.pinterest.ktlint:ktlint-cli", version.ref = "ktlint" }
 ktlint-rules-compose = { module = "io.nlopez.compose.rules:ktlint", version.ref = "composeRuleset" }
