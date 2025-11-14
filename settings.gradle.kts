@@ -1,6 +1,10 @@
 rootProject.name = "app"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
+if (JavaVersion.current() != JavaVersion.VERSION_21) {
+    error("Gradle must be run on JDK 21 (current: ${System.getProperty("java.version")})")
+}
+
 pluginManagement {
     repositories {
         google {

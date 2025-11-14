@@ -1,17 +1,12 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
     id("you.yearof.build.codequality")
+    id("you.yearof.build.toolchain")
 }
 
 kotlin {
-    androidTarget {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
-        }
-    }
+    androidTarget()
 
     iosArm64()
     iosSimulatorArm64()
@@ -34,10 +29,6 @@ android {
         libs.versions.android.compileSdk
             .get()
             .toInt()
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
     defaultConfig {
         minSdk =
             libs.versions.android.minSdk
