@@ -11,7 +11,9 @@ import platform.AVFoundation.requestAccessForMediaType
 import you.yearof.app.permissions.PermissionStatus
 import you.yearof.app.util.Log
 
-class CameraHelper(private val type: AVMediaType) : PermissionHelper {
+class CameraHelper(
+    private val type: AVMediaType,
+) : PermissionHelper {
     override fun request(onResult: (Boolean) -> Unit) {
         handleRequest(
             onResult = onResult,
@@ -19,20 +21,22 @@ class CameraHelper(private val type: AVMediaType) : PermissionHelper {
                 AVCaptureDevice.requestAccessForMediaType(type) {
                     onResult(it)
                 }
-            }
+            },
         )
     }
 
     override fun read(onResult: (PermissionStatus) -> Unit) {
         val status = AVCaptureDevice.authorizationStatusForMediaType(type)
-        onResult(when (status) {
-            AVAuthorizationStatusAuthorized -> PermissionStatus.Granted
-            AVAuthorizationStatusNotDetermined -> PermissionStatus.Unknown
-            AVAuthorizationStatusDenied, AVAuthorizationStatusRestricted -> PermissionStatus.Denied
-            else -> {
-                Log.warn("Permissions.CameraHelper", "Unknown permission status: $status")
-                PermissionStatus.Denied
-            }
-        })
+        onResult(
+            when (status) {
+                AVAuthorizationStatusAuthorized -> PermissionStatus.Granted
+                AVAuthorizationStatusNotDetermined -> PermissionStatus.Unknown
+                AVAuthorizationStatusDenied, AVAuthorizationStatusRestricted -> PermissionStatus.Denied
+                else -> {
+                    Log.warn("Permissions.CameraHelper", "Unknown permission status: $status")
+                    PermissionStatus.Denied
+                }
+            },
+        )
     }
 }

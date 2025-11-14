@@ -12,13 +12,17 @@ import platform.UIKit.UIView
 
 @OptIn(ExperimentalForeignApi::class)
 @Composable
-actual fun CameraPreview(modifier: Modifier, controller: CameraController) {
+actual fun CameraPreview(
+    controller: CameraController,
+    modifier: Modifier,
+) {
     UIKitView(
         modifier = modifier,
         factory = {
-            val previewLayer = AVCaptureVideoPreviewLayer(session = controller.camera.session).apply {
-                videoGravity = AVLayerVideoGravityResizeAspectFill
-            }
+            val previewLayer =
+                AVCaptureVideoPreviewLayer(session = controller.camera.session).apply {
+                    videoGravity = AVLayerVideoGravityResizeAspectFill
+                }
 
             object : UIView(frame = CGRectZero.readValue()) {
                 override fun layoutSubviews() {
@@ -28,6 +32,6 @@ actual fun CameraPreview(modifier: Modifier, controller: CameraController) {
             }.apply {
                 layer.addSublayer(previewLayer)
             }
-        }
+        },
     )
 }

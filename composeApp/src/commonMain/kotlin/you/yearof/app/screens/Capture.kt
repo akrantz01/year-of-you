@@ -20,29 +20,30 @@ import you.yearof.app.camera.CameraPreview
 import you.yearof.app.camera.rememberCameraController
 
 @Composable
-fun CaptureScreen() {
+fun CaptureScreen(modifier: Modifier = Modifier) {
     val scope = rememberCoroutineScope()
 
     val controller = rememberCameraController()
     val isReady by controller.isReady.collectAsState(false)
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxSize()) {
         CameraPreview(
             modifier = Modifier.fillMaxSize(),
             controller = controller,
         )
 
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 32.dp)
-                .align(Alignment.BottomCenter),
-            contentAlignment = Alignment.BottomCenter
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 32.dp)
+                    .align(Alignment.BottomCenter),
+            contentAlignment = Alignment.BottomCenter,
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceAround
+                horizontalArrangement = Arrangement.SpaceAround,
             ) {
                 Button(
                     enabled = isReady,
@@ -52,7 +53,7 @@ fun CaptureScreen() {
                                 config.copy(position = config.position.opposite())
                             }
                         }
-                    }
+                    },
                 ) {
                     Text("Switch")
                 }
@@ -63,7 +64,7 @@ fun CaptureScreen() {
                         scope.launch {
                             controller.capture()
                         }
-                    }
+                    },
                 ) {
                     Text("Capture")
                 }

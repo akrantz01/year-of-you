@@ -8,16 +8,38 @@ import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.usePinned
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
-import platform.AVFoundation.*
+import platform.AVFoundation.AVCaptureDevice
+import platform.AVFoundation.AVCaptureDeviceInput
+import platform.AVFoundation.AVCaptureDevicePositionBack
+import platform.AVFoundation.AVCaptureDevicePositionFront
+import platform.AVFoundation.AVCaptureDeviceTypeBuiltInWideAngleCamera
+import platform.AVFoundation.AVCaptureFlashModeAuto
+import platform.AVFoundation.AVCaptureFlashModeOff
+import platform.AVFoundation.AVCaptureFlashModeOn
+import platform.AVFoundation.AVCaptureFocusModeContinuousAutoFocus
+import platform.AVFoundation.AVCaptureInput
+import platform.AVFoundation.AVCapturePhoto
+import platform.AVFoundation.AVCapturePhotoCaptureDelegateProtocol
+import platform.AVFoundation.AVCapturePhotoOutput
+import platform.AVFoundation.AVCapturePhotoSettings
+import platform.AVFoundation.AVCaptureSession
+import platform.AVFoundation.AVCaptureSessionPresetPhoto
+import platform.AVFoundation.AVMediaTypeVideo
+import platform.AVFoundation.AVVideoCodecKey
+import platform.AVFoundation.AVVideoCodecTypeJPEG
+import platform.AVFoundation.defaultDeviceWithDeviceType
+import platform.AVFoundation.fileDataRepresentation
+import platform.AVFoundation.focusMode
+import platform.AVFoundation.isFocusModeSupported
 import platform.Foundation.NSData
 import platform.Foundation.NSError
 import platform.darwin.NSObject
 import platform.posix.memcpy
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 @Composable
 actual fun rememberCamera(): Camera = remember { Camera() }
@@ -28,17 +50,18 @@ actual class Camera : AbstractCamera() {
     private val output = AVCapturePhotoOutput()
     private val captureDelegate = CaptureDelegate()
 
-    actual suspend fun attach() = withContext(Dispatchers.IO) {
-        session.sessionPreset = AVCaptureSessionPresetPhoto
-        session.addOutput(output)
-        session.startRunning()
+    actual suspend fun attach() =
+        withContext(Dispatchers.IO) {
+            session.sessionPreset = AVCaptureSessionPresetPhoto
+            session.addOutput(output)
+            session.startRunning()
 
-        configuration.collectLatest { config ->
-            isReady.value = false
-            configureSession(config)
-            isReady.value = true
+            configuration.collectLatest { config ->
+                isReady.value = false
+                configureSession(config)
+                isReady.value = true
+            }
         }
-    }
 
     actual fun detach() {
         session.stopRunning()
@@ -71,28 +94,32 @@ actual class Camera : AbstractCamera() {
                 captureDelegate.clear()
             }
 
-            val settings = AVCapturePhotoSettings.photoSettingsWithFormat(
-                mapOf(AVVideoCodecKey to AVVideoCodecTypeJPEG)
-            )
+            val settings =
+                AVCapturePhotoSettings.photoSettingsWithFormat(
+                    mapOf(AVVideoCodecKey to AVVideoCodecTypeJPEG),
+                )
 
-            settings.flashMode = when (configuration.value.flashMode) {
-                FlashMode.Off -> AVCaptureFlashModeOff
-                FlashMode.Auto -> AVCaptureFlashModeAuto
-                FlashMode.On -> AVCaptureFlashModeOn
-            }
+            settings.flashMode =
+                when (configuration.value.flashMode) {
+                    FlashMode.Off -> AVCaptureFlashModeOff
+                    FlashMode.Auto -> AVCaptureFlashModeAuto
+                    FlashMode.On -> AVCaptureFlashModeOn
+                }
 
             output.capturePhotoWithSettings(settings, captureDelegate)
         }
 }
 
-private class CaptureDelegate : NSObject(), AVCapturePhotoCaptureDelegateProtocol {
+private class CaptureDelegate :
+    NSObject(),
+    AVCapturePhotoCaptureDelegateProtocol {
     var onCapture: ((Photo) -> Unit)? = null
     var onError: ((Throwable) -> Unit)? = null
 
     override fun captureOutput(
         output: AVCapturePhotoOutput,
         didFinishProcessingPhoto: AVCapturePhoto,
-        error: NSError?
+        error: NSError?,
     ) {
         if (error != null) {
             onError?.invoke(RuntimeException(error.localizedDescription))
@@ -115,14 +142,16 @@ private class CaptureDelegate : NSObject(), AVCapturePhotoCaptureDelegateProtoco
 
 @OptIn(ExperimentalForeignApi::class)
 private fun createInputDevice(config: CameraConfiguration): AVCaptureDeviceInput {
-    val device = AVCaptureDevice.defaultDeviceWithDeviceType(
-        deviceType = AVCaptureDeviceTypeBuiltInWideAngleCamera,
-        mediaType = AVMediaTypeVideo,
-        position = when (config.position) {
-            CameraPosition.Front -> AVCaptureDevicePositionFront
-            CameraPosition.Back -> AVCaptureDevicePositionBack
-        },
-    )!!
+    val device =
+        AVCaptureDevice.defaultDeviceWithDeviceType(
+            deviceType = AVCaptureDeviceTypeBuiltInWideAngleCamera,
+            mediaType = AVMediaTypeVideo,
+            position =
+                when (config.position) {
+                    CameraPosition.Front -> AVCaptureDevicePositionFront
+                    CameraPosition.Back -> AVCaptureDevicePositionBack
+                },
+        )!!
 
     if (device.isFocusModeSupported(AVCaptureFocusModeContinuousAutoFocus)) {
         try {
@@ -138,10 +167,11 @@ private fun createInputDevice(config: CameraConfiguration): AVCaptureDeviceInput
 }
 
 @OptIn(ExperimentalForeignApi::class)
-private fun NSData.toByteArray(): ByteArray = memScoped {
-    val buffer = ByteArray(length.toInt())
-    buffer.usePinned { pinned ->
-        memcpy(pinned.addressOf(0), this@toByteArray.bytes, this@toByteArray.length)
+private fun NSData.toByteArray(): ByteArray =
+    memScoped {
+        val buffer = ByteArray(length.toInt())
+        buffer.usePinned { pinned ->
+            memcpy(pinned.addressOf(0), this@toByteArray.bytes, this@toByteArray.length)
+        }
+        buffer
     }
-    buffer
-}

@@ -21,26 +21,34 @@ class NotificationHelper : PermissionHelper {
                     .requestAuthorizationWithOptions(
                         UNAuthorizationOptionSound
                             .or(UNAuthorizationOptionAlert)
-                            .or(UNAuthorizationOptionBadge)
+                            .or(UNAuthorizationOptionBadge),
                     ) { ok, error ->
                         onResult(ok && error == null)
                     }
-            }
+            },
         )
     }
 
     override fun read(onResult: (PermissionStatus) -> Unit) {
         notificationCenter()
             .getNotificationSettingsWithCompletionHandler { settings ->
-                onResult(when (settings?.authorizationStatus) {
-                    UNAuthorizationStatusAuthorized, UNAuthorizationStatusProvisional, UNAuthorizationStatusEphemeral -> PermissionStatus.Granted
-                    UNAuthorizationStatusNotDetermined -> PermissionStatus.Unknown
-                    UNAuthorizationStatusDenied -> PermissionStatus.Denied
-                    else -> {
-                        Log.warn("Permission.NotificationHelper", "Unknown permission status: ${settings?.authorizationStatus}")
-                        PermissionStatus.Denied
-                    }
-                })
+                onResult(
+                    when (settings?.authorizationStatus) {
+                        UNAuthorizationStatusAuthorized,
+                        UNAuthorizationStatusProvisional,
+                        UNAuthorizationStatusEphemeral,
+                        -> PermissionStatus.Granted
+                        UNAuthorizationStatusNotDetermined -> PermissionStatus.Unknown
+                        UNAuthorizationStatusDenied -> PermissionStatus.Denied
+                        else -> {
+                            Log.warn(
+                                tag = "Permission.NotificationHelper",
+                                message = "Unknown permission status: ${settings?.authorizationStatus}",
+                            )
+                            PermissionStatus.Denied
+                        }
+                    },
+                )
             }
     }
 

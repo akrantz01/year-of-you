@@ -1,3 +1,3 @@
 package you.yearof.app
 
-const val SERVER_PORT = 8080
+const val ServerPort = 8080

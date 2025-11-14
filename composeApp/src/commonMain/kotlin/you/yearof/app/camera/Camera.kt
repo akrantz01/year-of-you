@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.update
 @Composable
 expect fun rememberCamera(): Camera
 
-abstract class AbstractCamera {
+open class AbstractCamera {
     internal val configuration = MutableStateFlow(CameraConfiguration())
 
     internal val isReady = MutableStateFlow(false)
@@ -23,6 +23,8 @@ abstract class AbstractCamera {
 
 expect class Camera : AbstractCamera {
     suspend fun attach()
+
     fun detach()
+
     suspend fun captureImage(): Photo
 }

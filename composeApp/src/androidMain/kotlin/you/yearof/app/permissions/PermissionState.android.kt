@@ -18,15 +18,17 @@ import androidx.core.content.ContextCompat
 @Composable
 actual fun rememberPermissionState(permission: Permission): PermissionState {
     val context = LocalContext.current
-    val permissionState = remember(permission) {
-        AndroidPermissionState(permission, context)
-    }
+    val permissionState =
+        remember(permission) {
+            AndroidPermissionState(permission, context)
+        }
 
     PermissionLifecycleEffect(permissionState)
 
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
-        permissionState.refresh()
-    }
+    val launcher =
+        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
+            permissionState.refresh()
+        }
 
     DisposableEffect(permissionState, launcher) {
         permissionState.launcher = launcher
@@ -38,7 +40,10 @@ actual fun rememberPermissionState(permission: Permission): PermissionState {
     return permissionState
 }
 
-internal class AndroidPermissionState(override val permission: Permission, private val context: Context) : RefreshablePermissionState {
+internal class AndroidPermissionState(
+    override val permission: Permission,
+    private val context: Context,
+) : RefreshablePermissionState {
     private val androidPermission = permission.toAndroid()
 
     override var status by mutableStateOf(readStatus())
@@ -46,8 +51,11 @@ internal class AndroidPermissionState(override val permission: Permission, priva
     internal var launcher: ActivityResultLauncher<String>? = null
 
     override fun request() {
-        if (androidPermission.isEmpty()) refresh()
-        else launcher?.launch(androidPermission) ?: throw IllegalStateException("ActivityResultLauncher cannot be null")
+        if (androidPermission.isEmpty()) {
+            refresh()
+        } else {
+            checkNotNull(launcher).launch(androidPermission)
+        }
     }
 
     override fun refresh() {
@@ -57,7 +65,8 @@ internal class AndroidPermissionState(override val permission: Permission, priva
     private fun readStatus(): PermissionStatus {
         if (androidPermission.isEmpty()) return PermissionStatus.Granted
 
-        val hasPermission = ContextCompat.checkSelfPermission(context, androidPermission) == PackageManager.PERMISSION_GRANTED
+        val hasPermission =
+            ContextCompat.checkSelfPermission(context, androidPermission) == PackageManager.PERMISSION_GRANTED
         return if (hasPermission) PermissionStatus.Granted else PermissionStatus.Denied
     }
 }

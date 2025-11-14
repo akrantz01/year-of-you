@@ -9,14 +9,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 
 @Composable
-actual fun CameraPreview(modifier: Modifier, controller: CameraController) {
+actual fun CameraPreview(
+    controller: CameraController,
+    modifier: Modifier,
+) {
     val surfaceRequest by controller.camera.surfaceRequests.collectAsState()
 
     Box(modifier = modifier.fillMaxSize()) {
         surfaceRequest?.let { req ->
             CameraXViewfinder(
                 surfaceRequest = req,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
             )
         }
     }

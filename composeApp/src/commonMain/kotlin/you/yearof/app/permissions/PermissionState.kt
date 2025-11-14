@@ -3,11 +3,15 @@ package you.yearof.app.permissions
 import androidx.compose.runtime.Composable
 
 enum class Permission {
-    Camera, Notification
+    Camera,
+    Notification,
 }
 
 enum class PermissionStatus {
-    Loading, Unknown, Granted, Denied
+    Loading,
+    Unknown,
+    Granted,
+    Denied,
 }
 
 interface PermissionState {

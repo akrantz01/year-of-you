@@ -33,8 +33,10 @@ data object Main
 sealed interface Route {
     @Serializable
     data object Feed : Route
+
     @Serializable
     data object Capture : Route
+
     @Serializable
     data object Profile : Route
 }
@@ -52,7 +54,8 @@ fun App() {
                 composable<OnboardingRoute.Camera> { TODO() }
             }
 
-            navigation<Main>(startDestination = Route.Capture) { // TODO: switch to feed once implemented
+            navigation<Main>(startDestination = Route.Capture) {
+                // TODO: switch to feed once implemented
                 composable<Route.Feed> { TODO() }
                 composable<Route.Capture> { CaptureScreen() }
                 composable<Route.Profile> { TODO() }
@@ -69,10 +72,11 @@ fun InitializationDecider(nav: NavController) {
         val ready = cameraPermission.status != PermissionStatus.Loading
         if (!ready) return@LaunchedEffect
 
-        val next = when {
-            cameraPermission.status != PermissionStatus.Granted -> OnboardingRoute.Camera
-            else -> null
-        }
+        val next =
+            when {
+                cameraPermission.status != PermissionStatus.Granted -> OnboardingRoute.Camera
+                else -> null
+            }
 
         if (next == null) {
             nav.navigate(Main) { popUpTo(Initialization) { inclusive = true } }

@@ -13,16 +13,20 @@ import kotlinx.coroutines.launch
 @Composable
 actual fun rememberPermissionState(permission: Permission): PermissionState {
     val scope = rememberCoroutineScope()
-    val state = remember(permission) {
-        IosPermissionState(permission, scope)
-    }
+    val state =
+        remember(permission) {
+            IosPermissionState(permission, scope)
+        }
 
     PermissionLifecycleEffect(state)
 
     return state
 }
 
-internal class IosPermissionState(override val permission: Permission, private val scope: CoroutineScope) : RefreshablePermissionState {
+internal class IosPermissionState(
+    override val permission: Permission,
+    private val scope: CoroutineScope,
+) : RefreshablePermissionState {
     private val helper = permission.toHelper()
 
     override var status by mutableStateOf(PermissionStatus.Loading)

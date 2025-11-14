@@ -4,32 +4,40 @@ package you.yearof.app.camera
  * The position of the camera on the device
  */
 enum class CameraPosition {
-    Front, Back;
+    Front,
+    Back,
+    ;
 
-    fun opposite() = when (this) {
-        Front -> Back
-        Back -> Front
-    }
+    fun opposite() =
+        when (this) {
+            Front -> Back
+            Back -> Front
+        }
 }
 
 /**
  * The status of the camera flash
  */
 enum class FlashMode {
-    Off, Auto, On;
+    Off,
+    Auto,
+    On,
+    ;
 
-    fun next() = when (this) {
-        Off -> Auto
-        Auto -> On
-        On -> Off
-    }
+    fun next() =
+        when (this) {
+            Off -> Auto
+            Auto -> On
+            On -> Off
+        }
 }
 
 /**
  * The camera lens to use on devices with multiple cameras.
  */
 enum class CameraLens {
-    UltraWide, Wide
+    UltraWide,
+    Wide,
 }
 
 /**
@@ -38,7 +46,7 @@ enum class CameraLens {
 data class CameraConfiguration(
     val position: CameraPosition = CameraPosition.Back,
     val flashMode: FlashMode = FlashMode.Auto,
-    val lens: CameraLens = CameraLens.Wide
+    val lens: CameraLens = CameraLens.Wide,
 )
 
 /**

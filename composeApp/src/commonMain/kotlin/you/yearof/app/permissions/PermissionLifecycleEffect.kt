@@ -8,13 +8,18 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 
 @Composable
-internal fun PermissionLifecycleEffect(state: RefreshablePermissionState, lifecycleEvent: Lifecycle.Event = Lifecycle.Event.ON_RESUME) {
-    val observer = remember(state) {
-        LifecycleEventObserver { _, event ->
-            if (event == lifecycleEvent && state.status != PermissionStatus.Granted)
-                state.refresh()
+internal fun PermissionLifecycleEffect(
+    state: RefreshablePermissionState,
+    lifecycleEvent: Lifecycle.Event = Lifecycle.Event.ON_RESUME,
+) {
+    val observer =
+        remember(state) {
+            LifecycleEventObserver { _, event ->
+                if (event == lifecycleEvent && state.status != PermissionStatus.Granted) {
+                    state.refresh()
+                }
+            }
         }
-    }
 
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     DisposableEffect(lifecycle, observer) {
