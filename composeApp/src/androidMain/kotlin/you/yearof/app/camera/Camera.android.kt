@@ -10,6 +10,7 @@ import androidx.camera.core.SurfaceRequest
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.lifecycle.awaitInstance
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.LifecycleOwner
@@ -36,6 +37,7 @@ actual fun rememberCamera(): Camera {
     }
 }
 
+@Stable
 actual class Camera(
     private val context: Context,
     private val lifecycleOwner: LifecycleOwner,

@@ -1,6 +1,7 @@
 package you.yearof.app.permissions
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 
 enum class Permission {
     Camera,
@@ -15,6 +16,7 @@ enum class PermissionStatus {
     PermanentlyDenied,
 }
 
+@Stable
 interface PermissionState {
     val permission: Permission
 
@@ -23,6 +25,7 @@ interface PermissionState {
     fun request()
 }
 
+@Stable
 internal interface RefreshablePermissionState : PermissionState {
     fun refresh()
 }

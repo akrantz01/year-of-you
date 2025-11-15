@@ -2,6 +2,7 @@ package you.yearof.app.camera
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.CompletableDeferred
@@ -44,6 +45,7 @@ fun rememberCameraController(): CameraController {
     return remember { CameraController(camera, scope) }
 }
 
+@Stable
 class CameraController(
     internal val camera: Camera,
     private val scope: CoroutineScope,

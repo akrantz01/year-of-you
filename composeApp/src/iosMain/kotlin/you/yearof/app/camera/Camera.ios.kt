@@ -1,6 +1,7 @@
 package you.yearof.app.camera
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
@@ -44,6 +45,7 @@ import kotlin.coroutines.resumeWithException
 @Composable
 actual fun rememberCamera(): Camera = remember { Camera() }
 
+@Stable
 @OptIn(ExperimentalForeignApi::class)
 actual class Camera : AbstractCamera() {
     internal val session = AVCaptureSession()

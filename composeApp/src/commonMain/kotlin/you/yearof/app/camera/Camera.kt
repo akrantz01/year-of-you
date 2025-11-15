@@ -1,6 +1,7 @@
 package you.yearof.app.camera
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
@@ -8,6 +9,7 @@ import kotlinx.coroutines.flow.update
 @Composable
 expect fun rememberCamera(): Camera
 
+@Stable
 open class AbstractCamera {
     internal val configuration = MutableStateFlow(CameraConfiguration())
 
@@ -21,6 +23,7 @@ open class AbstractCamera {
     }
 }
 
+@Stable
 expect class Camera : AbstractCamera {
     suspend fun attach()
 
