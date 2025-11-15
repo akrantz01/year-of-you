@@ -1,6 +1,7 @@
 package you.yearof.app.permissions
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,6 +24,7 @@ actual fun rememberPermissionState(permission: Permission): PermissionState {
     return state
 }
 
+@Stable
 internal class IosPermissionState(
     override val permission: Permission,
     private val scope: CoroutineScope,

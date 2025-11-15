@@ -8,11 +8,13 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
 @Composable
@@ -20,7 +22,7 @@ actual fun rememberPermissionState(permission: Permission): PermissionState {
     val context = LocalContext.current
     val permissionState =
         remember(permission) {
-            AndroidPermissionState(permission, context)
+            AndroidPermissionState(permission, context, context.findActivity())
         }
 
     PermissionLifecycleEffect(permissionState)
@@ -40,9 +42,11 @@ actual fun rememberPermissionState(permission: Permission): PermissionState {
     return permissionState
 }
 
+@Stable
 internal class AndroidPermissionState(
     override val permission: Permission,
     private val context: Context,
+    private val activity: Activity,
 ) : RefreshablePermissionState {
     private val androidPermission = permission.toAndroid()
 
@@ -67,6 +71,9 @@ internal class AndroidPermissionState(
 
         val hasPermission =
             ContextCompat.checkSelfPermission(context, androidPermission) == PackageManager.PERMISSION_GRANTED
-        return if (hasPermission) PermissionStatus.Granted else PermissionStatus.Denied
+        if (hasPermission) return PermissionStatus.Granted
+
+        val permanent = ActivityCompat.shouldShowRequestPermissionRationale(activity, androidPermission)
+        return if (permanent) PermissionStatus.PermanentlyDenied else PermissionStatus.Denied
     }
 }

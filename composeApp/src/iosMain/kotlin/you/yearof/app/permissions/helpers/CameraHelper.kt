@@ -31,7 +31,7 @@ class CameraHelper(
             when (status) {
                 AVAuthorizationStatusAuthorized -> PermissionStatus.Granted
                 AVAuthorizationStatusNotDetermined -> PermissionStatus.Unknown
-                AVAuthorizationStatusDenied, AVAuthorizationStatusRestricted -> PermissionStatus.Denied
+                AVAuthorizationStatusDenied, AVAuthorizationStatusRestricted -> PermissionStatus.PermanentlyDenied
                 else -> {
                     Log.warn("Permissions.CameraHelper", "Unknown permission status: $status")
                     PermissionStatus.Denied

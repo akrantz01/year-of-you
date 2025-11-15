@@ -12,6 +12,7 @@ enum class PermissionStatus {
     Unknown,
     Granted,
     Denied,
+    PermanentlyDenied,
 }
 
 interface PermissionState {
