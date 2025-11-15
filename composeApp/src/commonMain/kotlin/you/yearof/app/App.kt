@@ -1,6 +1,11 @@
 package you.yearof.app
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
@@ -8,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
@@ -60,29 +66,37 @@ fun App() {
         }
     val nav = rememberNavController()
 
-    // TODO: add Modifier.safeContentPadding() somewhere
-
     val colorScheme = if (isSystemInDarkTheme()) darkColorScheme() else lightColorScheme()
     MaterialTheme(colorScheme = colorScheme) {
-        NavHost(navController = nav, startDestination = Initialization) {
-            composable<Initialization> { InitializationDecider(nav = nav, viewModel = onboardingViewModel) }
+        Box(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background)
+                    .safeDrawingPadding(),
+        ) {
+            NavHost(navController = nav, startDestination = Initialization) {
+                composable<Initialization> { InitializationDecider(nav = nav, viewModel = onboardingViewModel) }
 
-            navigation<Onboarding>(startDestination = OnboardingRoute.Camera) {
-                composable<OnboardingRoute.Camera> {
-                    val cameraStatus by onboardingViewModel.cameraStatus.collectAsState(PermissionStatus.Loading)
-                    CameraPermissions(
-                        status = cameraStatus,
-                        onRequest = onboardingViewModel::requestCamera,
-                        onContinue = { nav.toNextOnboardingRoute(onboardingViewModel) },
-                    )
+                navigation<Onboarding>(startDestination = OnboardingRoute.Camera) {
+                    composable<OnboardingRoute.Camera> {
+                        val cameraStatus by onboardingViewModel.cameraStatus.collectAsState(
+                            PermissionStatus.Loading,
+                        )
+                        CameraPermissions(
+                            status = cameraStatus,
+                            onRequest = onboardingViewModel::requestCamera,
+                            onContinue = { nav.toNextOnboardingRoute(onboardingViewModel) },
+                        )
+                    }
                 }
-            }
 
-            navigation<Main>(startDestination = Route.Capture) {
-                // TODO: switch to feed once implemented
-                composable<Route.Feed> { TODO() }
-                composable<Route.Capture> { CaptureScreen() }
-                composable<Route.Profile> { TODO() }
+                navigation<Main>(startDestination = Route.Capture) {
+                    // TODO: switch to feed once implemented
+                    composable<Route.Feed> { TODO() }
+                    composable<Route.Capture> { CaptureScreen() }
+                    composable<Route.Profile> { TODO() }
+                }
             }
         }
     }
