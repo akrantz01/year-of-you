@@ -18,7 +18,8 @@ import kotlinx.serialization.Serializable
 import you.yearof.app.onboarding.CameraPermissions
 import you.yearof.app.onboarding.OnboardingViewModel
 import you.yearof.app.permissions.Permission
-import you.yearof.app.permissions.rememberPermissionState
+import you.yearof.app.permissions.PermissionStatus
+import you.yearof.app.permissions.rememberPermissionHandle
 import you.yearof.app.screens.CaptureScreen
 
 @Serializable
@@ -49,13 +50,15 @@ sealed interface Route {
 }
 
 @Composable
-fun App(onboardingViewModel: OnboardingViewModel = viewModel { OnboardingViewModel() }) {
-    val cameraPermission = rememberPermissionState(Permission.Camera)
+fun App() {
+    val cameraHandle = rememberPermissionHandle(Permission.Camera)
+    val onboardingViewModel: OnboardingViewModel =
+        viewModel {
+            OnboardingViewModel(
+                handles = listOf(cameraHandle),
+            )
+        }
     val nav = rememberNavController()
-
-    LaunchedEffect(cameraPermission.status) {
-        onboardingViewModel.setCameraPermission(cameraPermission.status)
-    }
 
     // TODO: add Modifier.safeContentPadding() somewhere
 
@@ -66,11 +69,11 @@ fun App(onboardingViewModel: OnboardingViewModel = viewModel { OnboardingViewMod
 
             navigation<Onboarding>(startDestination = OnboardingRoute.Camera) {
                 composable<OnboardingRoute.Camera> {
-                    val onboardingState by onboardingViewModel.uiState.collectAsState()
+                    val cameraStatus by onboardingViewModel.cameraStatus.collectAsState(PermissionStatus.Loading)
                     CameraPermissions(
-                        status = onboardingState.camera,
-                        onRequest = cameraPermission::request,
-                        onContinue = { nav.toNextRoute(onboardingViewModel) },
+                        status = cameraStatus,
+                        onRequest = onboardingViewModel::requestCamera,
+                        onContinue = { nav.toNextOnboardingRoute(onboardingViewModel) },
                     )
                 }
             }
@@ -108,15 +111,15 @@ fun InitializationDecider(
     // TODO: show loading/black screen
 }
 
-private fun NavController.toNextRoute(model: OnboardingViewModel) {
-    when (val next = model.nextStep()) {
+private fun NavController.toNextOnboardingRoute(model: OnboardingViewModel) {
+    when (val route = model.nextStep()) {
         null ->
             navigate(Main) {
                 popUpTo(Onboarding) { inclusive = true }
                 launchSingleTop = true
             }
         else ->
-            navigate(next) {
+            navigate(route) {
                 val currentId = currentDestination?.id
                 if (currentId != null) popUpTo(currentId) { inclusive = true }
                 launchSingleTop = true

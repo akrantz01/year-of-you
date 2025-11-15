@@ -1,36 +1,53 @@
 package you.yearof.app.onboarding
 
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import you.yearof.app.OnboardingRoute
+import you.yearof.app.permissions.Permission
+import you.yearof.app.permissions.PermissionHandle
+import you.yearof.app.permissions.PermissionRequirement
 import you.yearof.app.permissions.PermissionStatus
+import you.yearof.app.permissions.PermissionsCoordinator
 
 data class OnboardingUiState(
     val camera: PermissionStatus = PermissionStatus.Loading,
 )
 
-class OnboardingViewModel : ViewModel() {
-    private val _uiState = MutableStateFlow(OnboardingUiState())
-    val uiState: StateFlow<OnboardingUiState> = _uiState
+class OnboardingViewModel(
+    handles: List<PermissionHandle>,
+) : ViewModel() {
+    private val coordinator =
+        PermissionsCoordinator(
+            scope = viewModelScope,
+            requirements = handles.map { PermissionRequirement(handle = it) },
+        )
 
-    fun setCameraPermission(status: PermissionStatus) {
-        _uiState.update { current ->
-            current.copy(camera = status)
-        }
-    }
+    val uiState: StateFlow<OnboardingUiState> =
+        coordinator.snapshot
+            .map { snapshot ->
+                OnboardingUiState(
+                    camera = snapshot.statuses[Permission.Camera] ?: PermissionStatus.Loading,
+                )
+            }.stateIn(viewModelScope, SharingStarted.Eagerly, OnboardingUiState())
+
+    val cameraStatus = uiState.map { it.camera }
 
     fun ready(): Boolean {
-        val state = _uiState.value
+        val state = uiState.value
         return state.camera != PermissionStatus.Loading
     }
 
-    fun nextStep(): OnboardingRoute? {
-        val state = _uiState.value
-        return when {
-            state.camera != PermissionStatus.Granted -> OnboardingRoute.Camera
+    fun nextStep(): OnboardingRoute? =
+        when (coordinator.nextBlockingPermission(listOf(Permission.Camera))) {
+            Permission.Camera -> OnboardingRoute.Camera
             else -> null
         }
+
+    fun requestCamera() {
+        coordinator.request(Permission.Camera)
     }
 }
