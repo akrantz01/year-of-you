@@ -22,40 +22,17 @@ import androidx.navigation.compose.rememberNavController
 import kotlinx.serialization.Serializable
 import you.yearof.app.onboarding.CameraPermissions
 import you.yearof.app.onboarding.NotificationPermissions
+import you.yearof.app.onboarding.Onboarding
+import you.yearof.app.onboarding.OnboardingRoute
 import you.yearof.app.onboarding.OnboardingViewModel
 import you.yearof.app.permissions.Permission
 import you.yearof.app.permissions.rememberPermissionState
 import you.yearof.app.screens.CaptureScreen
+import you.yearof.app.screens.Main
+import you.yearof.app.screens.Route
 
 @Serializable
 data object Initialization
-
-@Serializable
-data object Onboarding
-
-@Serializable
-sealed interface OnboardingRoute {
-    @Serializable
-    data object Camera : OnboardingRoute
-
-    @Serializable
-    data object Notifications : OnboardingRoute
-}
-
-@Serializable
-data object Main
-
-@Serializable
-sealed interface Route {
-    @Serializable
-    data object Feed : Route
-
-    @Serializable
-    data object Capture : Route
-
-    @Serializable
-    data object Profile : Route
-}
 
 @Composable
 fun App(onboardingViewModel: OnboardingViewModel = viewModel { OnboardingViewModel() }) {

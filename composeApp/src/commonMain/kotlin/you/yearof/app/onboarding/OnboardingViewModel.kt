@@ -2,12 +2,10 @@ package you.yearof.app.onboarding
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import you.yearof.app.OnboardingRoute
 import you.yearof.app.permissions.Permission
 import you.yearof.app.permissions.PermissionRequirement
 import you.yearof.app.permissions.PermissionStatus
