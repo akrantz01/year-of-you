@@ -12,17 +12,26 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.datastore.preferences.preferencesDataStore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+
+private val Context.permissionRequestDataStore by preferencesDataStore("permission-requests")
 
 @Composable
 actual fun rememberPermissionState(permission: Permission): PermissionState {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    val tracker = remember { PermissionRequestTracker(context.permissionRequestDataStore) }
     val permissionState =
         remember(permission) {
-            AndroidPermissionState(permission, context, context.findActivity())
+            AndroidPermissionState(permission, context, scope, context.findActivity(), tracker)
         }
 
     PermissionLifecycleEffect(permissionState)
@@ -46,15 +55,22 @@ actual fun rememberPermissionState(permission: Permission): PermissionState {
 internal class AndroidPermissionState(
     override val permission: Permission,
     private val context: Context,
+    private val scope: CoroutineScope,
     private val activity: Activity,
+    private val tracker: PermissionRequestTracker,
 ) : RefreshablePermissionState {
     private val androidPermission = permission.toAndroid()
 
-    override var status by mutableStateOf(readStatus())
+    override var status by mutableStateOf(PermissionStatus.Loading)
 
     internal var launcher: ActivityResultLauncher<String>? = null
 
+    init {
+        refresh()
+    }
+
     override fun request() {
+        scope.launch { tracker.markRequested(permission) }
         if (androidPermission.isEmpty()) {
             refresh()
         } else {
@@ -63,15 +79,22 @@ internal class AndroidPermissionState(
     }
 
     override fun refresh() {
-        status = readStatus()
+        scope.launch {
+            val requested = tracker.wasRequested(permission)
+            status = readStatus(requested)
+        }
     }
 
-    private fun readStatus(): PermissionStatus {
+    private fun readStatus(alreadyRequested: Boolean): PermissionStatus {
         if (androidPermission.isEmpty()) return PermissionStatus.Granted
 
         val hasPermission =
             ContextCompat.checkSelfPermission(context, androidPermission) == PackageManager.PERMISSION_GRANTED
-        if (hasPermission) return PermissionStatus.Granted
+        if (hasPermission) {
+            return PermissionStatus.Granted
+        } else if (!alreadyRequested) {
+            return PermissionStatus.Unknown
+        }
 
         val permanent = ActivityCompat.shouldShowRequestPermissionRationale(activity, androidPermission)
         return if (permanent) PermissionStatus.PermanentlyDenied else PermissionStatus.Denied

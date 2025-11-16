@@ -50,6 +50,8 @@ kotlin {
             implementation(libs.kstatemachine)
             implementation(libs.kstatemachine.coroutines)
             implementation(libs.androidx.navigation.compose)
+            implementation(libs.androidx.datastore)
+            implementation(libs.androidx.datastore.preferences)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
