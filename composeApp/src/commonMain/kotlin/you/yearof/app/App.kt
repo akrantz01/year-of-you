@@ -21,9 +21,9 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import kotlinx.serialization.Serializable
 import you.yearof.app.onboarding.CameraPermissions
+import you.yearof.app.onboarding.NotificationPermissions
 import you.yearof.app.onboarding.OnboardingViewModel
 import you.yearof.app.permissions.Permission
-import you.yearof.app.permissions.PermissionStatus
 import you.yearof.app.permissions.rememberPermissionState
 import you.yearof.app.screens.CaptureScreen
 
@@ -37,6 +37,9 @@ data object Onboarding
 sealed interface OnboardingRoute {
     @Serializable
     data object Camera : OnboardingRoute
+
+    @Serializable
+    data object Notifications : OnboardingRoute
 }
 
 @Serializable
@@ -57,11 +60,16 @@ sealed interface Route {
 @Composable
 fun App(onboardingViewModel: OnboardingViewModel = viewModel { OnboardingViewModel() }) {
     val cameraPermission = rememberPermissionState(Permission.Camera)
+    val notificationPermission = rememberPermissionState(Permission.Notification)
 
     val nav = rememberNavController()
 
     LaunchedEffect(cameraPermission.status) {
         onboardingViewModel.updatePermission(Permission.Camera, cameraPermission.status)
+    }
+
+    LaunchedEffect(notificationPermission.status) {
+        onboardingViewModel.updatePermission(Permission.Notification, notificationPermission.status)
     }
 
     val colorScheme = if (isSystemInDarkTheme()) darkColorScheme() else lightColorScheme()
@@ -78,12 +86,19 @@ fun App(onboardingViewModel: OnboardingViewModel = viewModel { OnboardingViewMod
 
                 navigation<Onboarding>(startDestination = OnboardingRoute.Camera) {
                     composable<OnboardingRoute.Camera> {
-                        val cameraStatus by onboardingViewModel.cameraStatus.collectAsState(
-                            PermissionStatus.Loading,
-                        )
+                        val cameraStatus by onboardingViewModel.cameraStatus.collectAsState()
                         CameraPermissions(
                             status = cameraStatus,
                             onRequest = cameraPermission::request,
+                            onContinue = { nav.toNextOnboardingRoute(onboardingViewModel) },
+                        )
+                    }
+
+                    composable<OnboardingRoute.Notifications> {
+                        val notificationStatus by onboardingViewModel.notificationStatus.collectAsState()
+                        NotificationPermissions(
+                            status = notificationStatus,
+                            onRequest = notificationPermission::request,
                             onContinue = { nav.toNextOnboardingRoute(onboardingViewModel) },
                         )
                     }

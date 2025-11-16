@@ -15,13 +15,18 @@ import you.yearof.app.permissions.PermissionsCoordinator
 
 data class OnboardingUiState(
     val camera: PermissionStatus = PermissionStatus.Loading,
+    val notifications: PermissionStatus = PermissionStatus.Loading,
 )
 
 class OnboardingViewModel : ViewModel() {
     private val coordinator =
         PermissionsCoordinator(
             scope = viewModelScope,
-            requirements = listOf(PermissionRequirement(Permission.Camera)),
+            requirements =
+                listOf(
+                    PermissionRequirement(Permission.Camera),
+                    PermissionRequirement(Permission.Notification, optional = true),
+                ),
         )
 
     val uiState: StateFlow<OnboardingUiState> =
@@ -29,20 +34,23 @@ class OnboardingViewModel : ViewModel() {
             .map { snapshot ->
                 OnboardingUiState(
                     camera = snapshot.statuses[Permission.Camera] ?: PermissionStatus.Loading,
+                    notifications = snapshot.statuses[Permission.Notification] ?: PermissionStatus.Loading,
                 )
             }.stateIn(viewModelScope, SharingStarted.Eagerly, OnboardingUiState())
 
-    val cameraStatus: StateFlow<PermissionStatus> =
-        coordinator.statusOf(Permission.Camera) ?: MutableStateFlow(PermissionStatus.Loading)
+    val cameraStatus: StateFlow<PermissionStatus> = checkNotNull(coordinator.statusOf(Permission.Camera))
+
+    val notificationStatus: StateFlow<PermissionStatus> = checkNotNull(coordinator.statusOf(Permission.Notification))
 
     fun ready(): Boolean {
         val state = uiState.value
-        return state.camera != PermissionStatus.Loading
+        return state.camera != PermissionStatus.Loading && state.notifications != PermissionStatus.Loading
     }
 
     fun nextStep(): OnboardingRoute? =
         when (coordinator.nextPermission()) {
             Permission.Camera -> OnboardingRoute.Camera
+            Permission.Notification -> OnboardingRoute.Notifications
             else -> null
         }
 
