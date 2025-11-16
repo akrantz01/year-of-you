@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -25,7 +24,7 @@ import you.yearof.app.onboarding.CameraPermissions
 import you.yearof.app.onboarding.OnboardingViewModel
 import you.yearof.app.permissions.Permission
 import you.yearof.app.permissions.PermissionStatus
-import you.yearof.app.permissions.rememberPermissionHandle
+import you.yearof.app.permissions.rememberPermissionState
 import you.yearof.app.screens.CaptureScreen
 
 @Serializable
@@ -56,15 +55,14 @@ sealed interface Route {
 }
 
 @Composable
-fun App() {
-    val cameraHandle = rememberPermissionHandle(Permission.Camera)
-    val onboardingViewModel: OnboardingViewModel =
-        viewModel {
-            OnboardingViewModel(
-                handles = listOf(cameraHandle),
-            )
-        }
+fun App(onboardingViewModel: OnboardingViewModel = viewModel { OnboardingViewModel() }) {
+    val cameraPermission = rememberPermissionState(Permission.Camera)
+
     val nav = rememberNavController()
+
+    LaunchedEffect(cameraPermission.status) {
+        onboardingViewModel.updatePermission(Permission.Camera, cameraPermission.status)
+    }
 
     val colorScheme = if (isSystemInDarkTheme()) darkColorScheme() else lightColorScheme()
     MaterialTheme(colorScheme = colorScheme) {
@@ -85,7 +83,7 @@ fun App() {
                         )
                         CameraPermissions(
                             status = cameraStatus,
-                            onRequest = onboardingViewModel::requestCamera,
+                            onRequest = cameraPermission::request,
                             onContinue = { nav.toNextOnboardingRoute(onboardingViewModel) },
                         )
                     }

@@ -2,13 +2,13 @@ package you.yearof.app.onboarding
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import you.yearof.app.OnboardingRoute
 import you.yearof.app.permissions.Permission
-import you.yearof.app.permissions.PermissionHandle
 import you.yearof.app.permissions.PermissionRequirement
 import you.yearof.app.permissions.PermissionStatus
 import you.yearof.app.permissions.PermissionsCoordinator
@@ -17,13 +17,11 @@ data class OnboardingUiState(
     val camera: PermissionStatus = PermissionStatus.Loading,
 )
 
-class OnboardingViewModel(
-    handles: List<PermissionHandle>,
-) : ViewModel() {
+class OnboardingViewModel : ViewModel() {
     private val coordinator =
         PermissionsCoordinator(
             scope = viewModelScope,
-            requirements = handles.map { PermissionRequirement(handle = it) },
+            requirements = listOf(PermissionRequirement(Permission.Camera)),
         )
 
     val uiState: StateFlow<OnboardingUiState> =
@@ -34,7 +32,8 @@ class OnboardingViewModel(
                 )
             }.stateIn(viewModelScope, SharingStarted.Eagerly, OnboardingUiState())
 
-    val cameraStatus = uiState.map { it.camera }
+    val cameraStatus: StateFlow<PermissionStatus> =
+        coordinator.statusOf(Permission.Camera) ?: MutableStateFlow(PermissionStatus.Loading)
 
     fun ready(): Boolean {
         val state = uiState.value
@@ -42,12 +41,15 @@ class OnboardingViewModel(
     }
 
     fun nextStep(): OnboardingRoute? =
-        when (coordinator.nextBlockingPermission(listOf(Permission.Camera))) {
+        when (coordinator.nextPermission()) {
             Permission.Camera -> OnboardingRoute.Camera
             else -> null
         }
 
-    fun requestCamera() {
-        coordinator.request(Permission.Camera)
+    fun updatePermission(
+        permission: Permission,
+        status: PermissionStatus,
+    ) {
+        coordinator.update(permission, status)
     }
 }
