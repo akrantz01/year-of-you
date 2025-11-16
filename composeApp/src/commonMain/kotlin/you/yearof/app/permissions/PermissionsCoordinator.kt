@@ -71,7 +71,7 @@ class PermissionsCoordinator(
         return permissions.firstOrNull { permission ->
             val status = snap.statuses[permission] ?: return@firstOrNull false
             if (permission in optional) {
-                status != PermissionStatus.Unknown
+                status == PermissionStatus.Unknown || status == PermissionStatus.Loading
             } else {
                 status != PermissionStatus.Granted
             }
