@@ -22,7 +22,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.concurrent.Executors
 import kotlin.coroutines.resume
@@ -85,6 +84,7 @@ actual class Camera(
             ImageCapture
                 .Builder()
                 .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+                .setTargetRotation(context.display.rotation)
                 .build()
                 .apply {
                     flashMode =
