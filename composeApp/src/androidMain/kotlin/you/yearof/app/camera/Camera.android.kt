@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.io.ByteArrayOutputStream
+import java.io.File
 import java.util.concurrent.Executors
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -106,7 +107,7 @@ actual class Camera(
         return cameraProvider.bindToLifecycle(lifecycleOwner, selector, preview, capture)
     }
 
-    actual suspend fun captureImage(): Photo =
+    actual suspend fun captureImage(): String =
         suspendCancellableCoroutine { cont ->
             val capture =
                 imageCapture ?: run {
@@ -114,14 +115,15 @@ actual class Camera(
                     return@suspendCancellableCoroutine
                 }
 
-            val outputStream = ByteArrayOutputStream()
+            val config = configuration.value
+            val output = File(context.cacheDir, photoName(config.position))
 
             capture.takePicture(
-                ImageCapture.OutputFileOptions.Builder(outputStream).build(),
+                ImageCapture.OutputFileOptions.Builder(output).build(),
                 executor,
                 object : ImageCapture.OnImageSavedCallback {
                     override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                        cont.resume(outputStream.toByteArray())
+                        cont.resume(output.absolutePath)
                     }
 
                     override fun onError(exception: ImageCaptureException) {

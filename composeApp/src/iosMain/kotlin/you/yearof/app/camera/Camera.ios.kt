@@ -81,11 +81,12 @@ actual class Camera : AbstractCamera() {
         session.commitConfiguration()
     }
 
-    actual suspend fun captureImage(): Photo =
+    actual suspend fun captureImage(): String =
         suspendCancellableCoroutine { cont ->
-            captureDelegate.onCapture = { result ->
+            captureDelegate.onCapture = {
                 captureDelegate.clear()
-                cont.resume(result)
+                // TODO: save result to file either here or within the delegate
+                cont.resume("TODO")
             }
             captureDelegate.onError = { error ->
                 captureDelegate.clear()

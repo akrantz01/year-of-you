@@ -65,9 +65,9 @@ class CameraController(
             camera.updateConfiguration(update)
         }
 
-    suspend fun capture(): Map<CameraPosition, Photo> =
+    suspend fun capture(): Map<CameraPosition, String> =
         withLock {
-            val deferred = CompletableDeferred<Map<CameraPosition, Photo>>()
+            val deferred = CompletableDeferred<Map<CameraPosition, String>>()
 
             val stateMachine = stateMachine()
             stateMachine.processEvent(
@@ -221,8 +221,8 @@ data class CaptureSession(
     val position: CameraPosition = configuration.position,
     val stage: LensStage = LensStage.First,
     val switchedLens: Boolean = false,
-    val photos: LinkedHashMap<CameraPosition, Photo> = LinkedHashMap(),
-    val deferred: CompletableDeferred<Map<CameraPosition, Photo>>,
+    val photos: LinkedHashMap<CameraPosition, String> = LinkedHashMap(),
+    val deferred: CompletableDeferred<Map<CameraPosition, String>>,
 )
 
 sealed interface CaptureState : State {
@@ -259,7 +259,7 @@ private sealed interface CaptureEvent : Event {
         CaptureEvent
 
     data class PhotoCaptured(
-        val photo: Photo,
+        val photo: String,
         override val data: CaptureSession,
     ) : DataEvent<CaptureSession>,
         CaptureEvent
