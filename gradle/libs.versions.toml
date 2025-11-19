@@ -22,6 +22,7 @@ detekt = "1.23.8"
 ktlint = "1.7.1"
 composeRuleset = "0.4.27"
 datastore = "1.1.7"
+skiko = "0.9.30"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -55,6 +56,7 @@ detekt = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.
 detekt-rules-compose = { module = "io.nlopez.compose.rules:detekt", version.ref = "composeRuleset" }
 ktlint = { module = "com.pinterest.ktlint:ktlint-cli", version.ref = "ktlint" }
 ktlint-rules-compose = { module = "io.nlopez.compose.rules:ktlint", version.ref = "composeRuleset" }
+skiko = { module = "org.jetbrains.skiko:skiko", version.ref = "skiko" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

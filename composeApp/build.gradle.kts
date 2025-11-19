@@ -56,6 +56,9 @@ kotlin {
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
+        iosMain.dependencies {
+            implementation(libs.skiko)
+        }
     }
 }
 

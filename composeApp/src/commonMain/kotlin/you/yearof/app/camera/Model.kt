@@ -1,5 +1,7 @@
 package you.yearof.app.camera
 
+import androidx.compose.ui.graphics.ImageBitmap
+
 /**
  * The position of the camera on the device
  */
@@ -48,8 +50,3 @@ data class CameraConfiguration(
     val flashMode: FlashMode = FlashMode.Auto,
     val lens: CameraLens = CameraLens.Wide,
 )
-
-/**
- * A JPEG encoded photo with included EXIF data
- */
-typealias Photo = ByteArray
