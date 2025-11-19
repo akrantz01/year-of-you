@@ -55,6 +55,7 @@ class CameraController(
 
     private val state = MutableStateFlow<CaptureState>(CaptureState.Idle)
     val currentState = state.asStateFlow()
+    val configuration = camera.configuration.asStateFlow()
     val isReady = currentState.map { state -> state == CaptureState.Idle }
 
     private suspend fun <T> withLock(block: suspend () -> T) = lock.withLock { block() }
