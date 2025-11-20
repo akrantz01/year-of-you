@@ -1,12 +1,18 @@
 package you.yearof.app.camera
 
 import android.content.Context
+import android.util.LayoutDirection
+import android.util.Rational
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.CameraState
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.core.SurfaceRequest
+import androidx.camera.core.UseCaseGroup
+import androidx.camera.core.ViewPort
+import androidx.camera.core.resolutionselector.AspectRatioStrategy
+import androidx.camera.core.resolutionselector.ResolutionSelector
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.lifecycle.awaitInstance
 import androidx.compose.runtime.Composable
@@ -80,31 +86,56 @@ actual class Camera(
                 CameraPosition.Back -> CameraSelector.DEFAULT_BACK_CAMERA
             }
 
+        val aspectRatioSelector =
+            ResolutionSelector
+                .Builder()
+                .setAspectRatioStrategy(AspectRatioStrategy.RATIO_4_3_FALLBACK_AUTO_STRATEGY)
+                .build()
+
         val capture =
             ImageCapture
                 .Builder()
                 .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
                 .setTargetRotation(context.display.rotation)
-                .build()
-                .apply {
-                    flashMode =
-                        when (config.flashMode) {
-                            FlashMode.Off -> ImageCapture.FLASH_MODE_OFF
-                            FlashMode.Auto -> ImageCapture.FLASH_MODE_AUTO
-                            FlashMode.On -> ImageCapture.FLASH_MODE_ON
-                        }
-                }
+                .setResolutionSelector(aspectRatioSelector)
+                .setFlashMode(
+                    when (config.flashMode) {
+                        FlashMode.Off -> ImageCapture.FLASH_MODE_OFF
+                        FlashMode.Auto -> ImageCapture.FLASH_MODE_AUTO
+                        FlashMode.On -> ImageCapture.FLASH_MODE_ON
+                    },
+                ).build()
         imageCapture = capture
 
         val preview =
-            Preview.Builder().build().apply {
-                setSurfaceProvider {
-                    surfaceRequests.value = it
+            Preview
+                .Builder()
+                .setResolutionSelector(aspectRatioSelector)
+                .build()
+                .apply {
+                    setSurfaceProvider {
+                        surfaceRequests.value = it
+                    }
                 }
-            }
+
+        val aspectRatio = Rational(3, 4)
+        val viewPort =
+            ViewPort
+                .Builder(aspectRatio, context.display.rotation)
+                .setLayoutDirection(LayoutDirection.LTR)
+                .setScaleType(ViewPort.FIT)
+                .build()
+
+        val useCase =
+            UseCaseGroup
+                .Builder()
+                .addUseCase(preview)
+                .addUseCase(capture)
+                .setViewPort(viewPort)
+                .build()
 
         cameraProvider.unbindAll()
-        return cameraProvider.bindToLifecycle(lifecycleOwner, selector, preview, capture)
+        return cameraProvider.bindToLifecycle(lifecycleOwner, selector, useCase)
     }
 
     actual suspend fun captureImage(): String =
@@ -119,7 +150,13 @@ actual class Camera(
             val output = File(context.cacheDir, photoName(config.position))
 
             capture.takePicture(
-                ImageCapture.OutputFileOptions.Builder(output).build(),
+                ImageCapture.OutputFileOptions
+                    .Builder(output)
+                    .setMetadata(
+                        ImageCapture.Metadata().apply {
+                            isReversedHorizontal = true
+                        },
+                    ).build(),
                 executor,
                 object : ImageCapture.OnImageSavedCallback {
                     override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
