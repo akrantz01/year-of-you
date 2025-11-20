@@ -26,6 +26,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.io.File
@@ -73,6 +74,8 @@ actual class Camera(
     }
 
     actual fun detach() {
+        surfaceRequests.value?.willNotProvideSurface()
+        surfaceRequests.value = null
         provider?.unbindAll()
         executor.shutdown()
     }
@@ -113,8 +116,8 @@ actual class Camera(
                 .setResolutionSelector(aspectRatioSelector)
                 .build()
                 .apply {
-                    setSurfaceProvider {
-                        surfaceRequests.value = it
+                    setSurfaceProvider { surfaceRequest ->
+                        surfaceRequests.update { surfaceRequest }
                     }
                 }
 

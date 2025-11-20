@@ -18,14 +18,16 @@ import ru.nsk.kstatemachine.event.Event
 import ru.nsk.kstatemachine.event.defaultDataExtractor
 import ru.nsk.kstatemachine.state.DefaultDataState
 import ru.nsk.kstatemachine.state.DefaultState
+import ru.nsk.kstatemachine.state.FinalState
 import ru.nsk.kstatemachine.state.State
+import ru.nsk.kstatemachine.state.addFinalState
 import ru.nsk.kstatemachine.state.addInitialState
 import ru.nsk.kstatemachine.state.addState
 import ru.nsk.kstatemachine.state.dataTransition
 import ru.nsk.kstatemachine.state.onEntry
-import ru.nsk.kstatemachine.state.transition
 import ru.nsk.kstatemachine.statemachine.StateMachine
 import ru.nsk.kstatemachine.statemachine.createStateMachine
+import ru.nsk.kstatemachine.statemachine.destroy
 import ru.nsk.kstatemachine.statemachine.onTransitionComplete
 
 @Composable
@@ -50,13 +52,12 @@ class CameraController(
     internal val camera: Camera,
     private val scope: CoroutineScope,
 ) {
-    private var machine: StateMachine? = null
     private val lock = Mutex()
 
     private val state = MutableStateFlow<CaptureState>(CaptureState.Idle)
     val currentState = state.asStateFlow()
     val configuration = camera.configuration.asStateFlow()
-    val isReady = currentState.map { state -> state == CaptureState.Idle }
+    val isReady = currentState.map { state -> state == CaptureState.Idle || state == CaptureState.Succeeded }
 
     private suspend fun <T> withLock(block: suspend () -> T) = lock.withLock { block() }
 
@@ -69,149 +70,159 @@ class CameraController(
         withLock {
             val deferred = CompletableDeferred<Map<CameraPosition, String>>()
 
+            state.emit(CaptureState.Idle)
             val stateMachine = stateMachine()
-            stateMachine.processEvent(
-                CaptureEvent.Start(
-                    CaptureSession(
-                        configuration = camera.configuration.value,
-                        deferred = deferred,
-                    ),
-                ),
-            )
 
-            deferred.await()
+            try {
+                stateMachine.processEvent(
+                    CaptureEvent.Start(
+                        CaptureSession(
+                            configuration = camera.configuration.value,
+                            deferred = deferred,
+                        ),
+                    ),
+                )
+
+                deferred.await()
+            } finally {
+                stateMachine.destroy()
+            }
         }
 
     @Suppress("LongMethod")
-    private suspend fun stateMachine(): StateMachine {
-        val existing = machine
-        if (existing != null) return existing
+    private suspend fun stateMachine(): StateMachine =
+        createStateMachine(scope, name = "CaptureWorkflow") {
+            val workflow = this@CameraController
+            val sm = this@createStateMachine
 
-        val created =
-            createStateMachine(scope, name = "CaptureWorkflow") {
-                val workflow = this@CameraController
-                val sm = this@createStateMachine
-
-                addInitialState(CaptureState.Idle) {
-                    dataTransition<CaptureEvent.Start, CaptureSession> {
-                        targetState = CaptureState.LensPreparing
-                    }
-                }
-
-                addState(CaptureState.LensPreparing) {
-                    onEntry {
-                        val session = data
-                        try {
-                            workflow.camera.waitReady(requireUnready = (session.stage == LensStage.Second))
-                            sm.processEvent(CaptureEvent.LensPrepared(session))
-                        } catch (t: Throwable) {
-                            sm.processEvent(CaptureEvent.Failed(t))
-                        }
-                    }
-
-                    dataTransition<CaptureEvent.LensPrepared, CaptureSession> {
-                        targetState = CaptureState.LensCapturing
-                    }
-                }
-
-                addState(CaptureState.LensCapturing) {
-                    onEntry {
-                        val session = data
-                        try {
-                            val photo = workflow.camera.captureImage()
-                            val updated =
-                                session.copy(
-                                    photos =
-                                        session.photos.apply {
-                                            put(session.position, photo)
-                                        },
-                                )
-                            sm.processEvent(CaptureEvent.PhotoCaptured(photo, updated))
-                        } catch (t: Throwable) {
-                            sm.processEvent(CaptureEvent.Failed(t))
-                        }
-                    }
-
-                    dataTransition<CaptureEvent.PhotoCaptured, CaptureSession> {
-                        guard = { event.data.stage == LensStage.First }
-                        targetState = CaptureState.SwitchingLens
-                    }
-
-                    dataTransition<CaptureEvent.PhotoCaptured, CaptureSession> {
-                        guard = { event.data.stage == LensStage.Second }
-                        targetState = CaptureState.Finalizing
-                    }
-                }
-
-                addState(CaptureState.SwitchingLens) {
-                    onEntry {
-                        val session = data
-                        try {
-                            val next = session.configuration.position.opposite()
-                            workflow.camera.configuration.value = session.configuration.copy(position = next)
-                            val updated =
-                                session.copy(
-                                    position = next,
-                                    stage = LensStage.Second,
-                                    switchedLens = true,
-                                )
-                            sm.processEvent(CaptureEvent.LensSwitched(updated))
-                        } catch (t: Throwable) {
-                            sm.processEvent(CaptureEvent.Failed(t))
-                        }
-                    }
-
-                    dataTransition<CaptureEvent.LensSwitched, CaptureSession> {
-                        targetState = CaptureState.LensPreparing
-                    }
-                }
-
-                addState(CaptureState.Finalizing) {
-                    onEntry {
-                        val session = data
-                        session.deferred.complete(session.photos)
-                        sm.processEvent(CaptureEvent.Finalized(session))
-                    }
-
-                    dataTransition<CaptureEvent.Finalized, CaptureSession> {
-                        targetState = CaptureState.Cleaning
-                    }
-                }
-
-                addState(CaptureState.Cleaning) {
-                    onEntry {
-                        val session = data
-                        val cleanup =
-                            runCatching {
-                                workflow.camera.configuration.value = session.configuration
-                                workflow.camera.waitReady(requireUnready = session.switchedLens)
-                            }
-
-                        if (cleanup.isFailure && !session.deferred.isCompleted) {
-                            session.deferred.completeExceptionally(checkNotNull(cleanup.exceptionOrNull()))
-                        }
-
-                        sm.processEvent(CaptureEvent.Cleaned(session))
-                    }
-
-                    transition<CaptureEvent.Cleaned> {
-                        targetState = CaptureState.Idle
-                    }
-                }
-
-                transition<CaptureEvent.Failed> {
-                    targetState = CaptureState.Cleaning
-                }
-
-                onTransitionComplete { states, _ ->
-                    check(states.size == 1) { "expected 1 active state, got $states" }
-                    state.emit(states.first() as CaptureState)
+            addInitialState(CaptureState.Idle) {
+                dataTransition<CaptureEvent.Start, CaptureSession> {
+                    targetState = CaptureState.LensPreparing
                 }
             }
 
-        machine = created
-        return created
-    }
+            addState(CaptureState.LensPreparing) {
+                onEntry {
+                    val session = data
+                    try {
+                        workflow.camera.waitReady(requireUnready = (session.stage == LensStage.Second))
+                        sm.processEvent(CaptureEvent.LensPrepared(session))
+                    } catch (t: Throwable) {
+                        sm.processEvent(CaptureEvent.Failed(session.copy(error = t)))
+                    }
+                }
+
+                dataTransition<CaptureEvent.LensPrepared, CaptureSession> {
+                    targetState = CaptureState.LensCapturing
+                }
+            }
+
+            addState(CaptureState.LensCapturing) {
+                onEntry {
+                    val session = data
+                    try {
+                        val photo = workflow.camera.captureImage()
+                        val updated =
+                            session.copy(
+                                photos =
+                                    session.photos.apply {
+                                        put(session.position, photo)
+                                    },
+                            )
+                        sm.processEvent(CaptureEvent.PhotoCaptured(photo, updated))
+                    } catch (t: Throwable) {
+                        sm.processEvent(CaptureEvent.Failed(session.copy(error = t)))
+                    }
+                }
+
+                dataTransition<CaptureEvent.PhotoCaptured, CaptureSession> {
+                    guard = { event.data.stage == LensStage.First }
+                    targetState = CaptureState.SwitchingLens
+                }
+
+                dataTransition<CaptureEvent.PhotoCaptured, CaptureSession> {
+                    guard = { event.data.stage == LensStage.Second }
+                    targetState = CaptureState.Cleaning
+                }
+            }
+
+            addState(CaptureState.SwitchingLens) {
+                onEntry {
+                    val session = data
+                    try {
+                        val next = session.configuration.position.opposite()
+                        workflow.camera.configuration.value = session.configuration.copy(position = next)
+                        val updated =
+                            session.copy(
+                                position = next,
+                                stage = LensStage.Second,
+                                switchedLens = true,
+                            )
+                        sm.processEvent(CaptureEvent.LensSwitched(updated))
+                    } catch (t: Throwable) {
+                        sm.processEvent(CaptureEvent.Failed(session.copy(error = t)))
+                    }
+                }
+
+                dataTransition<CaptureEvent.LensSwitched, CaptureSession> {
+                    targetState = CaptureState.LensPreparing
+                }
+            }
+
+            addState(CaptureState.Cleaning) {
+                onEntry {
+                    val session = data
+                    val cleanup =
+                        runCatching {
+                            workflow.camera.configuration.value = session.configuration
+                            workflow.camera.waitReady(requireUnready = session.switchedLens)
+                        }
+
+                    val combinedError =
+                        when {
+                            cleanup.isSuccess -> session.error
+                            session.error == null -> cleanup.exceptionOrNull()
+                            else -> session.error.also { it.addSuppressed(checkNotNull(cleanup.exceptionOrNull())) }
+                        }
+
+                    val updated = session.copy(error = combinedError)
+                    sm.processEvent(CaptureEvent.Cleaned(updated))
+                }
+
+                dataTransition<CaptureEvent.Cleaned, CaptureSession> {
+                    guard = { event.data.error == null }
+                    targetState = CaptureState.Succeeded
+                }
+
+                dataTransition<CaptureEvent.Cleaned, CaptureSession> {
+                    guard = { event.data.error != null }
+                    targetState = CaptureState.Failed
+                }
+            }
+
+            addFinalState(CaptureState.Succeeded) {
+                onEntry {
+                    val session = data
+                    session.deferred.complete(session.photos)
+                }
+            }
+
+            addFinalState(CaptureState.Failed) {
+                onEntry {
+                    val session = data
+                    session.deferred.completeExceptionally(checkNotNull(session.error))
+                }
+            }
+
+            dataTransition<CaptureEvent.Failed, CaptureSession> {
+                targetState = CaptureState.Cleaning
+            }
+
+            onTransitionComplete { states, _ ->
+                check(states.size == 1) { "expected 1 active state, got $states" }
+                state.emit(states.first() as CaptureState)
+            }
+        }
 }
 
 enum class LensStage { First, Second }
@@ -222,6 +233,7 @@ data class CaptureSession(
     val stage: LensStage = LensStage.First,
     val switchedLens: Boolean = false,
     val photos: LinkedHashMap<CameraPosition, String> = LinkedHashMap(),
+    val error: Throwable? = null,
     val deferred: CompletableDeferred<Map<CameraPosition, String>>,
 )
 
@@ -242,9 +254,11 @@ sealed interface CaptureState : State {
 
     data object SwitchingLens : WithSession("SwitchingLens")
 
-    data object Finalizing : WithSession("Finalizing")
-
     data object Cleaning : WithSession("Cleaning")
+
+    data object Succeeded : WithSession("Finished"), FinalState
+
+    data object Failed : WithSession("Failed"), FinalState
 }
 
 private sealed interface CaptureEvent : Event {
@@ -269,14 +283,10 @@ private sealed interface CaptureEvent : Event {
     ) : DataEvent<CaptureSession>,
         CaptureEvent
 
-    data class Finalized(
+    data class Failed(
         override val data: CaptureSession,
     ) : DataEvent<CaptureSession>,
         CaptureEvent
-
-    data class Failed(
-        val throwable: Throwable,
-    ) : CaptureEvent
 
     data class Cleaned(
         override val data: CaptureSession,
