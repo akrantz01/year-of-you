@@ -25,12 +25,16 @@ import app.composeapp.generated.resources.circle
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import you.yearof.app.camera.CameraController
+import you.yearof.app.camera.CameraPosition
 import you.yearof.app.camera.CameraPreview
 import you.yearof.app.camera.FlashMode
 import you.yearof.app.camera.rememberCameraController
 
 @Composable
-fun CaptureScreen(modifier: Modifier = Modifier) {
+fun CaptureScreen(
+    onCaptureComplete: (Map<CameraPosition, String>) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val controller = rememberCameraController()
 
     Box(modifier = modifier.fillMaxSize()) {
@@ -53,7 +57,7 @@ fun CaptureScreen(modifier: Modifier = Modifier) {
                 horizontalArrangement = Arrangement.SpaceAround,
             ) {
                 SwapPositionButton(controller = controller)
-                CaptureButton(controller = controller)
+                CaptureButton(controller = controller, onCaptureComplete = onCaptureComplete)
                 FlashToggleButton(controller = controller)
             }
         }
@@ -63,6 +67,7 @@ fun CaptureScreen(modifier: Modifier = Modifier) {
 @Composable
 fun CaptureButton(
     controller: CameraController,
+    onCaptureComplete: (Map<CameraPosition, String>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scope = rememberCoroutineScope()
@@ -73,7 +78,8 @@ fun CaptureButton(
         enabled = isReady,
         onClick = {
             scope.launch {
-                controller.capture()
+                val images = controller.capture()
+                onCaptureComplete(images)
             }
         },
     ) {

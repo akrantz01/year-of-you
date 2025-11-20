@@ -20,6 +20,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import kotlinx.serialization.Serializable
+import you.yearof.app.camera.CameraPosition
 import you.yearof.app.onboarding.CameraPermissions
 import you.yearof.app.onboarding.NotificationPermissions
 import you.yearof.app.onboarding.Onboarding
@@ -84,7 +85,19 @@ fun App(onboardingViewModel: OnboardingViewModel = viewModel { OnboardingViewMod
                 navigation<Main>(startDestination = Route.Capture) {
                     // TODO: switch to feed once implemented
                     composable<Route.Feed> { TODO() }
-                    composable<Route.Capture> { CaptureScreen() }
+                    composable<Route.Capture> {
+                        CaptureScreen(
+                            onCaptureComplete = { images ->
+                                nav.navigate(
+                                    Route.CapturePreview(
+                                        frontPath = images[CameraPosition.Front]!!,
+                                        backPath = images[CameraPosition.Back]!!,
+                                    ),
+                                )
+                            },
+                        )
+                    }
+                    composable<Route.CapturePreview> { TODO() }
                     composable<Route.Profile> { TODO() }
                 }
             }

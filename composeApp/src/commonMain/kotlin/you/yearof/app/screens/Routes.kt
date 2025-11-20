@@ -14,5 +14,11 @@ sealed interface Route {
     data object Capture : Route
 
     @Serializable
+    data class CapturePreview(
+        val frontPath: String,
+        val backPath: String,
+    ) : Route
+
+    @Serializable
     data object Profile : Route
 }
