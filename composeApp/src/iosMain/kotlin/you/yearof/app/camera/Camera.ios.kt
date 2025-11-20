@@ -4,9 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.cinterop.addressOf
-import kotlinx.cinterop.memScoped
-import kotlinx.cinterop.usePinned
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.collectLatest
@@ -35,10 +32,12 @@ import platform.AVFoundation.defaultDeviceWithDeviceType
 import platform.AVFoundation.fileDataRepresentation
 import platform.AVFoundation.focusMode
 import platform.AVFoundation.isFocusModeSupported
-import platform.Foundation.NSData
+import platform.Foundation.NSCachesDirectory
 import platform.Foundation.NSError
+import platform.Foundation.NSSearchPathForDirectoriesInDomains
+import platform.Foundation.NSUserDomainMask
+import platform.Foundation.writeToFile
 import platform.darwin.NSObject
-import platform.posix.memcpy
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
@@ -83,10 +82,19 @@ actual class Camera : AbstractCamera() {
 
     actual suspend fun captureImage(): String =
         suspendCancellableCoroutine { cont ->
-            captureDelegate.onCapture = {
+            val config = configuration.value
+            val directory =
+                NSSearchPathForDirectoriesInDomains(
+                    NSCachesDirectory,
+                    NSUserDomainMask,
+                    true,
+                ).firstOrNull()!! as String
+            val path = "$directory/${photoName(config.position)}"
+
+            captureDelegate.path = path
+            captureDelegate.onComplete = {
                 captureDelegate.clear()
-                // TODO: save result to file either here or within the delegate
-                cont.resume("TODO")
+                cont.resume(path)
             }
             captureDelegate.onError = { error ->
                 captureDelegate.clear()
@@ -103,7 +111,7 @@ actual class Camera : AbstractCamera() {
                 )
 
             settings.flashMode =
-                when (configuration.value.flashMode) {
+                when (config.flashMode) {
                     FlashMode.Off -> AVCaptureFlashModeOff
                     FlashMode.Auto -> AVCaptureFlashModeAuto
                     FlashMode.On -> AVCaptureFlashModeOn
@@ -116,7 +124,8 @@ actual class Camera : AbstractCamera() {
 private class CaptureDelegate :
     NSObject(),
     AVCapturePhotoCaptureDelegateProtocol {
-    var onCapture: ((Photo) -> Unit)? = null
+    var path: String? = null
+    var onComplete: (() -> Unit)? = null
     var onError: ((Throwable) -> Unit)? = null
 
     override fun captureOutput(
@@ -129,16 +138,20 @@ private class CaptureDelegate :
             return
         }
 
-        val data = didFinishProcessingPhoto.fileDataRepresentation()?.toByteArray()
+        val data = didFinishProcessingPhoto.fileDataRepresentation()
         if (data != null) {
-            onCapture?.invoke(data)
+            val path = checkNotNull(path)
+            data.writeToFile(path, true)
+
+            onComplete?.invoke()
         } else {
             onError?.invoke(IllegalStateException("No photo data returned"))
         }
     }
 
     fun clear() {
-        onCapture = null
+        path = null
+        onComplete = null
         onError = null
     }
 }
@@ -168,13 +181,3 @@ private fun createInputDevice(config: CameraConfiguration): AVCaptureDeviceInput
 
     return AVCaptureDeviceInput.deviceInputWithDevice(device, null)!!
 }
-
-@OptIn(ExperimentalForeignApi::class)
-private fun NSData.toByteArray(): ByteArray =
-    memScoped {
-        val buffer = ByteArray(length.toInt())
-        buffer.usePinned { pinned ->
-            memcpy(pinned.addressOf(0), this@toByteArray.bytes, this@toByteArray.length)
-        }
-        buffer
-    }
