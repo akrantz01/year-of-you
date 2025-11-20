@@ -77,6 +77,11 @@ actual class Camera : AbstractCamera() {
 
         session.addInput(createInputDevice(config))
 
+        output.connectionWithMediaType(AVMediaTypeVideo)?.let { connection ->
+            connection.automaticallyAdjustsVideoMirroring = false
+            connection.videoMirrored = config.position == CameraPosition.Front
+        }
+
         session.commitConfiguration()
     }
 
