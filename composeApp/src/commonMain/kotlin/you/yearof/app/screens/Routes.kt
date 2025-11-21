@@ -2,7 +2,6 @@ package you.yearof.app.screens
 
 import kotlinx.serialization.Serializable
 import you.yearof.app.dto.CompletedCapture
-import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
 @Serializable
@@ -17,7 +16,6 @@ sealed interface Route {
     data object Capture : Route
 
     @Serializable
-    @OptIn(ExperimentalTime::class)
     data class CapturePreview(
         val frontPath: String,
         val backPath: String,

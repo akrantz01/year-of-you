@@ -30,7 +30,6 @@ import you.yearof.app.camera.CameraPreview
 import you.yearof.app.camera.FlashMode
 import you.yearof.app.camera.rememberCameraController
 import you.yearof.app.dto.CompletedCapture
-import kotlin.time.ExperimentalTime
 
 @Composable
 fun CaptureScreen(
@@ -67,7 +66,6 @@ fun CaptureScreen(
 }
 
 @Composable
-@OptIn(ExperimentalTime::class)
 fun CaptureButton(
     controller: CameraController,
     onCaptureComplete: (CompletedCapture) -> Unit,

@@ -39,13 +39,11 @@ import you.yearof.app.screens.CapturePreview
 import you.yearof.app.screens.CaptureScreen
 import you.yearof.app.screens.Main
 import you.yearof.app.screens.Route
-import kotlin.time.ExperimentalTime
 
 @Serializable
 data object Initialization
 
 @Composable
-@OptIn(ExperimentalTime::class)
 fun App(onboardingViewModel: OnboardingViewModel = viewModel { OnboardingViewModel() }) {
     setSingletonImageLoaderFactory { context ->
         ImageLoader.Builder(context).crossfade(true).build()

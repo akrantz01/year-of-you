@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
 
 @Composable
 expect fun rememberCamera(): Camera
@@ -24,7 +23,6 @@ open class AbstractCamera {
         isReady.first { it }
     }
 
-    @OptIn(ExperimentalTime::class)
     protected fun photoName(position: CameraPosition): String {
         val timestamp = Clock.System.now().toEpochMilliseconds()
         return "capture-$position-$timestamp.jpeg"

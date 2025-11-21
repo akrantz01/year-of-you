@@ -8,14 +8,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.UIKitView
-import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.readValue
 import platform.AVFoundation.AVCaptureVideoPreviewLayer
 import platform.AVFoundation.AVLayerVideoGravityResizeAspect
 import platform.CoreGraphics.CGRectZero
 import platform.UIKit.UIView
 
-@OptIn(ExperimentalForeignApi::class)
 @Composable
 actual fun CameraPreview(
     controller: CameraController,

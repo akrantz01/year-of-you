@@ -5,7 +5,6 @@ import androidx.room.Dao
 import androidx.room.Entity
 import androidx.room.Insert
 import androidx.room.PrimaryKey
-import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
 @Entity
@@ -15,7 +14,6 @@ data class Capture(
     @ColumnInfo(name = "back_path") val backPath: String,
     @ColumnInfo(name = "at") val atMillis: Long,
 ) {
-    @OptIn(ExperimentalTime::class)
     val at: Instant
         get() = Instant.fromEpochMilliseconds(atMillis)
 }

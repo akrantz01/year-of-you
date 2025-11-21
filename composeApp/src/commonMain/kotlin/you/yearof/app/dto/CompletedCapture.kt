@@ -3,11 +3,9 @@ package you.yearof.app.dto
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.InstantComponentSerializer
 import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
 @Serializable
-@OptIn(ExperimentalTime::class)
 data class CompletedCapture(
     val frontPath: String,
     val backPath: String,

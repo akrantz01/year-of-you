@@ -3,7 +3,6 @@ package you.yearof.app.camera
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
-import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.collectLatest
@@ -45,7 +44,6 @@ import kotlin.coroutines.resumeWithException
 actual fun rememberCamera(): Camera = remember { Camera() }
 
 @Stable
-@OptIn(ExperimentalForeignApi::class)
 actual class Camera : AbstractCamera() {
     internal val session = AVCaptureSession()
     private val output = AVCapturePhotoOutput()
@@ -161,7 +159,6 @@ private class CaptureDelegate :
     }
 }
 
-@OptIn(ExperimentalForeignApi::class)
 private fun createInputDevice(config: CameraConfiguration): AVCaptureDeviceInput {
     val device =
         AVCaptureDevice.defaultDeviceWithDeviceType(
