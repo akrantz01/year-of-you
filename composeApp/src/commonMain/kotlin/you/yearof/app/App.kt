@@ -108,7 +108,11 @@ fun App(onboardingViewModel: OnboardingViewModel = viewModel { OnboardingViewMod
                     }
                     composable<Route.CapturePreview> { backStackEntry ->
                         val preview = backStackEntry.toRoute<Route.CapturePreview>()
-                        CapturePreview(frontPath = preview.frontPath, backPath = preview.backPath)
+                        CapturePreview(
+                            frontPath = preview.frontPath,
+                            backPath = preview.backPath,
+                            onCancel = { nav.popBackStack() },
+                        )
                     }
                     composable<Route.Profile> { TODO() }
                 }

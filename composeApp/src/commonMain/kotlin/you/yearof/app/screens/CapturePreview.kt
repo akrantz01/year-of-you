@@ -8,7 +8,12 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults.iconButtonColors
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,16 +26,31 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import app.composeapp.generated.resources.Res
+import app.composeapp.generated.resources.arrow_left
 import coil3.compose.AsyncImage
 import okio.Path.Companion.toPath
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun CapturePreview(
     frontPath: String,
     backPath: String,
+    onCancel: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxSize()) {
+        IconButton(
+            onClick = onCancel,
+            colors = iconButtonColors(contentColor = MaterialTheme.colorScheme.onBackground),
+        ) {
+            Icon(
+                modifier = Modifier.size(24.dp),
+                painter = painterResource(Res.drawable.arrow_left),
+                contentDescription = "Back",
+            )
+        }
+
         PictureInPicture(
             modifier = Modifier.fillMaxWidth(),
             front = frontPath,
