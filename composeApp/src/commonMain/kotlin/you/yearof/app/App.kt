@@ -25,6 +25,7 @@ import coil3.compose.setSingletonImageLoaderFactory
 import coil3.request.crossfade
 import kotlinx.serialization.Serializable
 import you.yearof.app.camera.CameraPosition
+import you.yearof.app.database.rememberDatabase
 import you.yearof.app.onboarding.CameraPermissions
 import you.yearof.app.onboarding.NotificationPermissions
 import you.yearof.app.onboarding.Onboarding
@@ -49,6 +50,7 @@ fun App(onboardingViewModel: OnboardingViewModel = viewModel { OnboardingViewMod
     val cameraPermission = rememberPermissionState(Permission.Camera)
     val notificationPermission = rememberPermissionState(Permission.Notification)
 
+    val db = rememberDatabase()
     val nav = rememberNavController()
 
     LaunchedEffect(cameraPermission.status) {
