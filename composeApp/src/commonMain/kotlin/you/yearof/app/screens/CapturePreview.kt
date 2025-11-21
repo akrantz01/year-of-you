@@ -10,10 +10,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults.iconButtonColors
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,11 +33,12 @@ import app.composeapp.generated.resources.arrow_left
 import coil3.compose.AsyncImage
 import okio.Path.Companion.toPath
 import org.jetbrains.compose.resources.painterResource
+import you.yearof.app.dto.CompletedCapture
 
 @Composable
 fun CapturePreview(
-    frontPath: String,
-    backPath: String,
+    capture: CompletedCapture,
+    onSave: (CompletedCapture) -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -53,9 +56,13 @@ fun CapturePreview(
 
         PictureInPicture(
             modifier = Modifier.fillMaxWidth(),
-            front = frontPath,
-            back = backPath,
+            front = capture.frontPath,
+            back = capture.backPath,
         )
+
+        Button(onClick = { onSave(capture) }) {
+            Text("Save")
+        }
     }
 }
 
@@ -88,7 +95,7 @@ fun PictureInPicture(
                 Modifier
                     .padding(8.dp)
                     .align(Alignment.TopEnd)
-                    .fillMaxWidth(0.4f)
+                    .fillMaxWidth(0.3f)
                     .aspectRatio(3f / 4f)
                     .clip(RoundedCornerShape(12.dp))
                     .shadow(6.dp, RoundedCornerShape(12.dp))

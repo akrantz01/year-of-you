@@ -10,7 +10,7 @@ import kotlin.time.Instant
 
 @Entity
 data class Capture(
-    @PrimaryKey(autoGenerate = true) val id: Int,
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @ColumnInfo(name = "front_path") val frontPath: String,
     @ColumnInfo(name = "back_path") val backPath: String,
     @ColumnInfo(name = "at") val atMillis: Long,

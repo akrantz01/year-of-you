@@ -1,6 +1,9 @@
 package you.yearof.app.screens
 
 import kotlinx.serialization.Serializable
+import you.yearof.app.dto.CompletedCapture
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 @Serializable
 data object Main
@@ -14,10 +17,28 @@ sealed interface Route {
     data object Capture : Route
 
     @Serializable
+    @OptIn(ExperimentalTime::class)
     data class CapturePreview(
         val frontPath: String,
         val backPath: String,
-    ) : Route
+        val timestamp: Long,
+    ) : Route {
+        fun toCompletedCapture(): CompletedCapture =
+            CompletedCapture(
+                frontPath = frontPath,
+                backPath = backPath,
+                timestamp = Instant.fromEpochMilliseconds(timestamp),
+            )
+
+        companion object {
+            fun from(completed: CompletedCapture): CapturePreview =
+                CapturePreview(
+                    frontPath = completed.frontPath,
+                    backPath = completed.backPath,
+                    timestamp = completed.timestamp.toEpochMilliseconds(),
+                )
+        }
+    }
 
     @Serializable
     data object Profile : Route

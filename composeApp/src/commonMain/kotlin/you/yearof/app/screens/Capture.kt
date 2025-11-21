@@ -29,10 +29,12 @@ import you.yearof.app.camera.CameraPosition
 import you.yearof.app.camera.CameraPreview
 import you.yearof.app.camera.FlashMode
 import you.yearof.app.camera.rememberCameraController
+import you.yearof.app.dto.CompletedCapture
+import kotlin.time.ExperimentalTime
 
 @Composable
 fun CaptureScreen(
-    onCaptureComplete: (Map<CameraPosition, String>) -> Unit,
+    onCaptureComplete: (CompletedCapture) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val controller = rememberCameraController()
@@ -65,9 +67,10 @@ fun CaptureScreen(
 }
 
 @Composable
+@OptIn(ExperimentalTime::class)
 fun CaptureButton(
     controller: CameraController,
-    onCaptureComplete: (Map<CameraPosition, String>) -> Unit,
+    onCaptureComplete: (CompletedCapture) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scope = rememberCoroutineScope()
@@ -79,7 +82,12 @@ fun CaptureButton(
         onClick = {
             scope.launch {
                 val images = controller.capture()
-                onCaptureComplete(images)
+                onCaptureComplete(
+                    CompletedCapture(
+                        frontPath = checkNotNull(images[CameraPosition.Front]),
+                        backPath = checkNotNull(images[CameraPosition.Back]),
+                    ),
+                )
             }
         },
     ) {

@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -23,8 +24,9 @@ import androidx.navigation.toRoute
 import coil3.ImageLoader
 import coil3.compose.setSingletonImageLoaderFactory
 import coil3.request.crossfade
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
-import you.yearof.app.camera.CameraPosition
+import you.yearof.app.database.Capture
 import you.yearof.app.database.rememberDatabase
 import you.yearof.app.onboarding.CameraPermissions
 import you.yearof.app.onboarding.NotificationPermissions
@@ -37,15 +39,19 @@ import you.yearof.app.screens.CapturePreview
 import you.yearof.app.screens.CaptureScreen
 import you.yearof.app.screens.Main
 import you.yearof.app.screens.Route
+import kotlin.time.ExperimentalTime
 
 @Serializable
 data object Initialization
 
 @Composable
+@OptIn(ExperimentalTime::class)
 fun App(onboardingViewModel: OnboardingViewModel = viewModel { OnboardingViewModel() }) {
     setSingletonImageLoaderFactory { context ->
         ImageLoader.Builder(context).crossfade(true).build()
     }
+
+    val scope = rememberCoroutineScope()
 
     val cameraPermission = rememberPermissionState(Permission.Camera)
     val notificationPermission = rememberPermissionState(Permission.Notification)
@@ -98,21 +104,29 @@ fun App(onboardingViewModel: OnboardingViewModel = viewModel { OnboardingViewMod
                     composable<Route.Feed> { TODO() }
                     composable<Route.Capture> {
                         CaptureScreen(
-                            onCaptureComplete = { images ->
-                                nav.navigate(
-                                    Route.CapturePreview(
-                                        frontPath = images[CameraPosition.Front]!!,
-                                        backPath = images[CameraPosition.Back]!!,
-                                    ),
-                                )
+                            onCaptureComplete = { completed ->
+                                nav.navigate(Route.CapturePreview.from(completed))
                             },
                         )
                     }
                     composable<Route.CapturePreview> { backStackEntry ->
                         val preview = backStackEntry.toRoute<Route.CapturePreview>()
                         CapturePreview(
-                            frontPath = preview.frontPath,
-                            backPath = preview.backPath,
+                            capture = preview.toCompletedCapture(),
+                            onSave = { capture ->
+                                scope.launch {
+                                    db.captures().insert(
+                                        Capture(
+                                            frontPath = capture.frontPath,
+                                            backPath = capture.backPath,
+                                            atMillis = capture.timestamp.toEpochMilliseconds(),
+                                        ),
+                                    )
+                                    nav.navigate(Route.Feed) {
+                                        popUpTo(Route.Capture) { inclusive = true }
+                                    }
+                                }
+                            },
                             onCancel = { nav.popBackStack() },
                         )
                     }
