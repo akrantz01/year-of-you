@@ -19,6 +19,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
+import coil3.ImageLoader
+import coil3.compose.setSingletonImageLoaderFactory
+import coil3.request.crossfade
 import kotlinx.serialization.Serializable
 import you.yearof.app.camera.CameraPosition
 import you.yearof.app.onboarding.CameraPermissions
@@ -28,6 +32,7 @@ import you.yearof.app.onboarding.OnboardingRoute
 import you.yearof.app.onboarding.OnboardingViewModel
 import you.yearof.app.permissions.Permission
 import you.yearof.app.permissions.rememberPermissionState
+import you.yearof.app.screens.CapturePreview
 import you.yearof.app.screens.CaptureScreen
 import you.yearof.app.screens.Main
 import you.yearof.app.screens.Route
@@ -37,6 +42,10 @@ data object Initialization
 
 @Composable
 fun App(onboardingViewModel: OnboardingViewModel = viewModel { OnboardingViewModel() }) {
+    setSingletonImageLoaderFactory { context ->
+        ImageLoader.Builder(context).crossfade(true).build()
+    }
+
     val cameraPermission = rememberPermissionState(Permission.Camera)
     val notificationPermission = rememberPermissionState(Permission.Notification)
 
@@ -97,7 +106,10 @@ fun App(onboardingViewModel: OnboardingViewModel = viewModel { OnboardingViewMod
                             },
                         )
                     }
-                    composable<Route.CapturePreview> { TODO() }
+                    composable<Route.CapturePreview> { backStackEntry ->
+                        val preview = backStackEntry.toRoute<Route.CapturePreview>()
+                        CapturePreview(frontPath = preview.frontPath, backPath = preview.backPath)
+                    }
                     composable<Route.Profile> { TODO() }
                 }
             }

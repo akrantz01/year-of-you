@@ -52,12 +52,11 @@ kotlin {
             implementation(libs.androidx.navigation.compose)
             implementation(libs.androidx.datastore)
             implementation(libs.androidx.datastore.preferences)
+            implementation(libs.coil.compose)
+            implementation(libs.okio)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
-        }
-        iosMain.dependencies {
-            implementation(libs.skiko)
         }
     }
 }
