@@ -14,7 +14,7 @@ class CaptureViewModel(
     fun onCaptureComplete(capture: CompletedCapture) {
         viewModelScope.launch {
             navigationCoordinator.navigateTo(
-                Route.CapturePreview.from(capture),
+                CaptureNav.CapturePreview.from(capture),
                 options = { launchSingleTop = true },
             )
         }

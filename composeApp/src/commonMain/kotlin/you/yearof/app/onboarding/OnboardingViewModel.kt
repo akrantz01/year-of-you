@@ -15,7 +15,7 @@ import you.yearof.app.permissions.Permission
 import you.yearof.app.permissions.PermissionRequirement
 import you.yearof.app.permissions.PermissionStatus
 import you.yearof.app.permissions.PermissionsCoordinator
-import you.yearof.app.screens.Main
+import you.yearof.app.screens.MainGraph
 
 data class OnboardingUiState(
     val camera: PermissionStatus = PermissionStatus.Loading,
@@ -72,7 +72,7 @@ class OnboardingViewModel(
         viewModelScope.launch {
             when (val route = nextStep()) {
                 null ->
-                    navigationCoordinator.navigateTo(Main) {
+                    navigationCoordinator.navigateTo(MainGraph) {
                         popUpTo(Onboarding) { inclusive = true }
                         launchSingleTop = true
                     }
@@ -89,7 +89,7 @@ class OnboardingViewModel(
             val next = nextStep()
 
             if (next == null) {
-                navigationCoordinator.navigateTo(Main) {
+                navigationCoordinator.navigateTo(MainGraph) {
                     popUpTo(Initialization) { inclusive = true }
                 }
             } else {

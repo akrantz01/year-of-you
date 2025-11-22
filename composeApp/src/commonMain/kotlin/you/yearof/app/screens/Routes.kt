@@ -5,23 +5,41 @@ import you.yearof.app.dto.CompletedCapture
 import you.yearof.app.navigation.NavigationRoute
 import kotlin.time.Instant
 
+/**
+ * Top-level graph for the main portion of the app (after onboarding/initialization).
+ */
 @Serializable
-data object Main : NavigationRoute
+data object MainGraph : NavigationRoute
+
+/**
+ * Marker objects for tab graphs.
+ */
+@Serializable
+data object FeedGraph : NavigationRoute
 
 @Serializable
-sealed interface Route : NavigationRoute {
-    @Serializable
-    data object Feed : Route
+data object CaptureGraph : NavigationRoute
 
+@Serializable
+data object ProfileGraph : NavigationRoute
+
+@Serializable
+sealed interface FeedNav : NavigationRoute {
     @Serializable
-    data object Capture : Route
+    data object Feed : FeedNav
+}
+
+@Serializable
+sealed interface CaptureNav : NavigationRoute {
+    @Serializable
+    data object Capture : CaptureNav
 
     @Serializable
     data class CapturePreview(
         val frontPath: String,
         val backPath: String,
         val timestamp: Long,
-    ) : Route {
+    ) : CaptureNav {
         fun toCompletedCapture(): CompletedCapture =
             CompletedCapture(
                 frontPath = frontPath,
@@ -38,7 +56,10 @@ sealed interface Route : NavigationRoute {
                 )
         }
     }
+}
 
+@Serializable
+sealed interface ProfileNav : NavigationRoute {
     @Serializable
-    data object Profile : Route
+    data object Profile : ProfileNav
 }
