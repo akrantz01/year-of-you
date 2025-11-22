@@ -44,7 +44,10 @@ import you.yearof.app.screens.Route
 data object Initialization
 
 @Composable
-fun App(onboardingViewModel: OnboardingViewModel = viewModel { OnboardingViewModel() }) {
+fun App(
+    modifier: Modifier = Modifier,
+    onboardingViewModel: OnboardingViewModel = viewModel { OnboardingViewModel() },
+) {
     setSingletonImageLoaderFactory { context ->
         ImageLoader.Builder(context).crossfade(true).build()
     }
@@ -69,7 +72,7 @@ fun App(onboardingViewModel: OnboardingViewModel = viewModel { OnboardingViewMod
     MaterialTheme(colorScheme = colorScheme) {
         Box(
             modifier =
-                Modifier
+                modifier
                     .fillMaxSize()
                     .background(MaterialTheme.colorScheme.background)
                     .safeDrawingPadding(),

@@ -19,6 +19,12 @@ internal fun RoomDatabase.Builder<AppDatabase>.commonConfiguration() {
     setQueryCoroutineContext(Dispatchers.IO)
 }
 
+fun buildDatabase(initializer: (String) -> RoomDatabase.Builder<AppDatabase>): AppDatabase =
+    initializer(DatabaseName)
+        .setDriver(BundledSQLiteDriver())
+        .setQueryCoroutineContext(Dispatchers.IO)
+        .build()
+
 @Database(entities = [Capture::class], version = 1)
 @ConstructedBy(AppDatabaseConstructor::class)
 abstract class AppDatabase : RoomDatabase() {
