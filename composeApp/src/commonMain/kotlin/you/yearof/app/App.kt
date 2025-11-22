@@ -10,12 +10,7 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
@@ -24,48 +19,30 @@ import androidx.navigation.toRoute
 import coil3.ImageLoader
 import coil3.compose.setSingletonImageLoaderFactory
 import coil3.request.crossfade
-import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
-import you.yearof.app.database.Capture
-import you.yearof.app.database.rememberDatabase
-import you.yearof.app.onboarding.CameraPermissions
-import you.yearof.app.onboarding.NotificationPermissions
+import org.koin.compose.koinInject
+import you.yearof.app.navigation.NavigationCoordinator
+import you.yearof.app.navigation.NavigationEvent
+import you.yearof.app.navigation.NavigationRoute
+import you.yearof.app.navigation.sharedViewModel
+import you.yearof.app.onboarding.CameraPermissionsScreen
+import you.yearof.app.onboarding.InitializationScreen
+import you.yearof.app.onboarding.NotificationPermissionsScreen
 import you.yearof.app.onboarding.Onboarding
 import you.yearof.app.onboarding.OnboardingRoute
 import you.yearof.app.onboarding.OnboardingViewModel
-import you.yearof.app.permissions.Permission
-import you.yearof.app.permissions.rememberPermissionState
-import you.yearof.app.screens.CapturePreview
+import you.yearof.app.screens.CapturePreviewScreen
 import you.yearof.app.screens.CaptureScreen
 import you.yearof.app.screens.Main
 import you.yearof.app.screens.Route
 
 @Serializable
-data object Initialization
+data object Initialization : NavigationRoute
 
 @Composable
-fun App(
-    modifier: Modifier = Modifier,
-    onboardingViewModel: OnboardingViewModel = viewModel { OnboardingViewModel() },
-) {
+fun App(modifier: Modifier = Modifier) {
     setSingletonImageLoaderFactory { context ->
         ImageLoader.Builder(context).crossfade(true).build()
-    }
-
-    val scope = rememberCoroutineScope()
-
-    val cameraPermission = rememberPermissionState(Permission.Camera)
-    val notificationPermission = rememberPermissionState(Permission.Notification)
-
-    val db = rememberDatabase()
-    val nav = rememberNavController()
-
-    LaunchedEffect(cameraPermission.status) {
-        onboardingViewModel.updatePermission(Permission.Camera, cameraPermission.status)
-    }
-
-    LaunchedEffect(notificationPermission.status) {
-        onboardingViewModel.updatePermission(Permission.Notification, notificationPermission.status)
     }
 
     val colorScheme = if (isSystemInDarkTheme()) darkColorScheme() else lightColorScheme()
@@ -77,102 +54,61 @@ fun App(
                     .background(MaterialTheme.colorScheme.background)
                     .safeDrawingPadding(),
         ) {
-            NavHost(navController = nav, startDestination = Initialization) {
-                composable<Initialization> { InitializationDecider(nav = nav, viewModel = onboardingViewModel) }
-
-                navigation<Onboarding>(startDestination = OnboardingRoute.Camera) {
-                    composable<OnboardingRoute.Camera> {
-                        val cameraStatus by onboardingViewModel.cameraStatus.collectAsState()
-                        CameraPermissions(
-                            status = cameraStatus,
-                            onRequest = cameraPermission::request,
-                            onContinue = { nav.toNextOnboardingRoute(onboardingViewModel) },
-                        )
-                    }
-
-                    composable<OnboardingRoute.Notifications> {
-                        val notificationStatus by onboardingViewModel.notificationStatus.collectAsState()
-                        NotificationPermissions(
-                            status = notificationStatus,
-                            onRequest = notificationPermission::request,
-                            onContinue = { nav.toNextOnboardingRoute(onboardingViewModel) },
-                        )
-                    }
-                }
-
-                navigation<Main>(startDestination = Route.Capture) {
-                    // TODO: switch to feed once implemented
-                    composable<Route.Feed> { TODO() }
-                    composable<Route.Capture> {
-                        CaptureScreen(
-                            onCaptureComplete = { completed ->
-                                nav.navigate(Route.CapturePreview.from(completed))
-                            },
-                        )
-                    }
-                    composable<Route.CapturePreview> { backStackEntry ->
-                        val preview = backStackEntry.toRoute<Route.CapturePreview>()
-                        CapturePreview(
-                            capture = preview.toCompletedCapture(),
-                            onSave = { capture ->
-                                scope.launch {
-                                    db.captures().insert(
-                                        Capture(
-                                            frontPath = capture.frontPath,
-                                            backPath = capture.backPath,
-                                            atMillis = capture.timestamp.toEpochMilliseconds(),
-                                        ),
-                                    )
-                                    nav.navigate(Route.Feed) {
-                                        popUpTo(Route.Capture) { inclusive = true }
-                                    }
-                                }
-                            },
-                            onCancel = { nav.popBackStack() },
-                        )
-                    }
-                    composable<Route.Profile> { TODO() }
-                }
-            }
+            AppNavigation()
         }
     }
 }
 
 @Composable
-fun InitializationDecider(
-    nav: NavController,
-    viewModel: OnboardingViewModel,
-) {
-    val state by viewModel.uiState.collectAsState()
+private fun AppNavigation(navigationCoordinator: NavigationCoordinator = koinInject()) {
+    val navController = rememberNavController()
 
-    LaunchedEffect(state) {
-        if (!viewModel.ready()) return@LaunchedEffect
-
-        val next = viewModel.nextStep()
-
-        if (next == null) {
-            nav.navigate(Main) { popUpTo(Initialization) { inclusive = true } }
-        } else {
-            nav.navigate(Onboarding) { popUpTo(Initialization) { inclusive = true } }
-            nav.navigate(next)
+    // Centralized navigation handling
+    LaunchedEffect(navigationCoordinator) {
+        navigationCoordinator.navigationEvents.collect { event ->
+            when (event) {
+                is NavigationEvent.NavigateTo -> {
+                    navController.navigate(event.route) {
+                        event.navOptions?.invoke(this)
+                    }
+                }
+                is NavigationEvent.NavigateUp -> navController.navigateUp()
+            }
         }
     }
 
-    // TODO: show loading/black screen
-}
+    NavHost(navController = navController, startDestination = Initialization) {
+        composable<Initialization> {
+            InitializationScreen()
+        }
 
-private fun NavController.toNextOnboardingRoute(model: OnboardingViewModel) {
-    when (val route = model.nextStep()) {
-        null ->
-            navigate(Main) {
-                popUpTo(Onboarding) { inclusive = true }
-                launchSingleTop = true
+        navigation<Onboarding>(startDestination = OnboardingRoute.Camera) {
+            composable<OnboardingRoute.Camera> { backStackEntry ->
+                val viewModel: OnboardingViewModel = backStackEntry.sharedViewModel(navController)
+                CameraPermissionsScreen(viewModel = viewModel)
             }
-        else ->
-            navigate(route) {
-                val currentId = currentDestination?.id
-                if (currentId != null) popUpTo(currentId) { inclusive = true }
-                launchSingleTop = true
+
+            composable<OnboardingRoute.Notifications> { backStackEntry ->
+                val viewModel: OnboardingViewModel = backStackEntry.sharedViewModel(navController)
+                NotificationPermissionsScreen(viewModel = viewModel)
             }
+        }
+
+        navigation<Main>(startDestination = Route.Capture) {
+            // TODO: switch to feed once implemented
+            composable<Route.Feed> { TODO() }
+            composable<Route.Capture> {
+                CaptureScreen(
+                    onCaptureComplete = { completed ->
+                        navController.navigate(Route.CapturePreview.from(completed))
+                    },
+                )
+            }
+            composable<Route.CapturePreview> { backStackEntry ->
+                val preview = backStackEntry.toRoute<Route.CapturePreview>()
+                CapturePreviewScreen(capture = preview.toCompletedCapture())
+            }
+            composable<Route.Profile> { TODO() }
+        }
     }
 }

@@ -12,21 +12,35 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import org.koin.compose.viewmodel.koinViewModel
+import you.yearof.app.permissions.Permission
 import you.yearof.app.permissions.PermissionStatus
+import you.yearof.app.permissions.rememberPermissionState
+import you.yearof.app.util.rememberSettingsAccess
 
 @Composable
-fun NotificationPermissions(
-    status: PermissionStatus,
-    onRequest: () -> Unit,
-    onContinue: () -> Unit,
+fun CameraPermissionsScreen(
     modifier: Modifier = Modifier,
+    viewModel: OnboardingViewModel = koinViewModel(),
 ) {
+    val cameraPermission = rememberPermissionState(Permission.Camera)
+    val status by viewModel.cameraStatus.collectAsState()
+    val settings = rememberSettingsAccess()
+
+    LaunchedEffect(cameraPermission.status) {
+        viewModel.updatePermission(Permission.Camera, cameraPermission.status)
+    }
+
     LaunchedEffect(status) {
-        if (status != PermissionStatus.Loading && status != PermissionStatus.Unknown) onContinue()
+        if (status == PermissionStatus.Granted) {
+            viewModel.onContinueClicked()
+        }
     }
 
     Box(modifier = modifier.fillMaxSize().padding(24.dp)) {
@@ -35,15 +49,15 @@ fun NotificationPermissions(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = "Allow notifications?",
+                text = "Allow camera access",
                 color = MaterialTheme.colorScheme.onBackground,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.padding(top = 16.dp, bottom = 8.dp),
             )
 
             Text(
-                text = "We'll send you notifications at most once a day reminding you to take a picture at a semi-random time.",
+                text = "Please provide access to your camera so we can capture shots of your days whenever you want.",
                 color = MaterialTheme.colorScheme.onBackground,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(horizontal = 8.dp),
@@ -51,11 +65,20 @@ fun NotificationPermissions(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = onRequest,
-            ) {
-                Text("Enable notifications")
+            if (status == PermissionStatus.PermanentlyDenied) {
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = settings::open,
+                ) {
+                    Text("Open Settings")
+                }
+            } else {
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = cameraPermission::request,
+                ) {
+                    Text("Enable camera")
+                }
             }
         }
     }

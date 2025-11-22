@@ -17,6 +17,7 @@ import androidx.compose.material3.IconButtonDefaults.iconButtonColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,18 +34,20 @@ import app.composeapp.generated.resources.arrow_left
 import coil3.compose.AsyncImage
 import okio.Path.Companion.toPath
 import org.jetbrains.compose.resources.painterResource
+import org.koin.compose.viewmodel.koinViewModel
 import you.yearof.app.dto.CompletedCapture
 
 @Composable
-fun CapturePreview(
+fun CapturePreviewScreen(
     capture: CompletedCapture,
-    onSave: (CompletedCapture) -> Unit,
-    onCancel: () -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: CaptureViewModel = koinViewModel(),
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+
     Column(modifier = modifier.fillMaxSize()) {
         IconButton(
-            onClick = onCancel,
+            onClick = viewModel::onCancel,
             colors = iconButtonColors(contentColor = MaterialTheme.colorScheme.onBackground),
         ) {
             Icon(
@@ -60,14 +63,14 @@ fun CapturePreview(
             back = capture.backPath,
         )
 
-        Button(onClick = { onSave(capture) }) {
+        Button(onClick = { viewModel.onSave(capture) }) {
             Text("Save")
         }
     }
 }
 
 @Composable
-fun PictureInPicture(
+private fun PictureInPicture(
     front: String,
     back: String,
     modifier: Modifier = Modifier,

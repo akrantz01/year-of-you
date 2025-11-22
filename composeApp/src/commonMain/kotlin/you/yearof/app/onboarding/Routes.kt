@@ -1,12 +1,13 @@
 package you.yearof.app.onboarding
 
 import kotlinx.serialization.Serializable
+import you.yearof.app.navigation.NavigationRoute
 
 @Serializable
-data object Onboarding
+data object Onboarding : NavigationRoute
 
 @Serializable
-sealed interface OnboardingRoute {
+sealed interface OnboardingRoute : NavigationRoute {
     @Serializable
     data object Camera : OnboardingRoute
 
