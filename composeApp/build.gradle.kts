@@ -42,27 +42,34 @@ kotlin {
             implementation(libs.androidx.camera.extensions)
             implementation(libs.androidx.camera.lifecycle)
             implementation(libs.androidx.camera.view)
+            implementation(libs.koin.android)
         }
-        commonMain.dependencies {
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material3)
-            implementation(compose.ui)
-            implementation(compose.components.resources)
-            implementation(compose.components.uiToolingPreview)
-            implementation(libs.androidx.lifecycle.viewmodelCompose)
-            implementation(libs.androidx.lifecycle.runtimeCompose)
-            implementation(projects.shared)
-            implementation(libs.kstatemachine)
-            implementation(libs.kstatemachine.coroutines)
-            implementation(libs.androidx.navigation.compose)
-            implementation(libs.androidx.datastore)
-            implementation(libs.androidx.datastore.preferences)
-            implementation(libs.coil.compose)
-            implementation(libs.okio)
-            implementation(libs.androidx.room.runtime)
-            implementation(libs.androidx.sqlite.bundled)
-            implementation(libs.kotlinx.serialization.json)
+        commonMain {
+            dependencies {
+                implementation(compose.runtime)
+                implementation(compose.foundation)
+                implementation(compose.material3)
+                implementation(compose.ui)
+                implementation(compose.components.resources)
+                implementation(compose.components.uiToolingPreview)
+                implementation(libs.androidx.lifecycle.viewmodelCompose)
+                implementation(libs.androidx.lifecycle.runtimeCompose)
+                implementation(projects.shared)
+                implementation(libs.kstatemachine)
+                implementation(libs.kstatemachine.coroutines)
+                implementation(libs.androidx.navigation.compose)
+                implementation(libs.androidx.datastore)
+                implementation(libs.androidx.datastore.preferences)
+                implementation(libs.coil.compose)
+                implementation(libs.okio)
+                implementation(libs.androidx.room.runtime)
+                implementation(libs.androidx.sqlite.bundled)
+                implementation(libs.kotlinx.serialization.json)
+                implementation(libs.koin.core)
+                implementation(libs.koin.compose.viewmodel)
+                api(libs.koin.annotations)
+            }
+            kotlin.srcDir("build/generated/ksp/metadata/commonMain/kotlin")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -108,8 +115,22 @@ dependencies {
     add("kspAndroid", libs.androidx.room.compiler)
     add("kspIosSimulatorArm64", libs.androidx.room.compiler)
     add("kspIosArm64", libs.androidx.room.compiler)
+
+    add("kspCommonMainMetadata", libs.koin.compiler)
+    add("kspAndroid", libs.koin.compiler)
+    add("kspIosSimulatorArm64", libs.koin.compiler)
+    add("kspIosArm64", libs.koin.compiler)
+}
+
+ksp {
+    arg("KOIN_CONFIG_CHECK", "true")
+    arg("KOIN_LOG_TIMES", "true")
 }
 
 room {
     schemaDirectory("$projectDir/schemas")
+}
+
+tasks.matching { it.name.startsWith("ksp") && it.name != "kspCommonMainKotlinMetadata" }.configureEach {
+    dependsOn("kspCommonMainKotlinMetadata")
 }
