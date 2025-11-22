@@ -41,7 +41,7 @@ import you.yearof.app.dto.CompletedCapture
 fun CapturePreviewScreen(
     capture: CompletedCapture,
     modifier: Modifier = Modifier,
-    viewModel: CaptureViewModel = koinViewModel(),
+    viewModel: CapturePreviewViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
 

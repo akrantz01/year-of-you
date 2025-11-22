@@ -24,6 +24,7 @@ import app.composeapp.generated.resources.camera_rotate
 import app.composeapp.generated.resources.circle
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
+import org.koin.compose.viewmodel.koinViewModel
 import you.yearof.app.camera.CameraController
 import you.yearof.app.camera.CameraPosition
 import you.yearof.app.camera.CameraPreview
@@ -33,8 +34,8 @@ import you.yearof.app.dto.CompletedCapture
 
 @Composable
 fun CaptureScreen(
-    onCaptureComplete: (CompletedCapture) -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: CaptureViewModel = koinViewModel(),
 ) {
     val controller = rememberCameraController()
 
@@ -58,7 +59,7 @@ fun CaptureScreen(
                 horizontalArrangement = Arrangement.SpaceAround,
             ) {
                 SwapPositionButton(controller = controller)
-                CaptureButton(controller = controller, onCaptureComplete = onCaptureComplete)
+                CaptureButton(controller = controller, onCaptureComplete = viewModel::onCaptureComplete)
                 FlashToggleButton(controller = controller)
             }
         }
