@@ -96,7 +96,7 @@ private fun AppNavigation(navigationCoordinator: NavigationCoordinator = koinInj
 
         navigation<Main>(startDestination = Route.Capture) {
             // TODO: switch to feed once implemented
-            composable<Route.Feed> { TODO() }
+            composable<Route.Feed> { }
             composable<Route.Capture> { CaptureScreen() }
             composable<Route.CapturePreview> { backStackEntry ->
                 val preview = backStackEntry.toRoute<Route.CapturePreview>()

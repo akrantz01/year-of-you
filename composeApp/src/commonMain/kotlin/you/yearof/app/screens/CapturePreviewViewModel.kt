@@ -10,6 +10,7 @@ import org.koin.android.annotation.KoinViewModel
 import org.koin.core.annotation.Provided
 import you.yearof.app.database.AppDatabase
 import you.yearof.app.database.Capture
+import you.yearof.app.database.CaptureDao
 import you.yearof.app.dto.CompletedCapture
 import you.yearof.app.navigation.NavigationCoordinator
 
@@ -20,7 +21,7 @@ data class CapturePreviewUiState(
 
 @KoinViewModel
 class CapturePreviewViewModel(
-    @Provided private val database: AppDatabase,
+    @Provided private val captures: CaptureDao,
     private val navigationCoordinator: NavigationCoordinator,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CapturePreviewUiState())
@@ -31,7 +32,7 @@ class CapturePreviewViewModel(
             _uiState.value = _uiState.value.copy(isSaving = true)
 
             try {
-                database.captures().insert(
+                captures.insert(
                     Capture(
                         frontPath = capture.frontPath,
                         backPath = capture.backPath,
