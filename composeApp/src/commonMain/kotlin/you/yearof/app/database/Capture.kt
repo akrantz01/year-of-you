@@ -7,7 +7,7 @@ import androidx.room.Insert
 import androidx.room.PrimaryKey
 import kotlin.time.Instant
 
-@Entity
+@Entity(tableName = "captures")
 data class Capture(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @ColumnInfo(name = "front_path") val frontPath: String,

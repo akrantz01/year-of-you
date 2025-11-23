@@ -2,10 +2,10 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "069895b9397274c1fdec69d413e19772",
+    "identityHash": "b8fa1bd14986ef993972b613a99e3e4c",
     "entities": [
       {
-        "tableName": "Capture",
+        "tableName": "captures",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `front_path` TEXT NOT NULL, `back_path` TEXT NOT NULL, `at` INTEGER NOT NULL)",
         "fields": [
           {
@@ -43,7 +43,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '069895b9397274c1fdec69d413e19772')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b8fa1bd14986ef993972b613a99e3e4c')"
     ]
   }
 }
