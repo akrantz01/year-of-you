@@ -6,4 +6,6 @@ class AndroidPaths(
     val context: Context,
 ) : Paths {
     override fun forDatabase(name: String): String = context.getDatabasePath(name).absolutePath
+
+    override fun inDocuments(name: String): String = context.filesDir.resolve(name).absolutePath
 }

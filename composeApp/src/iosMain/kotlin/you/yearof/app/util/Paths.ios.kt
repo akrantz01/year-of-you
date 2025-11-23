@@ -5,7 +5,9 @@ import platform.Foundation.NSFileManager
 import platform.Foundation.NSUserDomainMask
 
 class IosPaths : Paths {
-    override fun forDatabase(name: String): String {
+    override fun forDatabase(name: String): String = inDocuments(name)
+
+    override fun inDocuments(name: String): String {
         val directory =
             NSFileManager.defaultManager.URLForDirectory(
                 directory = NSDocumentDirectory,
@@ -14,6 +16,6 @@ class IosPaths : Paths {
                 create = false,
                 error = null,
             )
-        return checkNotNull(directory?.path)
+        return "${checkNotNull(directory?.path)}/$name"
     }
 }
