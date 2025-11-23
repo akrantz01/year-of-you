@@ -1,27 +1,22 @@
 package you.yearof.app.database
 
-import androidx.compose.runtime.Composable
 import androidx.room.ConstructedBy
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.RoomDatabaseConstructor
+import androidx.sqlite.SQLiteDriver
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 
 internal const val DatabaseName = "year-of-you.db"
 
-@Composable
-expect fun rememberDatabase(): AppDatabase
-
-internal fun RoomDatabase.Builder<AppDatabase>.commonConfiguration() {
-    setDriver(BundledSQLiteDriver())
-    setQueryCoroutineContext(Dispatchers.IO)
-}
-
-fun buildDatabase(initializer: (String) -> RoomDatabase.Builder<AppDatabase>): AppDatabase =
+fun buildDatabase(
+    driver: SQLiteDriver = BundledSQLiteDriver(),
+    initializer: (String) -> RoomDatabase.Builder<AppDatabase>,
+): AppDatabase =
     initializer(DatabaseName)
-        .setDriver(BundledSQLiteDriver())
+        .setDriver(driver)
         .setQueryCoroutineContext(Dispatchers.IO)
         .build()
 

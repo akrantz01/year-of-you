@@ -44,6 +44,7 @@ kotlin {
             implementation(libs.androidx.camera.lifecycle)
             implementation(libs.androidx.camera.view)
             implementation(libs.koin.android)
+            implementation(libs.androidx.sqlite.framework)
         }
         commonMain {
             dependencies {
@@ -103,9 +104,16 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    buildFeatures {
+        buildConfig = true
+    }
     buildTypes {
+        getByName("debug") {
+            buildConfigField("boolean", "USE_NATIVE_SQLITE_DRIVER", "true")
+        }
         getByName("release") {
             isMinifyEnabled = false
+            buildConfigField("boolean", "USE_NATIVE_SQLITE_DRIVER", "false")
         }
     }
 }
