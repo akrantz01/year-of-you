@@ -5,7 +5,6 @@ import androidx.compose.runtime.Stable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
-import kotlin.time.Clock
 
 @Composable
 expect fun rememberCamera(): Camera
@@ -21,11 +20,6 @@ open class AbstractCamera {
     internal suspend fun waitReady(requireUnready: Boolean = false) {
         if (requireUnready) isReady.first { !it }
         isReady.first { it }
-    }
-
-    protected fun photoName(position: CameraPosition): String {
-        val timestamp = Clock.System.now().toEpochMilliseconds()
-        return "capture-$position-$timestamp.jpeg"
     }
 }
 

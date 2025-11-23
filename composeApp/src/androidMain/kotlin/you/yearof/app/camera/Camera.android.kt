@@ -33,6 +33,7 @@ import java.io.File
 import java.util.concurrent.Executors
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
+import kotlin.uuid.Uuid
 
 @Composable
 actual fun rememberCamera(): Camera {
@@ -149,8 +150,7 @@ actual class Camera(
                     return@suspendCancellableCoroutine
                 }
 
-            val config = configuration.value
-            val output = File(context.cacheDir, photoName(config.position))
+            val output = File(context.cacheDir, "${Uuid.random()}.jpeg")
 
             capture.takePicture(
                 ImageCapture.OutputFileOptions

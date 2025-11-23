@@ -32,13 +32,16 @@ import platform.AVFoundation.fileDataRepresentation
 import platform.AVFoundation.focusMode
 import platform.AVFoundation.isFocusModeSupported
 import platform.Foundation.NSCachesDirectory
+import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSError
+import platform.Foundation.NSFileManager
 import platform.Foundation.NSSearchPathForDirectoriesInDomains
 import platform.Foundation.NSUserDomainMask
 import platform.Foundation.writeToFile
 import platform.darwin.NSObject
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
+import kotlin.uuid.Uuid
 
 @Composable
 actual fun rememberCamera(): Camera = remember { Camera() }
@@ -87,12 +90,14 @@ actual class Camera : AbstractCamera() {
         suspendCancellableCoroutine { cont ->
             val config = configuration.value
             val directory =
-                NSSearchPathForDirectoriesInDomains(
-                    NSCachesDirectory,
-                    NSUserDomainMask,
-                    true,
-                ).firstOrNull()!! as String
-            val path = "$directory/${photoName(config.position)}"
+                NSFileManager.defaultManager.URLForDirectory(
+                    directory = NSDocumentDirectory,
+                    inDomain = NSUserDomainMask,
+                    appropriateForURL = null,
+                    create = false,
+                    error = null,
+                )
+            val path = "${checkNotNull(directory?.path)}/${Uuid.random()}.jpeg"
 
             captureDelegate.path = path
             captureDelegate.onComplete = {
