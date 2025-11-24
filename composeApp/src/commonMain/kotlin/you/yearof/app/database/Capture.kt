@@ -5,6 +5,8 @@ import androidx.room.Dao
 import androidx.room.Entity
 import androidx.room.Insert
 import androidx.room.PrimaryKey
+import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
 import kotlin.time.Instant
 
 @Entity(tableName = "captures")
@@ -22,4 +24,7 @@ data class Capture(
 interface CaptureDao {
     @Insert
     suspend fun insert(capture: Capture)
+
+    @Query("select * from captures")
+    fun all(): Flow<List<Capture>>
 }

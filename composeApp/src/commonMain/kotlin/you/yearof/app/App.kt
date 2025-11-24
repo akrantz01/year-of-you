@@ -39,6 +39,7 @@ import you.yearof.app.screens.CapturePreviewScreen
 import you.yearof.app.screens.CaptureScreen
 import you.yearof.app.screens.FeedGraph
 import you.yearof.app.screens.FeedNav
+import you.yearof.app.screens.FeedScreen
 import you.yearof.app.screens.MainGraph
 import you.yearof.app.screens.ProfileGraph
 import you.yearof.app.screens.ProfileNav
@@ -107,10 +108,9 @@ private fun AppNavigation(navigationCoordinator: NavigationCoordinator = koinInj
                 }
             }
 
-            navigation<MainGraph>(startDestination = CaptureGraph) {
-                // TODO: switch to feed once implemented
+            navigation<MainGraph>(startDestination = FeedGraph) {
                 navigation<FeedGraph>(startDestination = FeedNav.Feed) {
-                    composable<FeedNav.Feed> { }
+                    composable<FeedNav.Feed> { FeedScreen() }
                 }
 
                 navigation<CaptureGraph>(startDestination = CaptureNav.Capture) {
