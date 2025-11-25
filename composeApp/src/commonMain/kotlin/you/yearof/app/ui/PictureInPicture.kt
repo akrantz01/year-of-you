@@ -22,7 +22,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import okio.Path.Companion.toPath
-import you.yearof.app.camera.CameraPosition
 
 @Composable
 fun PictureInPicture(
