@@ -46,6 +46,7 @@ fun CapturePreviewScreen(
             modifier = Modifier.fillMaxWidth(),
             front = capture.frontPath,
             back = capture.backPath,
+            initiallySwapped = capture.swapped,
         )
 
         Button(onClick = { viewModel.onSave(capture) }) {

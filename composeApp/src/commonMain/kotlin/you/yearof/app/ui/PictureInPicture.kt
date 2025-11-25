@@ -22,14 +22,16 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import okio.Path.Companion.toPath
+import you.yearof.app.camera.CameraPosition
 
 @Composable
 fun PictureInPicture(
     front: String,
     back: String,
+    initiallySwapped: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
-    var swapped by remember { mutableStateOf(false) }
+    var swapped by remember { mutableStateOf(initiallySwapped) }
 
     val frontModel = remember(front) { front.toPath() }
     val backModel = remember(back) { back.toPath() }
