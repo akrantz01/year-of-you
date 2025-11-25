@@ -29,7 +29,11 @@ fun FeedScreen(
             val capture = captures[index]
             if (capture != null) {
                 // TODO: attach extra metadata
-                PictureInPicture(front = capture.frontPath, back = capture.backPath)
+                PictureInPicture(
+                    front = capture.frontPath,
+                    back = capture.backPath,
+                    initiallySwapped = capture.swapped,
+                )
             } else {
                 // TODO: show loading spinner/state
             }
