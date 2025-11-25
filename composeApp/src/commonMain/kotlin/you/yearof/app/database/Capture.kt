@@ -26,6 +26,6 @@ interface CaptureDao {
     @Insert
     suspend fun insert(capture: Capture)
 
-    @Query("select * from captures")
+    @Query("SELECT * FROM captures ORDER BY at DESC")
     fun all(): PagingSource<Int, Capture>
 }
