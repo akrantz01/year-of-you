@@ -16,7 +16,6 @@ kotlin {
             add("-Xexpect-actual-classes")
             add("-opt-in=kotlin.time.ExperimentalTime")
             add("-opt-in=kotlin.uuid.ExperimentalUuidApi")
-            add("-opt-in=kotlinx.cinterop.ExperimentalForeignApi")
         }
     }
 
@@ -30,6 +29,7 @@ kotlin {
             baseName = "ComposeApp"
             isStatic = true
         }
+        iosTarget.compilerOptions.freeCompilerArgs.add("-opt-in=kotlinx.cinterop.ExperimentalForeignApi")
     }
 
     sourceSets {
