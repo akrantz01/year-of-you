@@ -1,5 +1,6 @@
 package you.yearof.app.database
 
+import androidx.room.AutoMigration
 import androidx.room.ConstructedBy
 import androidx.room.Database
 import androidx.room.RoomDatabase
@@ -20,7 +21,11 @@ fun buildDatabase(
         .setQueryCoroutineContext(Dispatchers.IO)
         .build()
 
-@Database(entities = [Capture::class], version = 1)
+@Database(
+    version = 2,
+    entities = [Capture::class],
+    autoMigrations = [AutoMigration(from = 1, to = 2)],
+)
 @ConstructedBy(AppDatabaseConstructor::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun captures(): CaptureDao

@@ -15,6 +15,7 @@ data class Capture(
     @ColumnInfo(name = "front_path") val frontPath: String,
     @ColumnInfo(name = "back_path") val backPath: String,
     @ColumnInfo(name = "at") val atMillis: Long,
+    @ColumnInfo(defaultValue = "false") val swapped: Boolean = false,
 ) {
     val at: Instant
         get() = Instant.fromEpochMilliseconds(atMillis)
