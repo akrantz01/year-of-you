@@ -80,9 +80,11 @@ fun CaptureButton(
         enabled = isReady,
         onClick = {
             scope.launch {
+                val config = controller.configuration.value
                 val images = controller.capture()
                 onCaptureComplete(
                     CompletedCapture(
+                        swapped = config.position == CameraPosition.Front,
                         frontPath = checkNotNull(images[CameraPosition.Front]),
                         backPath = checkNotNull(images[CameraPosition.Back]),
                     ),

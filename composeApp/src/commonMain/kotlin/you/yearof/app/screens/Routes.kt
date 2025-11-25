@@ -38,12 +38,14 @@ sealed interface CaptureNav : NavigationRoute {
     data class CapturePreview(
         val frontPath: String,
         val backPath: String,
+        val swapped: Boolean,
         val timestamp: Long,
     ) : CaptureNav {
         fun toCompletedCapture(): CompletedCapture =
             CompletedCapture(
                 frontPath = frontPath,
                 backPath = backPath,
+                swapped = swapped,
                 timestamp = Instant.fromEpochMilliseconds(timestamp),
             )
 
@@ -52,6 +54,7 @@ sealed interface CaptureNav : NavigationRoute {
                 CapturePreview(
                     frontPath = completed.frontPath,
                     backPath = completed.backPath,
+                    swapped = completed.swapped,
                     timestamp = completed.timestamp.toEpochMilliseconds(),
                 )
         }
