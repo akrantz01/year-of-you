@@ -1,5 +1,7 @@
 package you.yearof.app.screens
 
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.toTextFieldBuffer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,11 +18,11 @@ import you.yearof.app.database.Capture
 import you.yearof.app.database.CaptureDao
 import you.yearof.app.dto.CompletedCapture
 import you.yearof.app.navigation.NavigationCoordinator
-import you.yearof.app.screens.CaptureNav
-import you.yearof.app.screens.FeedNav
+import you.yearof.app.util.Log
 import you.yearof.app.util.Paths
 
 data class CapturePreviewUiState(
+    val caption: String = "",
     val isSaving: Boolean = false,
     val error: String? = null,
 )
@@ -33,6 +35,8 @@ class CapturePreviewViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CapturePreviewUiState())
     val uiState: StateFlow<CapturePreviewUiState> = _uiState.asStateFlow()
+
+    val captionState = TextFieldState()
 
     fun onSave(capture: CompletedCapture) {
         viewModelScope.launch {
@@ -62,6 +66,7 @@ class CapturePreviewViewModel(
                 backPath = backPath.toString(),
                 atMillis = capture.timestamp.toEpochMilliseconds(),
                 swapped = capture.swapped,
+                caption = captionState.text.toString(),
             ),
         )
 
