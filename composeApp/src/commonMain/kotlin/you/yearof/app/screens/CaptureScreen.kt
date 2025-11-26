@@ -2,11 +2,17 @@ package you.yearof.app.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
@@ -15,6 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import app.composeapp.generated.resources.Res
 import app.composeapp.generated.resources.bolt
@@ -39,28 +46,42 @@ fun CaptureScreen(
 ) {
     val controller = rememberCameraController()
 
-    Box(modifier = modifier.fillMaxSize()) {
-        CameraPreview(
-            modifier = Modifier.fillMaxSize(),
-            controller = controller,
-        )
+    BoxWithConstraints(modifier = modifier.fillMaxSize()) {
+        val topPadding = 10.dp
+        val bottomPadding = 32.dp
+        val controlsMinHeight = 120.dp
+        val previewMaxHeight = (maxHeight - controlsMinHeight - topPadding - bottomPadding).coerceAtLeast(0.dp)
 
-        Box(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 32.dp)
-                    .align(Alignment.BottomCenter),
-            contentAlignment = Alignment.BottomCenter,
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceAround,
+        Column(modifier = Modifier.fillMaxSize().padding(bottom = bottomPadding)) {
+            Spacer(modifier = Modifier.height(topPadding))
+
+            CameraPreview(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = previewMaxHeight)
+                        .padding(horizontal = 8.dp)
+                        .clip(RoundedCornerShape(16.dp)),
+                controller = controller,
+            )
+
+            Box(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .heightIn(min = controlsMinHeight),
+                contentAlignment = Alignment.Center,
             ) {
-                SwapPositionButton(controller = controller)
-                CaptureButton(controller = controller, onCaptureComplete = viewModel::onCaptureComplete)
-                FlashToggleButton(controller = controller)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceAround,
+                ) {
+                    SwapPositionButton(controller = controller)
+                    CaptureButton(controller = controller, onCaptureComplete = viewModel::onCaptureComplete)
+                    FlashToggleButton(controller = controller)
+                }
             }
         }
     }
