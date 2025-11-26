@@ -108,6 +108,14 @@ private fun CaptureItem(
                 back = capture.backPath,
                 initiallySwapped = capture.swapped,
             )
+
+            if (capture.caption.isNotBlank()) {
+                // TODO: limit to 3ish lines (when rendered) before clipping to "show more..."
+                Text(
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                    text = capture.caption,
+                )
+            }
         }
     }
 }
