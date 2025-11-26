@@ -12,6 +12,9 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
@@ -85,7 +88,21 @@ private fun AppNavigation(navigationCoordinator: NavigationCoordinator = koinInj
     }
 
     Scaffold(
-        bottomBar = { BottomBar(navController = navController) },
+        bottomBar = {
+            val borderColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.25f)
+            BottomBar(
+                modifier =
+                    Modifier.drawBehind {
+                        drawLine(
+                            color = borderColor,
+                            start = Offset.Zero,
+                            end = Offset(size.width, 0f),
+                            strokeWidth = 1.dp.toPx(),
+                        )
+                    },
+                navController = navController,
+            )
+        },
     ) { paddingValues ->
         NavHost(
             navController = navController,
