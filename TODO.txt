@@ -1,0 +1,9 @@
+- empty state for feed screen
+- notifications
+  - schedule daily notifications
+  - set notification preferences
+  - handle tapped notifications (deep links)
+- loading states
+  - initialization
+  - feed
+- profile screen
