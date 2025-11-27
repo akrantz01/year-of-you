@@ -13,6 +13,7 @@ import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
+import you.yearof.app.database.initializeDatabase
 import kotlin.uuid.Uuid
 
 fun main(args: Array<String>) {
@@ -38,6 +39,8 @@ fun Application.module() {
             call.respondText(text = "500: $cause", status = HttpStatusCode.InternalServerError)
         }
     }
+
+    initializeDatabase()
 
     routing {
         get("/") {
