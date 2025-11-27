@@ -9,7 +9,7 @@ plugins {
 group = "you.yearof.app"
 version = "1.0.0"
 application {
-    mainClass.set("you.yearof.app.ApplicationKt")
+    mainClass = "io.ktor.server.netty.EngineMain"
 
     val isDevelopment: Boolean = project.ext.has("development")
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
@@ -18,8 +18,21 @@ application {
 dependencies {
     implementation(projects.shared)
     implementation(libs.logback)
-    implementation(libs.ktor.serverCore)
-    implementation(libs.ktor.serverNetty)
-    testImplementation(libs.ktor.serverTestHost)
+    implementation(libs.ktor.serialization.kotlinx.json)
+    implementation(libs.ktor.server.call.id)
+    implementation(libs.ktor.server.call.logging)
+    implementation(libs.ktor.server.config.yaml)
+    implementation(libs.ktor.server.contentNegotiation)
+    implementation(libs.ktor.server.core)
+    implementation(libs.ktor.server.host.common)
+    implementation(libs.ktor.server.netty)
+    implementation(libs.ktor.server.statusPages)
+    testImplementation(libs.ktor.server.test)
     testImplementation(libs.kotlin.testJunit)
+}
+
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.add("-opt-in=kotlin.uuid.ExperimentalUuidApi")
+    }
 }
