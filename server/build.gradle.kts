@@ -19,13 +19,13 @@ application {
 dependencies {
     implementation(projects.shared)
     implementation(libs.database.h2)
+    implementation(libs.database.hikaricp)
     implementation(libs.database.mariadb)
     implementation(libs.database.mysql)
     implementation(libs.database.postgresql)
     implementation(libs.exposed.core)
     implementation(libs.exposed.dao)
-    implementation(libs.exposed.migration.core)
-    implementation(libs.exposed.migration.r2dbc)
+    implementation(libs.exposed.jdbc)
     implementation(libs.exposed.r2dbc)
     implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.ktor.server.call.id)
@@ -43,6 +43,9 @@ dependencies {
 
 kotlin {
     compilerOptions {
-        freeCompilerArgs.add("-opt-in=kotlin.uuid.ExperimentalUuidApi")
+        freeCompilerArgs.apply {
+            add("-opt-in=kotlinx.serialization.ExperimentalSerializationApi")
+            add("-opt-in=kotlin.uuid.ExperimentalUuidApi")
+        }
     }
 }
