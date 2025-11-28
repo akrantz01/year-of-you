@@ -9,6 +9,7 @@ database:
   url: ${DATABASE_URL:}
   username: ${DATABASE_USERNAME:}
   password: ${DATABASE_PASSWORD:}
+  migrate: ${DATABASE_MIGRATE:true}
 
   pool:
     max-size: ${DATABASE_POOL_MAX_SIZE:10}
