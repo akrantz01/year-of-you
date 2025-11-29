@@ -99,7 +99,6 @@ koin-compiler = { module = "io.insert-koin:koin-ksp-compiler", version.ref = "ko
 exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed" }
 exposed-dao = { module = "org.jetbrains.exposed:exposed-dao", version.ref = "exposed" }
 exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed" }
-exposed-r2dbc = { module = "org.jetbrains.exposed:exposed-r2dbc", version.ref = "exposed" }
 database-h2 = { module = "com.h2database:h2", version.ref = "h2" }
 database-hikaricp = { module = "com.zaxxer:HikariCP", version.ref = "hikaricp" }
 database-postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }

@@ -26,7 +26,6 @@ dependencies {
     implementation(libs.exposed.core)
     implementation(libs.exposed.dao)
     implementation(libs.exposed.jdbc)
-    implementation(libs.exposed.r2dbc)
     implementation(libs.flyway)
     implementation(libs.flyway.database.postgresql)
     implementation(libs.flyway.database.mysql)
