@@ -26,6 +26,8 @@ dependencies {
     implementation(libs.exposed.core)
     implementation(libs.exposed.dao)
     implementation(libs.exposed.jdbc)
+    implementation(libs.exposed.migration.core)
+    implementation(libs.exposed.migration.jdbc)
     implementation(libs.flyway)
     implementation(libs.flyway.database.postgresql)
     implementation(libs.flyway.database.mysql)
@@ -48,6 +50,15 @@ kotlin {
         freeCompilerArgs.apply {
             add("-opt-in=kotlinx.serialization.ExperimentalSerializationApi")
             add("-opt-in=kotlin.uuid.ExperimentalUuidApi")
+            add("-opt-in=org.jetbrains.exposed.v1.core.ExperimentalDatabaseMigrationApi")
         }
     }
+}
+
+tasks.register<JavaExec>("generateMigration") {
+    group = "application"
+    description = "Generate a new database migration"
+
+    classpath = sourceSets.getByName("main").runtimeClasspath
+    mainClass = "you.yearof.app.GenerateMigrationKt"
 }
