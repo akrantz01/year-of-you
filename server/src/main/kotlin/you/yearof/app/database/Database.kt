@@ -14,7 +14,7 @@ fun Application.initializeDatabase() {
     val dataSource = createConnectionPool(config)
 
     if (config.migrate) {
-        migrate(dataSource)
+        migrate(config.driver, dataSource)
     }
 
     Database.connect(datasource = dataSource)
