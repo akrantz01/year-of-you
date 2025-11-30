@@ -5,8 +5,8 @@ import io.ktor.server.engine.CommandLineConfig
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.jetbrains.exposed.v1.migration.jdbc.MigrationUtils
-import you.yearof.app.database.Accounts
 import you.yearof.app.database.createConnectionPool
+import you.yearof.app.database.tables.Accounts
 import kotlin.io.path.Path
 import kotlin.io.path.createFile
 import kotlin.io.path.listDirectoryEntries

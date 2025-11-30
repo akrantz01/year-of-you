@@ -25,6 +25,7 @@ dependencies {
     implementation(libs.database.postgresql)
     implementation(libs.exposed.core)
     implementation(libs.exposed.dao)
+    implementation(libs.exposed.datetime)
     implementation(libs.exposed.jdbc)
     implementation(libs.exposed.migration.core)
     implementation(libs.exposed.migration.jdbc)
@@ -48,6 +49,7 @@ dependencies {
 kotlin {
     compilerOptions {
         freeCompilerArgs.apply {
+            add("-opt-in=kotlin.time.ExperimentalTime")
             add("-opt-in=kotlinx.serialization.ExperimentalSerializationApi")
             add("-opt-in=kotlin.uuid.ExperimentalUuidApi")
             add("-opt-in=org.jetbrains.exposed.v1.core.ExperimentalDatabaseMigrationApi")
