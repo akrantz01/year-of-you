@@ -2,6 +2,7 @@ ktor:
   application:
     modules:
       - you.yearof.app.ApplicationKt.module
+      - you.yearof.app.routes.authentication.ModuleKt.authenticationRoutes
   deployment:
     port: 8080
 

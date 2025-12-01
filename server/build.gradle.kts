@@ -41,6 +41,8 @@ dependencies {
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.host.common)
     implementation(libs.ktor.server.netty)
+    implementation(libs.ktor.server.requestValidation)
+    implementation(libs.ktor.server.resources)
     implementation(libs.ktor.server.statusPages)
     implementation(libs.logback)
     implementation(libs.logback.apacheCommonsBridge)

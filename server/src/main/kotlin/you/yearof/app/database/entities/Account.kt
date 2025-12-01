@@ -10,9 +10,9 @@ class Account(
 ) : UIntEntity(id) {
     companion object : UIntEntityClass<Account>(Accounts)
 
-    val displayName by Accounts.displayName
-    val username by Accounts.username
-    val password by Accounts.password
+    var displayName by Accounts.displayName
+    var username by Accounts.username
+    var password by Accounts.password
     val lastUpdated by Accounts.lastUpdated
     val createdAt by Accounts.createdAt
 }
