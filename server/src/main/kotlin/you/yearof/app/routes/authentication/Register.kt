@@ -10,8 +10,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import you.yearof.app.database.tables.DisplayNameMaxLength
 import you.yearof.app.database.tables.UsernameMaxLength
-import you.yearof.app.passwords.Passwords
 import you.yearof.app.repositories.AccountRepository
+import you.yearof.app.services.PasswordService
 
 private val UsernameRegex = Regex("^[a-z0-9_]+$")
 
@@ -76,7 +76,7 @@ internal fun Route.registerRoute(accounts: AccountRepository) {
             accounts.create(
                 displayName = requested.displayName,
                 username = requested.username,
-                password = Passwords.hash(requested.password),
+                password = PasswordService.hash(requested.password),
             )
 
         // TODO: generate valid token after registration

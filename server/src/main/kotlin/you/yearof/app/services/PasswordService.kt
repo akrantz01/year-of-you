@@ -1,9 +1,23 @@
-package you.yearof.app.passwords
+package you.yearof.app.services
 
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder
 
-object Passwords {
+enum class VerificationResult {
+    Valid,
+    NeedsUpgrade,
+    Invalid,
+    ;
+
+    val ok: Boolean
+        get() =
+            when (this) {
+                Valid, NeedsUpgrade -> true
+                else -> false
+            }
+}
+
+object PasswordService {
     private val encoder =
         DelegatingPasswordEncoder(
             "argon2id",
