@@ -1,9 +1,10 @@
 package you.yearof.app.services
 
 import com.auth0.jwt.JWT
-import com.auth0.jwt.JWTCreator
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.interfaces.JWTVerifier
+import io.ktor.server.auth.jwt.JWTCredential
+import io.ktor.server.auth.jwt.JWTPrincipal
 import io.ktor.server.plugins.di.annotations.Property
 import kotlinx.serialization.Serializable
 import you.yearof.app.database.entities.Account
@@ -29,6 +30,11 @@ fun provide(
     check(config.secret.length >= 32) { "signing secret must be at least 32 bytes" }
 
     return TokenService(config)
+}
+
+enum class TokenUsage {
+    Access,
+    Refresh,
 }
 
 data class IssuedTokens(
@@ -60,25 +66,38 @@ class TokenService(
                     id = id,
                     subject = account.id.value,
                     lifetime = 7.days,
-                ).withJWTId(id)
-                    .withSubject(account.id.value.toString())
-                    .sign(algorithm),
+                    type = TokenUsage.Access,
+                ),
             refreshToken =
                 newToken(
                     id = id,
                     subject = account.id.value,
                     lifetime = 30.days,
-                ).withJWTId(id)
-                    .withSubject(account.id.value.toString())
-                    .sign(algorithm),
+                    type = TokenUsage.Refresh,
+                ),
         )
+    }
+
+    fun validate(
+        requiredUsage: TokenUsage,
+        credential: JWTCredential,
+    ): JWTPrincipal? {
+        val scope = credential.payload.getClaim("scope").asString()
+        val usage = TokenUsage.valueOf(scope)
+
+        return if (usage == requiredUsage) {
+            JWTPrincipal(credential.payload)
+        } else {
+            null
+        }
     }
 
     private fun newToken(
         id: String,
         subject: UInt,
         lifetime: Duration,
-    ): JWTCreator.Builder {
+        type: TokenUsage,
+    ): String {
         val now = Clock.System.now()
         return JWT
             .create()
@@ -89,5 +108,7 @@ class TokenService(
             .withNotBefore(now.toJavaInstant())
             .withIssuedAt(now.toJavaInstant())
             .withExpiresAt(now.plus(lifetime).toJavaInstant())
+            .withClaim("scope", type.name)
+            .sign(algorithm)
     }
 }
