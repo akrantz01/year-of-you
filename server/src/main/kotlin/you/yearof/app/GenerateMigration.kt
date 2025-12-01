@@ -55,11 +55,8 @@ private fun java.nio.file.Path.currentVersion(): Int {
     if (contents.isEmpty()) return 0
 
     return contents
-        .mapNotNull {
-            VersionRegex.matchEntire(
-                it.name,
-            )
-        }.mapNotNull { it.groups[0]?.value?.toIntOrNull() }
+        .mapNotNull { VersionRegex.matchAt(it.name, 0) }
+        .mapNotNull { it.groupValues[1].toIntOrNull() }
         .maxOrNull() ?: 0
 }
 
