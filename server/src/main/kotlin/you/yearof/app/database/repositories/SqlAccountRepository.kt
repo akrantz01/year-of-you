@@ -25,6 +25,11 @@ class SqlAccountRepository(
             }
         }
 
+    override suspend fun get(id: UInt): Account? =
+        suspendTransaction(db) {
+            Account.findById(id)
+        }
+
     override suspend fun findByUsername(username: String): Account? =
         suspendTransaction(db) {
             Account.find { Accounts.username eq username }.firstOrNull()

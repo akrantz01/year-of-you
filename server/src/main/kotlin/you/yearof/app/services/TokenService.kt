@@ -43,6 +43,11 @@ data class IssuedTokens(
     val refreshToken: String,
 )
 
+data class RefreshedTokens(
+    val accessToken: String,
+    val refreshToken: String?,
+)
+
 class TokenService(
     config: TokenConfig,
 ) {
@@ -75,6 +80,18 @@ class TokenService(
                     lifetime = 30.days,
                     type = TokenUsage.Refresh,
                 ),
+        )
+    }
+
+    fun refresh(
+        account: Account,
+        current: JWTPrincipal,
+    ): RefreshedTokens {
+        val id = current.jwtId!!
+
+        return RefreshedTokens(
+            accessToken = newToken(id = id, subject = account.id.value, lifetime = 7.days, type = TokenUsage.Access),
+            refreshToken = null, // TODO: re-generate refresh token when nearing expiration (within 1 week)
         )
     }
 

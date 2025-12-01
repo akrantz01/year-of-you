@@ -21,6 +21,11 @@ class Authentication {
     class Login(
         val parent: Authentication = Authentication(),
     )
+
+    @Resource("/refresh")
+    class Refresh(
+        val parent: Authentication = Authentication(),
+    )
 }
 
 fun Application.authenticationRoutes(
@@ -49,5 +54,6 @@ fun Application.authenticationRoutes(
     routing {
         registerRoute(accounts)
         loginRoute(accounts, tokens)
+        refreshRoute(accounts, tokens)
     }
 }
