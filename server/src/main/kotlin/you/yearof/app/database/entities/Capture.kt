@@ -14,5 +14,6 @@ class Capture(
     val front by Captures.front
     val back by Captures.back
     val swapped by Captures.swapped
-    val created_at by Captures.created_at
+    val takenAt by Captures.takenAt
+    val uploadedAt by Captures.uploadedAt
 }

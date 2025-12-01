@@ -1,0 +1,2 @@
+ALTER TABLE captures RENAME COLUMN created_at TO taken_at;
+ALTER TABLE captures ADD uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL;
