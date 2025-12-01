@@ -8,4 +8,6 @@ interface AccountRepository {
         username: String,
         password: String,
     ): Account
+
+    suspend fun findByUsername(username: String): Account?
 }

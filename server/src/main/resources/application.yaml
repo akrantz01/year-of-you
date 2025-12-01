@@ -3,6 +3,7 @@ ktor:
     dependencies:
       - you.yearof.app.database.DatabaseKt.provideDatabase
       - you.yearof.app.database.repositories.SqlAccountRepositoryKt.provide
+      - you.yearof.app.services.TokenServiceKt.provide
     modules:
       - you.yearof.app.ApplicationKt.module
       - you.yearof.app.routes.authentication.ModuleKt.authenticationRoutes
@@ -23,3 +24,7 @@ database:
     connection-timeout: ${DATABASE_POOL_CONNECTION_TIMEOUT:PT30S}
     validation-timeout: ${DATABASE_POOL_VALIDATION_TIMEOUT:PT5S}
     validation-query: ${DATABASE_POOL_VALIDATION_QUERY:SELECT 1}
+
+jwt:
+  issuer: ${TOKEN_ISSUER:https://yearof.you}
+  secret: ${TOKEN_SECRET:}
