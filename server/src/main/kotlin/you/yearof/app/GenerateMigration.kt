@@ -7,6 +7,7 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.jetbrains.exposed.v1.migration.jdbc.MigrationUtils
 import you.yearof.app.database.createConnectionPool
 import you.yearof.app.database.tables.Accounts
+import you.yearof.app.database.tables.Captures
 import kotlin.io.path.Path
 import kotlin.io.path.createFile
 import kotlin.io.path.listDirectoryEntries
@@ -43,6 +44,7 @@ private fun java.nio.file.Path.autoGenerate(config: ApplicationConfig) {
     transaction(db) {
         MigrationUtils.generateMigrationScript(
             Accounts,
+            Captures,
             scriptDirectory = parent.pathString,
             scriptName = nameWithoutExtension,
             withLogs = true,
