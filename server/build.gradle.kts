@@ -18,6 +18,7 @@ application {
 
 dependencies {
     implementation(projects.shared)
+    implementation(libs.bouncycastle)
     implementation(libs.database.h2)
     implementation(libs.database.hikaricp)
     implementation(libs.database.mariadb)
@@ -42,6 +43,8 @@ dependencies {
     implementation(libs.ktor.server.netty)
     implementation(libs.ktor.server.statusPages)
     implementation(libs.logback)
+    implementation(libs.logback.apacheCommonsBridge)
+    implementation(libs.spring.security.crypto)
     testImplementation(libs.ktor.server.test)
     testImplementation(libs.kotlin.testJunit)
 }
