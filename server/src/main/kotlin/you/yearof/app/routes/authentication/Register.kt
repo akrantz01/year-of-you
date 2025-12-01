@@ -14,7 +14,7 @@ import you.yearof.app.database.tables.DisplayNameMaxLength
 import you.yearof.app.database.tables.UsernameMaxLength
 import you.yearof.app.passwords.Passwords
 
-private val UsernameRegex = Regex("^[a-z0-9_]+$", RegexOption.IGNORE_CASE)
+private val UsernameRegex = Regex("^[a-z0-9_]+$")
 
 @Serializable
 data class RegisterRequest(
@@ -55,7 +55,9 @@ internal fun Route.registerRoute() {
                 }
 
                 !request.username.matches(UsernameRegex) -> {
-                    ValidationResult.Invalid("username can only consist of alphanumeric characters and underscore")
+                    ValidationResult.Invalid(
+                        "username can only consist of lowercase alphanumeric characters and underscore",
+                    )
                 }
 
                 request.password.isBlank() -> {
