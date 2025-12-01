@@ -3,6 +3,7 @@ package you.yearof.app.routes.authentication
 import io.ktor.resources.Resource
 import io.ktor.server.application.Application
 import io.ktor.server.routing.routing
+import you.yearof.app.repositories.AccountRepository
 
 @Resource("/auth")
 class Authentication {
@@ -12,8 +13,8 @@ class Authentication {
     )
 }
 
-fun Application.authenticationRoutes() {
+fun Application.authenticationRoutes(accounts: AccountRepository) {
     routing {
-        registerRoute()
+        registerRoute(accounts)
     }
 }

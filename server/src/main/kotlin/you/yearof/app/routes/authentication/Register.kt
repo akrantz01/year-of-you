@@ -8,11 +8,10 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.jetbrains.exposed.v1.jdbc.transactions.suspendTransaction
-import you.yearof.app.database.entities.Account
 import you.yearof.app.database.tables.DisplayNameMaxLength
 import you.yearof.app.database.tables.UsernameMaxLength
 import you.yearof.app.passwords.Passwords
+import you.yearof.app.repositories.AccountRepository
 
 private val UsernameRegex = Regex("^[a-z0-9_]+$")
 
@@ -32,7 +31,7 @@ data class RegisterResponse(
     val username: String,
 )
 
-internal fun Route.registerRoute() {
+internal fun Route.registerRoute(accounts: AccountRepository) {
     install(RequestValidation) {
         validate<RegisterRequest> { request ->
             when {
@@ -74,13 +73,11 @@ internal fun Route.registerRoute() {
     post<Authentication.Register> {
         val requested = call.receive<RegisterRequest>()
         val account =
-            suspendTransaction {
-                Account.new {
-                    displayName = requested.displayName
-                    username = requested.username
-                    password = Passwords.hash(requested.password)
-                }
-            }
+            accounts.create(
+                displayName = requested.displayName,
+                username = requested.username,
+                password = Passwords.hash(requested.password),
+            )
 
         // TODO: generate valid token after registration
         call.respond(
