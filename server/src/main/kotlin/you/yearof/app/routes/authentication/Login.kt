@@ -6,6 +6,7 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import you.yearof.app.api.Routes
 import you.yearof.app.repositories.AccountRepository
 import you.yearof.app.services.PasswordService
 import you.yearof.app.services.TokenService
@@ -28,7 +29,7 @@ internal fun Route.loginRoute(
     accounts: AccountRepository,
     tokens: TokenService,
 ) {
-    post<Authentication.Login> {
+    post<Routes.Login> {
         val request = call.receive<LoginRequest>()
         val account = accounts.findByUsername(request.username)
         checkNotNull(account) // TODO: handle error properly

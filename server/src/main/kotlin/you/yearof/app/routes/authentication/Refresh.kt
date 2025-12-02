@@ -8,6 +8,7 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import you.yearof.app.api.Routes
 import you.yearof.app.repositories.AccountRepository
 import you.yearof.app.services.TokenService
 
@@ -24,7 +25,7 @@ internal fun Route.refreshRoute(
     tokens: TokenService,
 ) {
     authenticate("refresh") {
-        post<Authentication.Refresh> {
+        post<Routes.Refresh> {
             val principal = call.principal<JWTPrincipal>()!!
             val account = accounts.get(principal.subject!!.toUInt())
             checkNotNull(account) // TODO: handle properly

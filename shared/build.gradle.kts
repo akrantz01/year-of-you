@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.androidLibrary)
     id("you.yearof.build.codequality")
     id("you.yearof.build.toolchain")
@@ -15,7 +16,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            // put your Multiplatform dependencies here
+            implementation(libs.ktor.resources)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

@@ -8,6 +8,7 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import you.yearof.app.api.Routes
 import you.yearof.app.database.tables.DisplayNameMaxLength
 import you.yearof.app.database.tables.UsernameMaxLength
 import you.yearof.app.repositories.AccountRepository
@@ -70,7 +71,7 @@ internal fun Route.registerRoute(accounts: AccountRepository) {
         }
     }
 
-    post<Authentication.Register> {
+    post<Routes.Register> {
         val requested = call.receive<RegisterRequest>()
         val account =
             accounts.create(

@@ -11,6 +11,7 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.util.cio.writeChannel
 import io.ktor.utils.io.copyAndClose
+import you.yearof.app.api.Routes
 import you.yearof.app.repositories.AccountRepository
 import you.yearof.app.repositories.CaptureRepository
 import java.io.File
@@ -31,7 +32,7 @@ internal fun Route.uploadRoute(
     accounts: AccountRepository,
     captures: CaptureRepository,
 ) {
-    post<Captures> {
+    post<Routes.Captures> {
         val builder = UploadRequestBuilder()
         call.receiveMultipart(formFieldLimit = UploadLimit).forEachPart(builder::handlePart)
         val request = builder.finish()
