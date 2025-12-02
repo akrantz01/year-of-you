@@ -65,4 +65,7 @@ sealed interface CaptureNav : NavigationRoute {
 sealed interface ProfileNav : NavigationRoute {
     @Serializable
     data object Profile : ProfileNav
+
+    @Serializable
+    data object AccountLogin : ProfileNav
 }

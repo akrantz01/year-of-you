@@ -46,6 +46,7 @@ import you.yearof.app.screens.feed.FeedScreen
 import you.yearof.app.screens.MainGraph
 import you.yearof.app.screens.ProfileGraph
 import you.yearof.app.screens.ProfileNav
+import you.yearof.app.screens.profile.ProfileScreen
 
 @Serializable
 data object Initialization : NavigationRoute
@@ -139,7 +140,8 @@ private fun AppNavigation(navigationCoordinator: NavigationCoordinator = koinInj
                 }
 
                 navigation<ProfileGraph>(startDestination = ProfileNav.Profile) {
-                    composable<ProfileNav.Profile> { TODO() }
+                    composable<ProfileNav.Profile> { ProfileScreen() }
+                    composable<ProfileNav.AccountLogin> { TODO() }
                 }
             }
         }
