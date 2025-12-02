@@ -95,6 +95,16 @@ class TokenService(
         )
     }
 
+    fun verifyRefresh(token: String): JWTPrincipal? {
+        val decoded = try {
+            verifier.verify(token)
+        } catch (t: Throwable) {
+            return null
+        }
+
+        return validate(TokenUsage.Refresh, JWTCredential(decoded))
+    }
+
     fun validate(
         requiredUsage: TokenUsage,
         credential: JWTCredential,

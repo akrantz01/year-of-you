@@ -19,14 +19,17 @@ import io.ktor.client.plugins.resources.get
 import io.ktor.client.plugins.resources.post
 import io.ktor.client.request.header
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.request
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
+import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
 import org.koin.core.annotation.Provided
 import org.koin.core.annotation.Single
 import you.yearof.app.api.requests.LoginRequest
+import you.yearof.app.api.requests.RefreshRequest
 import you.yearof.app.api.requests.RegisterRequest
 import you.yearof.app.api.responses.CurrentUser
 import you.yearof.app.api.responses.LoginSuccess
@@ -72,14 +75,19 @@ class Client(
                     }
                     refreshTokens {
                         val refreshToken = oldTokens?.refreshToken ?: return@refreshTokens null
-
-                        val newTokens = client.post(Routes.Refresh) {
-                            header(HttpHeaders.Authorization, "Bearer $refreshToken")
+                        val response = client.post(Routes.Refresh) {
                             markAsRefreshTokenRequest()
-                        }.body<RefreshSuccess>()
-                        setTokens(newTokens.accessToken, newTokens.refreshToken)
+                            contentType(ContentType.Application.Json)
+                            setBody(RefreshRequest(token = refreshToken))
+                        }
 
-                        BearerTokens(newTokens.accessToken, newTokens.refreshToken)
+                        if (response.status.isSuccess()) {
+                            val tokens = response.body<RefreshSuccess>()
+                            setTokens(tokens.accessToken, tokens.refreshToken)
+                            BearerTokens(tokens.accessToken, tokens.refreshToken)
+                        } else {
+                            null
+                        }
                     }
                     sendWithoutRequest {
                         // TODO: create proper filter
