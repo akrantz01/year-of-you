@@ -16,10 +16,15 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
+            implementation(libs.kotlinx.serialization.core)
             implementation(libs.ktor.resources)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+        }
+
+        all {
+            languageSettings.optIn("kotlin.time.ExperimentalTime")
         }
     }
 }

@@ -9,20 +9,13 @@ import io.ktor.server.routing.Route
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import you.yearof.app.api.Routes
+import you.yearof.app.api.requests.RegisterRequest
 import you.yearof.app.database.tables.DisplayNameMaxLength
 import you.yearof.app.database.tables.UsernameMaxLength
 import you.yearof.app.repositories.AccountRepository
 import you.yearof.app.services.PasswordService
 
 private val UsernameRegex = Regex("^[a-z0-9_]+$")
-
-@Serializable
-data class RegisterRequest(
-    @SerialName("display_name")
-    val displayName: String,
-    val username: String,
-    val password: String,
-)
 
 @Serializable
 data class RegisterResponse(

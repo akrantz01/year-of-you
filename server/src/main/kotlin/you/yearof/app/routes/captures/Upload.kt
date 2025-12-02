@@ -12,6 +12,7 @@ import io.ktor.server.routing.Route
 import io.ktor.util.cio.writeChannel
 import io.ktor.utils.io.copyAndClose
 import you.yearof.app.api.Routes
+import you.yearof.app.api.requests.UploadRequest
 import you.yearof.app.repositories.AccountRepository
 import you.yearof.app.repositories.CaptureRepository
 import java.io.File
@@ -20,13 +21,6 @@ import kotlin.time.Instant
 import kotlin.uuid.Uuid
 
 private const val UploadLimit: Long = 1024 * 1024 * 16
-
-data class UploadRequest(
-    val frontPath: String,
-    val backPath: String,
-    val swapped: Boolean,
-    val taken: Instant,
-)
 
 internal fun Route.uploadRoute(
     accounts: AccountRepository,
