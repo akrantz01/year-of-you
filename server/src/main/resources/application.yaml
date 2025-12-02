@@ -5,10 +5,13 @@ ktor:
       - you.yearof.app.database.repositories.ProvidersKt.accountRepository
       - you.yearof.app.database.repositories.ProvidersKt.captureRepository
       - you.yearof.app.services.TokenServiceKt.provide
+      - you.yearof.app.scheduler.LockKt.databaseLock
+      - you.yearof.app.scheduler.LockKt.taskExecutor
     modules:
       - you.yearof.app.ApplicationKt.module
       - you.yearof.app.routes.authentication.ModuleKt.authenticationRoutes
       - you.yearof.app.routes.captures.ModuleKt.capturesRoutes
+      - you.yearof.app.scheduler.SchedulerKt.scheduler
   deployment:
     port: 8080
 

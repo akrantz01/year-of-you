@@ -49,6 +49,8 @@ dependencies {
     implementation(libs.ktor.server.statusPages)
     implementation(libs.logback)
     implementation(libs.logback.apacheCommonsBridge)
+    implementation(libs.shedlock.core)
+    implementation(libs.shedlock.exposed)
     implementation(libs.spring.security.crypto)
     testImplementation(libs.ktor.server.test)
     testImplementation(libs.kotlin.testJunit)

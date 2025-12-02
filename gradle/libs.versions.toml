@@ -43,6 +43,7 @@ postgresql = "42.7.8"
 flyway = "11.18.0"
 spring-security-crypto = "7.0.0"
 bouncycastle = "1.83"
+shedlock = "7.2.1"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -121,6 +122,8 @@ flyway-database-mysql = { module = "org.flywaydb:flyway-mysql", version.ref = "f
 flyway-database-postgresql = { module = "org.flywaydb:flyway-database-postgresql", version.ref = "flyway" }
 spring-security-crypto = { module = "org.springframework.security:spring-security-crypto", version.ref = "spring-security-crypto" }
 bouncycastle = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bouncycastle" }
+shedlock-core = { module = "net.javacrumbs.shedlock:shedlock-core", version.ref = "shedlock" }
+shedlock-exposed = { module = "net.javacrumbs.shedlock:shedlock-provider-exposed", version.ref = "shedlock" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
