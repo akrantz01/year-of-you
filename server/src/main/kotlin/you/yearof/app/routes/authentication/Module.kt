@@ -5,6 +5,8 @@ import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.auth.jwt.jwt
 import io.ktor.server.routing.routing
+import you.yearof.app.api.DefaultRealm
+import you.yearof.app.api.RefreshRealm
 import you.yearof.app.repositories.AccountRepository
 import you.yearof.app.services.TokenService
 import you.yearof.app.services.TokenUsage
@@ -34,7 +36,7 @@ fun Application.authenticationRoutes(
 ) {
     install(AuthenticationPlugin) {
         jwt {
-            realm = "Year of You: access token"
+            realm = DefaultRealm
             verifier(tokens.verifier)
 
             validate { credential ->
@@ -43,7 +45,7 @@ fun Application.authenticationRoutes(
         }
 
         jwt("refresh") {
-            realm = "Year of You: refresh token"
+            realm = RefreshRealm
             verifier(tokens.verifier)
             validate { credential ->
                 tokens.validate(TokenUsage.Refresh, credential)
