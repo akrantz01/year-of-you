@@ -91,6 +91,7 @@ kotlin {
         all {
             languageSettings.optIn("kotlin.time.ExperimentalTime")
             languageSettings.optIn("kotlin.uuid.ExperimentalUuidApi")
+            languageSettings.optIn("kotlinx.cinterop.BetaInteropApi")
             languageSettings.optIn("kotlinx.cinterop.ExperimentalForeignApi")
         }
     }
