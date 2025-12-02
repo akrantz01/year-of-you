@@ -12,11 +12,7 @@ plugins {
 
 kotlin {
     compilerOptions {
-        freeCompilerArgs.apply {
-            add("-Xexpect-actual-classes")
-            add("-opt-in=kotlin.time.ExperimentalTime")
-            add("-opt-in=kotlin.uuid.ExperimentalUuidApi")
-        }
+        freeCompilerArgs.add("-Xexpect-actual-classes")
     }
 
     androidTarget()
@@ -29,7 +25,6 @@ kotlin {
             baseName = "ComposeApp"
             isStatic = true
         }
-        iosTarget.compilerOptions.freeCompilerArgs.add("-opt-in=kotlinx.cinterop.ExperimentalForeignApi")
     }
 
     sourceSets {
@@ -91,6 +86,12 @@ kotlin {
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
+        }
+
+        all {
+            languageSettings.optIn("kotlin.time.ExperimentalTime")
+            languageSettings.optIn("kotlin.uuid.ExperimentalUuidApi")
+            languageSettings.optIn("kotlinx.cinterop.ExperimentalForeignApi")
         }
     }
 }
