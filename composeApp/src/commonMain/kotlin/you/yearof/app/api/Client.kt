@@ -90,7 +90,7 @@ class Client(
             addDefaultResponseValidation()
             defaultRequest {
                 // TODO: pull from preferences or a mutable flow or something
-                url("http://10.0.0.33:8080")
+                url("https://10.0.0.33:8443")
             }
         }
 

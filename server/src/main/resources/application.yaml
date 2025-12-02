@@ -14,7 +14,14 @@ ktor:
       - you.yearof.app.routes.captures.ModuleKt.capturesRoutes
       - you.yearof.app.scheduler.SchedulerKt.scheduler
   deployment:
-    port: 8080
+    port: ${PORT:8080}
+    sslPort: $?SSL_PORT
+  security:
+    ssl:
+      keyStore: $?SSL_KEY_STORE
+      keyAlias: $?SSL_KEY_ALIAS
+      keyStorePassword: $?SSL_KEY_STORE_PASSWORD
+      privateKeyPassword: $?SSL_PRIVATE_KEY_PASSWORD
 
 database:
   url: ${DATABASE_URL:}
