@@ -44,6 +44,7 @@ flyway = "11.18.0"
 spring-security-crypto = "7.0.0"
 bouncycastle = "1.83"
 shedlock = "7.2.1"
+tink = "1.19.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -132,6 +133,7 @@ spring-security-crypto = { module = "org.springframework.security:spring-securit
 bouncycastle = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bouncycastle" }
 shedlock-core = { module = "net.javacrumbs.shedlock:shedlock-core", version.ref = "shedlock" }
 shedlock-exposed = { module = "net.javacrumbs.shedlock:shedlock-provider-exposed", version.ref = "shedlock" }
+tink = { module = "com.google.crypto.tink:tink-android", version.ref = "tink" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

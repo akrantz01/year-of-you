@@ -14,13 +14,17 @@ import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.resources.Resources
 import io.ktor.http.HttpHeaders
 import io.ktor.serialization.kotlinx.json.json
+import org.koin.core.annotation.Provided
 import org.koin.core.annotation.Single
 import you.yearof.app.util.Log
+import you.yearof.app.util.SecureStorage
 
 internal expect val engine: HttpClientEngineFactory<HttpClientEngineConfig>
 
 @Single
-class Client {
+class Client(
+    @Provided private val secureStorage: SecureStorage,
+) {
     private val inner =
         HttpClient(engine) {
             install(ContentEncoding)

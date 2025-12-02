@@ -7,7 +7,9 @@ import org.koin.dsl.module
 import you.yearof.app.database.AppDatabase
 import you.yearof.app.database.buildDatabase
 import you.yearof.app.util.IosPaths
+import you.yearof.app.util.IosSecureStorage
 import you.yearof.app.util.Paths
+import you.yearof.app.util.SecureStorage
 
 actual val platformModule =
     module {
@@ -22,5 +24,9 @@ actual val platformModule =
             }
         }) {
             binds(listOf(AppDatabase::class))
+        }
+
+        singleOf(::IosSecureStorage) {
+            binds(listOf(SecureStorage::class))
         }
     }

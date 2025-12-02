@@ -46,6 +46,7 @@ kotlin {
             implementation(libs.koin.android)
             implementation(libs.androidx.sqlite.framework)
             implementation(libs.ktor.client.okhttp)
+            implementation(libs.tink)
         }
         commonMain {
             dependencies {

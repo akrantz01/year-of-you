@@ -12,7 +12,9 @@ import you.yearof.app.BuildConfig
 import you.yearof.app.database.AppDatabase
 import you.yearof.app.database.buildDatabase
 import you.yearof.app.util.AndroidPaths
+import you.yearof.app.util.AndroidSecureStorage
 import you.yearof.app.util.Paths
+import you.yearof.app.util.SecureStorage
 
 actual val platformModule: Module =
     module {
@@ -28,5 +30,9 @@ actual val platformModule: Module =
             }
         }) {
             binds(listOf(AppDatabase::class))
+        }
+
+        singleOf(::AndroidSecureStorage) {
+            binds(listOf(SecureStorage::class))
         }
     }
