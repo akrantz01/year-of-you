@@ -13,6 +13,7 @@ import com.google.crypto.tink.aead.PredefinedAeadParameters
 import com.google.crypto.tink.integration.android.AndroidKeystore
 import kotlinx.coroutines.flow.firstOrNull
 import java.io.File
+import java.security.GeneralSecurityException
 
 private const val KeysetFileName = "secure_storage_keyset.json"
 private const val MasterKeyAlias = "secure_storage_master_key"
@@ -57,22 +58,32 @@ class AndroidSecureStorage(
     private fun initAead(): Aead {
         AeadConfig.register()
 
-        val masterAead = AndroidKeystore.getAead(MasterKeyAlias)
+        val masterAead = ensureMasterAead()
         val keysetFile = File(context.noBackupFilesDir, KeysetFileName)
 
-        val handle =
-            if (keysetFile.exists()) {
-                val bytes = keysetFile.readBytes()
-                TinkProtoKeysetFormat.parseEncryptedKeyset(bytes, masterAead, ByteArray(0))
-            } else {
-                val handle = KeysetHandle.generateNew(PredefinedAeadParameters.AES256_GCM)
-
+        val handle = runCatching {
+            val bytes = keysetFile.readBytes()
+            TinkProtoKeysetFormat.parseEncryptedKeyset(bytes, masterAead, ByteArray(0))
+        }.getOrElse {
+            KeysetHandle.generateNew(PredefinedAeadParameters.AES256_GCM).also { handle ->
                 val serialized = TinkProtoKeysetFormat.serializeEncryptedKeyset(handle, masterAead, ByteArray(0))
                 keysetFile.writeBytes(serialized)
-
-                handle
             }
+        }
 
         return handle.getPrimitive(RegistryConfiguration.get(), Aead::class.java)
+    }
+
+    private fun ensureMasterAead(): Aead {
+        return try {
+            if (!AndroidKeystore.hasKey(MasterKeyAlias)) {
+                AndroidKeystore.generateNewAes256GcmKey(MasterKeyAlias)
+            }
+            AndroidKeystore.getAead(MasterKeyAlias)
+        } catch (e: GeneralSecurityException) {
+            AndroidKeystore.deleteKey(MasterKeyAlias)
+            AndroidKeystore.generateNewAes256GcmKey(MasterKeyAlias)
+            AndroidKeystore.getAead(MasterKeyAlias)
+        }
     }
 }
