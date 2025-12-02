@@ -38,11 +38,11 @@ import you.yearof.app.onboarding.OnboardingRoute
 import you.yearof.app.onboarding.OnboardingViewModel
 import you.yearof.app.screens.CaptureGraph
 import you.yearof.app.screens.CaptureNav
-import you.yearof.app.screens.CapturePreviewScreen
-import you.yearof.app.screens.CaptureScreen
+import you.yearof.app.screens.capture.CapturePreviewScreen
+import you.yearof.app.screens.capture.CaptureScreen
 import you.yearof.app.screens.FeedGraph
 import you.yearof.app.screens.FeedNav
-import you.yearof.app.screens.FeedScreen
+import you.yearof.app.screens.feed.FeedScreen
 import you.yearof.app.screens.MainGraph
 import you.yearof.app.screens.ProfileGraph
 import you.yearof.app.screens.ProfileNav

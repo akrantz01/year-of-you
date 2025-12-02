@@ -1,4 +1,4 @@
-package you.yearof.app.screens
+package you.yearof.app.screens.capture
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -6,6 +6,7 @@ import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
 import you.yearof.app.dto.CompletedCapture
 import you.yearof.app.navigation.NavigationCoordinator
+import you.yearof.app.screens.CaptureNav
 
 @KoinViewModel
 class CaptureViewModel(

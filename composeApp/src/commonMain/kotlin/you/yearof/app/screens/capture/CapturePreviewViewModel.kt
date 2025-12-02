@@ -1,9 +1,10 @@
-package you.yearof.app.screens
+package you.yearof.app.screens.capture
 
 import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.text.input.toTextFieldBuffer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavOptionsBuilder
+import androidx.navigation.PopUpToBuilder
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,7 +19,8 @@ import you.yearof.app.database.Capture
 import you.yearof.app.database.CaptureDao
 import you.yearof.app.dto.CompletedCapture
 import you.yearof.app.navigation.NavigationCoordinator
-import you.yearof.app.util.Log
+import you.yearof.app.screens.CaptureNav
+import you.yearof.app.screens.FeedNav
 import you.yearof.app.util.Paths
 
 data class CapturePreviewUiState(

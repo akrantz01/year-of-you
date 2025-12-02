@@ -1,4 +1,4 @@
-package you.yearof.app.screens
+package you.yearof.app.screens.feed
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

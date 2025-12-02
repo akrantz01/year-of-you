@@ -1,4 +1,4 @@
-package you.yearof.app.screens
+package you.yearof.app.screens.feed
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

@@ -1,4 +1,4 @@
-package you.yearof.app.screens
+package you.yearof.app.screens.capture
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

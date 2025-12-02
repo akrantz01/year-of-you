@@ -1,4 +1,4 @@
-package you.yearof.app.screens
+package you.yearof.app.screens.capture
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,7 +29,6 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 import you.yearof.app.dto.CompletedCapture
 import you.yearof.app.ui.PictureInPicture
-import you.yearof.app.util.Log
 
 @Composable
 fun CapturePreviewScreen(
