@@ -10,10 +10,10 @@ class Capture(
 ) : UIntEntity(id) {
     companion object : UIntEntityClass<Capture>(Captures)
 
-    val account by Account referencedOn Captures.account
-    val front by Captures.front
-    val back by Captures.back
-    val swapped by Captures.swapped
-    val takenAt by Captures.takenAt
+    var account by Account referencedOn Captures.account
+    var front by Captures.front
+    var back by Captures.back
+    var swapped by Captures.swapped
+    var takenAt by Captures.takenAt
     val uploadedAt by Captures.uploadedAt
 }

@@ -7,8 +7,6 @@ import you.yearof.app.database.entities.Account
 import you.yearof.app.database.tables.Accounts
 import you.yearof.app.repositories.AccountRepository
 
-fun provide(db: Database): AccountRepository = SqlAccountRepository(db)
-
 class SqlAccountRepository(
     private val db: Database,
 ) : AccountRepository {

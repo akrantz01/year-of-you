@@ -2,11 +2,13 @@ ktor:
   application:
     dependencies:
       - you.yearof.app.database.DatabaseKt.provideDatabase
-      - you.yearof.app.database.repositories.SqlAccountRepositoryKt.provide
+      - you.yearof.app.database.repositories.ProvidersKt.accountRepository
+      - you.yearof.app.database.repositories.ProvidersKt.captureRepository
       - you.yearof.app.services.TokenServiceKt.provide
     modules:
       - you.yearof.app.ApplicationKt.module
       - you.yearof.app.routes.authentication.ModuleKt.authenticationRoutes
+      - you.yearof.app.routes.captures.ModuleKt.capturesRoutes
   deployment:
     port: 8080
 
