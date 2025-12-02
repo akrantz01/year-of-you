@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
-import you.yearof.app.api.Client
+import you.yearof.app.api.UserService
 import you.yearof.app.navigation.NavigationCoordinator
 
 data class LoginUiState(
@@ -17,8 +17,8 @@ data class LoginUiState(
 
 @KoinViewModel
 class LoginViewModel(
-    private val api: Client,
     private val navigationCoordinator: NavigationCoordinator,
+    private val userService: UserService,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState
@@ -33,15 +33,11 @@ class LoginViewModel(
         _uiState.update { it.copy(loading = true) }
 
         try {
-            doLogin()
+            userService.login(usernameState.text.toString(), passwordState.text.toString())
+            navigationCoordinator.navigateUp()
         } finally {
             _uiState.update { it.copy(loading = false) }
         }
-    }
-
-    private suspend fun doLogin() {
-        api.login(usernameState.text.toString(), passwordState.text.toString())
-        navigationCoordinator.navigateUp()
     }
 
     fun onCancel() = viewModelScope.launch {
