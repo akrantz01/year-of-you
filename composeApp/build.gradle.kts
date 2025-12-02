@@ -45,6 +45,7 @@ kotlin {
             implementation(libs.androidx.camera.view)
             implementation(libs.koin.android)
             implementation(libs.androidx.sqlite.framework)
+            implementation(libs.ktor.client.okhttp)
         }
         commonMain {
             dependencies {
@@ -74,11 +75,21 @@ kotlin {
                 implementation(libs.koin.core)
                 implementation(libs.koin.compose.viewmodel)
                 api(libs.koin.annotations)
+                implementation(libs.ktor.serialization.kotlinx.json)
+                implementation(libs.ktor.client.auth)
+                implementation(libs.ktor.client.core)
+                implementation(libs.ktor.client.contentEncoding)
+                implementation(libs.ktor.client.contentNegotiation)
+                implementation(libs.ktor.client.logging)
+                implementation(libs.ktor.client.resources)
             }
             kotlin.srcDir("build/generated/ksp/metadata/commonMain/kotlin")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+        }
+        iosMain.dependencies {
+            implementation(libs.ktor.client.darwin)
         }
     }
 }
