@@ -10,7 +10,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -23,8 +25,10 @@ import androidx.navigation.toRoute
 import coil3.ImageLoader
 import coil3.compose.setSingletonImageLoaderFactory
 import coil3.request.crossfade
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import org.koin.compose.koinInject
+import you.yearof.app.api.UserService
 import you.yearof.app.navigation.BottomBar
 import you.yearof.app.navigation.NavigationCoordinator
 import you.yearof.app.navigation.NavigationEvent
@@ -72,8 +76,12 @@ fun App(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun AppNavigation(navigationCoordinator: NavigationCoordinator = koinInject()) {
+private fun AppNavigation(
+    navigationCoordinator: NavigationCoordinator = koinInject(),
+    userService: UserService = koinInject(),
+) {
     val navController = rememberNavController()
+    val scope = rememberCoroutineScope()
 
     // Centralized navigation handling
     LaunchedEffect(navigationCoordinator) {
@@ -86,6 +94,15 @@ private fun AppNavigation(navigationCoordinator: NavigationCoordinator = koinInj
                 }
                 is NavigationEvent.NavigateUp -> navController.navigateUp()
             }
+        }
+    }
+
+    DisposableEffect(userService) {
+        val job = scope.launch {
+            userService.load()
+        }
+        onDispose {
+            job.cancel()
         }
     }
 
