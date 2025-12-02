@@ -19,6 +19,8 @@ captures
 node_modules/
 .env
 uploads/
+*.crt
+*.p12
 
 # Negative ignores
 !server/src/main/kotlin/you/yearof/app/routes/captures
