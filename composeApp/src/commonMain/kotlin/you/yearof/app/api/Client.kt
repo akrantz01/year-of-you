@@ -21,6 +21,7 @@ import io.ktor.client.request.header
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import org.koin.core.annotation.Provided
@@ -94,7 +95,12 @@ class Client(
             }
         }
 
-    suspend fun currentUser(): CurrentUser? = get(Routes.CurrentUser)
+    // TODO: probably need to handle http errors everywhere :(
+    suspend fun currentUser(): CurrentUser? {
+        val response = inner.get(Routes.CurrentUser)
+        return if (response.status == HttpStatusCode.Unauthorized) null
+        else response.body()
+    }
 
     suspend fun register(displayName: String, username: String, password: String): CurrentUser =
         post(Routes.Register, RegisterRequest(displayName, username, password))
