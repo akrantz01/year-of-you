@@ -11,11 +11,15 @@ import you.yearof.app.screens.ProfileNav
 @KoinViewModel
 class ProfileViewModel(
     private val navigationCoordinator: NavigationCoordinator,
-    userService: UserService,
+    private val userService: UserService,
 ) : ViewModel() {
     val authState = userService.state
 
     fun showProfile() = viewModelScope.launch {
         navigationCoordinator.navigateTo(ProfileNav.AccountLogin)
+    }
+
+    fun logout() = viewModelScope.launch {
+        userService.logout()
     }
 }

@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -24,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import app.composeapp.generated.resources.Res
+import app.composeapp.generated.resources.chevron_right
 import app.composeapp.generated.resources.circle_user
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -37,7 +40,7 @@ fun ProfileScreen(modifier: Modifier = Modifier, viewModel: ProfileViewModel = k
     Column(modifier = modifier.fillMaxSize()) {
         ProfileCard(
             state = authState,
-            onClickAuthenticated = { TODO() },
+            onClickAuthenticated = viewModel::logout,
             onClickUnauthenticated = viewModel::showProfile,
             modifier = Modifier.fillMaxWidth(),
         )
@@ -72,14 +75,21 @@ private fun ProfileCard(
 private fun UnauthenticatedProfileCard(onClick: () -> Unit, modifier: Modifier = Modifier) {
     BaseProfileCard(modifier = modifier, onClick = onClick) {
         Icon(
-            modifier = Modifier.size(80.dp),
+            modifier = Modifier.size(80.dp).align(Alignment.CenterVertically),
             painter = painterResource(Res.drawable.circle_user),
             contentDescription = "Empty profile",
         )
-        Column {
+
+        Column(modifier = Modifier.weight(1f)) {
             Text(text = "Share with friends!", style = MaterialTheme.typography.headlineMedium)
             Text(text = "Sign in or create an account to share your captures with friends!", style = MaterialTheme.typography.bodySmall)
         }
+
+        Icon(
+            modifier = Modifier.size(32.dp).align(Alignment.CenterVertically),
+            painter = painterResource(Res.drawable.chevron_right),
+            contentDescription = "Sign in or register",
+        )
     }
 }
 
@@ -121,10 +131,16 @@ private fun AuthenticatedProfileCard(
             )
         }
 
-        Column {
+        Column(modifier = Modifier.weight(1f)) {
             Text(text = displayName, style = MaterialTheme.typography.headlineMedium)
             Text(text = username, style = MaterialTheme.typography.bodyMedium, fontStyle = FontStyle.Italic)
         }
+
+        Icon(
+            modifier = Modifier.size(32.dp).align(Alignment.CenterVertically),
+            painter = painterResource(Res.drawable.chevron_right),
+            contentDescription = "Account settings",
+        )
     }
 }
 
@@ -145,14 +161,14 @@ private fun SkeletonProfileCard(modifier: Modifier = Modifier) {
 private fun BaseProfileCard(
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
-    content: @Composable () -> Unit,
+    content: @Composable RowScope.() -> Unit,
 ) {
     Card(
         modifier = modifier.padding(16.dp),
         onClick = onClick,
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(4.dp),
+            modifier = Modifier.fillMaxWidth().padding(8.dp),
             verticalAlignment = Alignment.Top,
             horizontalArrangement = Arrangement.spacedBy(2.dp),
         ) {
