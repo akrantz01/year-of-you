@@ -91,10 +91,12 @@ fun BottomBar(
                 NavigationBarItem(
                     selected = isSelected,
                     onClick = {
-                        navController.navigate(tab.route) {
-                            popUpTo<MainGraph> { saveState = true }
-                            launchSingleTop = true
-                            restoreState = false
+                        if (!isSelected) {
+                            navController.navigate(tab.route) {
+                                popUpTo<MainGraph> { saveState = true }
+                                launchSingleTop = true
+                                restoreState = false
+                            }
                         }
                     },
                     icon = {
