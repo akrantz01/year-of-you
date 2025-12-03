@@ -20,7 +20,7 @@ actual val platformModule =
         singleOf({ paths: Paths ->
             buildDatabase { name ->
                 val path = paths.forDatabase(name)
-                Room.databaseBuilder(name = path)
+                Room.databaseBuilder(name = path.toString())
             }
         }) {
             binds(listOf(AppDatabase::class))

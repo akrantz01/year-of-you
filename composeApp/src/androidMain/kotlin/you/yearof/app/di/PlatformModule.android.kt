@@ -26,7 +26,7 @@ actual val platformModule: Module =
             val driver = if (BuildConfig.USE_NATIVE_SQLITE_DRIVER) AndroidSQLiteDriver() else BundledSQLiteDriver()
             buildDatabase(driver = driver) { name ->
                 val path = paths.forDatabase(name)
-                Room.databaseBuilder(context = context, name = path)
+                Room.databaseBuilder(context = context, name = path.toString())
             }
         }) {
             binds(listOf(AppDatabase::class))

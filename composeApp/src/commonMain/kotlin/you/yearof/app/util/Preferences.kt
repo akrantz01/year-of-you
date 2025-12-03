@@ -16,7 +16,8 @@ class Preferences(
     @Provided private val paths: Paths,
 ) {
     private val dataStore = PreferenceDataStoreFactory.createWithPath {
-        paths.inDocuments(DataStoreName).toPath()
+        // TODO: look into effort required to use kotlinx instead of okio
+        paths.inDocuments(DataStoreName).toString().toPath()
     }
 
     val user: Flow<CurrentUserInfo?> = dataStore.data.map { prefs ->

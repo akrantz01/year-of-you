@@ -1,13 +1,14 @@
 package you.yearof.app.util
 
+import kotlinx.io.files.Path
 import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSUserDomainMask
 
 class IosPaths : Paths {
-    override fun forDatabase(name: String): String = inDocuments(name)
+    override fun forDatabase(name: String): Path = inDocuments(name)
 
-    override fun inDocuments(name: String): String {
+    override fun inDocuments(name: String): Path {
         val directory =
             NSFileManager.defaultManager.URLForDirectory(
                 directory = NSDocumentDirectory,
@@ -16,6 +17,6 @@ class IosPaths : Paths {
                 create = false,
                 error = null,
             )
-        return "${checkNotNull(directory?.path)}/$name"
+        return Path(checkNotNull(directory?.path), name)
     }
 }

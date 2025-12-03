@@ -11,9 +11,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import okio.FileSystem
-import okio.Path.Companion.toPath
-import okio.SYSTEM
+import kotlinx.io.files.Path
+import kotlinx.io.files.SystemFileSystem
 import org.koin.android.annotation.KoinViewModel
 import org.koin.core.annotation.Provided
 import you.yearof.app.api.UserService
@@ -67,14 +66,14 @@ class CapturePreviewViewModel(
     private suspend fun doSave(capture: CompletedCapture) {
         val state = uiState.value
 
-        val base = paths.inDocuments("captures").toPath().resolve(capture.timestamp.toEpochMilliseconds().toString())
-        FileSystem.SYSTEM.createDirectories(base)
+        val base = Path(paths.inDocuments("captures"), capture.timestamp.toEpochMilliseconds().toString())
+        SystemFileSystem.createDirectories(base)
 
-        val frontPath = base.resolve("front.jpeg")
-        FileSystem.SYSTEM.atomicMove(source = capture.frontPath.toPath(), target = frontPath)
+        val frontPath = Path(base, "front.jpeg")
+        SystemFileSystem.atomicMove(source = Path(capture.frontPath), destination = frontPath)
 
-        val backPath = base.resolve("back.jpeg")
-        FileSystem.SYSTEM.atomicMove(source = capture.backPath.toPath(), target = backPath)
+        val backPath = Path(base, "back.jpeg")
+        SystemFileSystem.atomicMove(source = Path(capture.backPath), destination = backPath)
 
         captures.insert(
             Capture(

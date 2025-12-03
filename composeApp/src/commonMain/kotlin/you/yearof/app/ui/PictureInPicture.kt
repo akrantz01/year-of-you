@@ -32,6 +32,7 @@ fun PictureInPicture(
 ) {
     var swapped by remember { mutableStateOf(initiallySwapped) }
 
+    // TODO: migrate to kotlinx.io once supported by coil
     val frontModel = remember(front) { front.toPath() }
     val backModel = remember(back) { back.toPath() }
 

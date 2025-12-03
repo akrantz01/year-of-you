@@ -1,7 +1,9 @@
 package you.yearof.app.util
 
-interface Paths {
-    fun forDatabase(name: String): String
+import kotlinx.io.files.Path
 
-    fun inDocuments(name: String): String
+interface Paths {
+    fun forDatabase(name: String): Path
+
+    fun inDocuments(name: String): Path
 }
