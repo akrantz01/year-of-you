@@ -6,11 +6,15 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.input.InputTransformation
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.maxLength
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults.iconButtonColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -28,9 +32,10 @@ import org.koin.compose.viewmodel.koinViewModel
 import you.yearof.app.ui.LoadingButton
 import you.yearof.app.ui.PasswordTextField
 import you.yearof.app.ui.UsernameTextField
+import you.yearof.app.util.then
 
 @Composable
-fun LoginScreen(modifier: Modifier = Modifier, viewModel: LoginViewModel = koinViewModel()) {
+fun RegisterScreen(modifier: Modifier = Modifier, viewModel: RegisterViewModel = koinViewModel()) {
     val state by viewModel.uiState.collectAsState()
 
     Column(modifier = modifier.fillMaxSize()) {
@@ -49,37 +54,52 @@ fun LoginScreen(modifier: Modifier = Modifier, viewModel: LoginViewModel = koinV
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text(text = "Welcome back!", style = MaterialTheme.typography.headlineLarge)
+            Text(text = "Create your account!", style = MaterialTheme.typography.headlineLarge)
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            TextField(
+                state = viewModel.displayNameState,
+                label = { Text("What should we call you?") },
+                enabled = !state.loading,
+                lineLimits = TextFieldLineLimits.SingleLine,
+                inputTransformation = InputTransformation.maxLength(64),
+            )
             UsernameTextField(
                 state = viewModel.usernameState,
-                label = { Text("Username") },
+                label = { Text("Choose your handle") },
                 enabled = !state.loading
             )
             PasswordTextField(
                 state = viewModel.passwordState,
-                label = { Text("Password") },
-                enabled = !state.loading
+                label = { Text("Pick a password") },
+                enabled = !state.loading,
+                error = !viewModel.passwordsMatch,
+            )
+            PasswordTextField(
+                state = viewModel.passwordConfirmationState,
+                label = { Text("Re-enter your password") },
+                enabled = !state.loading,
+                error = !viewModel.passwordsMatch,
+                supportingText = viewModel.passwordsMatch.not().then { { Text("Passwords do not match") } },
             )
 
             // TODO: allow configuring server
             Spacer(modifier = Modifier.height(16.dp))
 
             LoadingButton(
-                text = "Login",
-                onClick = viewModel::onLogin,
-                enabled = viewModel.canLogin,
+                text = "Create",
+                onClick = viewModel::onRegister,
+                enabled = viewModel.canRegister,
                 loading = state.loading,
             )
 
             Text(
-                modifier = Modifier.clickable { viewModel.toRegister() },
+                modifier = Modifier.clickable { viewModel.toLogin() },
                 text = buildAnnotatedString {
-                    append("Don't have an account? ")
+                    append("Already have an account? ")
                     withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)) {
-                        append("Sign up!")
+                        append("Sign in!")
                     }
                 },
             )

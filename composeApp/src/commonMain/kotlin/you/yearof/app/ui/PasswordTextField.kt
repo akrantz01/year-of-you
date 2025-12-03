@@ -25,6 +25,8 @@ fun PasswordTextField(
     state: TextFieldState,
     enabled: Boolean = true,
     label: @Composable (TextFieldLabelScope.() -> Unit)? = null,
+    error: Boolean = false,
+    supportingText: @Composable (() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
     var showPassword by remember { mutableStateOf(false) }
@@ -44,5 +46,7 @@ fun PasswordTextField(
         },
         enabled = enabled,
         label = label,
+        isError = error,
+        supportingText = supportingText,
     )
 }

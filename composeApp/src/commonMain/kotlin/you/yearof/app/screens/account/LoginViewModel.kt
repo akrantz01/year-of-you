@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
 import you.yearof.app.api.UserService
 import you.yearof.app.navigation.NavigationCoordinator
+import you.yearof.app.screens.ProfileNav
 
 data class LoginUiState(
     val loading: Boolean = false,
@@ -34,10 +35,16 @@ class LoginViewModel(
 
         try {
             userService.login(usernameState.text.toString(), passwordState.text.toString())
-            navigationCoordinator.navigateUp()
+            navigationCoordinator.navigateTo(ProfileNav.Profile) {
+                popUpTo(ProfileNav.Profile) { inclusive = true }
+            }
         } finally {
             _uiState.update { it.copy(loading = false) }
         }
+    }
+
+    fun toRegister() = viewModelScope.launch {
+        navigationCoordinator.navigateTo(ProfileNav.AccountRegister)
     }
 
     fun onCancel() = viewModelScope.launch {

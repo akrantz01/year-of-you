@@ -51,6 +51,7 @@ import you.yearof.app.screens.MainGraph
 import you.yearof.app.screens.ProfileGraph
 import you.yearof.app.screens.ProfileNav
 import you.yearof.app.screens.account.LoginScreen
+import you.yearof.app.screens.account.RegisterScreen
 import you.yearof.app.screens.profile.ProfileScreen
 
 @Serializable
@@ -160,6 +161,7 @@ private fun AppNavigation(
                 navigation<ProfileGraph>(startDestination = ProfileNav.Profile) {
                     composable<ProfileNav.Profile> { ProfileScreen() }
                     composable<ProfileNav.AccountLogin> { LoginScreen() }
+                    composable<ProfileNav.AccountRegister> { RegisterScreen() }
                 }
             }
         }

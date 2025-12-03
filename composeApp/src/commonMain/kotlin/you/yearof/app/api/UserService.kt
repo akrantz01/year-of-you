@@ -33,6 +33,11 @@ class UserService(
         refresh()
     }
 
+    suspend fun register(displayName: String, username: String, password: String) {
+        api.register(displayName, username, password)
+        // TODO: this won't work correctly till registration is sorted out
+    }
+
     suspend fun login(username: String, password: String) {
         api.login(username, password)
         refresh()
