@@ -17,6 +17,8 @@ data class Capture(
     @ColumnInfo(name = "at") val at: Instant,
     @ColumnInfo(defaultValue = "false") val swapped: Boolean = false,
     @ColumnInfo(defaultValue = "") val caption: String = "",
+    @ColumnInfo(defaultValue = "false") val shared: Boolean = false,
+    @ColumnInfo(name = "uploaded_at", defaultValue = "null") val uploadedAt: Instant? = null,
 )
 
 @Dao

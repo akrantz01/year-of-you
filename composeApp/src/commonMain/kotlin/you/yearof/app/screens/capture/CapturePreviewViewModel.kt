@@ -65,6 +65,8 @@ class CapturePreviewViewModel(
     }
 
     private suspend fun doSave(capture: CompletedCapture) {
+        val state = uiState.value
+
         val base = paths.inDocuments("captures").toPath().resolve(capture.timestamp.toEpochMilliseconds().toString())
         FileSystem.SYSTEM.createDirectories(base)
 
@@ -81,8 +83,11 @@ class CapturePreviewViewModel(
                 at = capture.timestamp,
                 swapped = capture.swapped,
                 caption = captionState.text.toString(),
+                shared = state.share,
             ),
         )
+
+        // TODO: start capture upload
 
         navigationCoordinator.navigateTo(FeedNav.Feed) {
             popUpTo(CaptureNav.Capture) { inclusive = false }
