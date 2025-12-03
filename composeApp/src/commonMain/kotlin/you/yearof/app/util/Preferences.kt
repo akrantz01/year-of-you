@@ -7,7 +7,6 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import okio.Path.Companion.toPath
 import org.koin.core.annotation.Provided
 import org.koin.core.annotation.Single
 
@@ -17,7 +16,7 @@ class Preferences(
 ) {
     private val dataStore = PreferenceDataStoreFactory.createWithPath {
         // TODO: look into effort required to use kotlinx instead of okio
-        paths.inDocuments(DataStoreName).toString().toPath()
+        paths.inDocuments(DataStoreName).asOkioPath()
     }
 
     val user: Flow<CurrentUserInfo?> = dataStore.data.map { prefs ->

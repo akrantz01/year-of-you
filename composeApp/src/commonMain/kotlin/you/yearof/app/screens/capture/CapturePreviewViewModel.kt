@@ -77,8 +77,8 @@ class CapturePreviewViewModel(
 
         captures.insert(
             Capture(
-                frontPath = frontPath.toString(),
-                backPath = backPath.toString(),
+                frontPath = frontPath,
+                backPath = backPath,
                 at = capture.timestamp,
                 swapped = capture.swapped,
                 caption = captionState.text.toString(),

@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults.iconButtonColors
@@ -24,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import app.composeapp.generated.resources.Res
 import app.composeapp.generated.resources.arrow_left
+import kotlinx.io.files.Path
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 import you.yearof.app.dto.CompletedCapture
@@ -54,8 +54,8 @@ fun CapturePreviewScreen(
 
         PictureInPicture(
             modifier = Modifier.fillMaxWidth(),
-            front = capture.frontPath,
-            back = capture.backPath,
+            front = Path(capture.frontPath),
+            back = Path(capture.backPath),
             initiallySwapped = capture.swapped,
         )
 

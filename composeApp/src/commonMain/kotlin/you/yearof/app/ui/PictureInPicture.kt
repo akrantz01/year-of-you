@@ -21,20 +21,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import okio.Path.Companion.toPath
+import kotlinx.io.files.Path
+import you.yearof.app.util.asOkioPath
 
 @Composable
 fun PictureInPicture(
-    front: String,
-    back: String,
+    front: Path,
+    back: Path,
     initiallySwapped: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     var swapped by remember { mutableStateOf(initiallySwapped) }
 
     // TODO: migrate to kotlinx.io once supported by coil
-    val frontModel = remember(front) { front.toPath() }
-    val backModel = remember(back) { back.toPath() }
+    val frontModel = remember(front) { front.asOkioPath() }
+    val backModel = remember(back) { back.asOkioPath() }
 
     val baseModel = if (swapped) frontModel else backModel
     val overlayModel = if (swapped) backModel else frontModel
