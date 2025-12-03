@@ -1,6 +1,7 @@
 package you.yearof.app.util
 
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -26,11 +27,21 @@ class Preferences(
         else null
     }
 
+    val accountOnboardingSeen: Flow<Boolean> = dataStore.data.map { prefs ->
+        prefs[accountOnboardingSeenKey] ?: false
+    }
+
     suspend fun setUser(id: UInt, username: String, name: String) {
         dataStore.edit { prefs ->
             prefs[idKey] = id.toInt()
             prefs[usernameKey] = username
             prefs[displayNameKey] = name
+        }
+    }
+
+    suspend fun setAccountOnboardingSeen(seen: Boolean = true) {
+        dataStore.edit { prefs ->
+            prefs[accountOnboardingSeenKey] = seen
         }
     }
 
@@ -48,6 +59,7 @@ class Preferences(
         private val idKey = intPreferencesKey("id")
         private val usernameKey = stringPreferencesKey("username")
         private val displayNameKey = stringPreferencesKey("displayName")
+        private val accountOnboardingSeenKey = booleanPreferencesKey("accountOnboardingSeen")
     }
 }
 

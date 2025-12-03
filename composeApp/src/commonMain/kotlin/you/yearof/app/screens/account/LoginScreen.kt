@@ -20,12 +20,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 import you.yearof.app.ui.LoadingButton
 import you.yearof.app.ui.PasswordTextField
 import you.yearof.app.ui.UsernameTextField
 
 @Composable
-fun LoginScreen(modifier: Modifier = Modifier, viewModel: LoginViewModel = koinViewModel()) {
+fun LoginScreen(
+    modifier: Modifier = Modifier,
+    router: AccountRouter,
+    viewModel: LoginViewModel = koinViewModel(parameters = { parametersOf(router) }),
+) {
     val state by viewModel.uiState.collectAsState()
 
     Column(

@@ -8,9 +8,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
+import org.koin.core.annotation.InjectedParam
 import you.yearof.app.api.UserService
-import you.yearof.app.navigation.NavigationCoordinator
-import you.yearof.app.screens.ProfileNav
+import you.yearof.app.screens.account.AccountRouter
 
 data class LoginUiState(
     val loading: Boolean = false,
@@ -18,8 +18,8 @@ data class LoginUiState(
 
 @KoinViewModel
 class LoginViewModel(
-    private val navigationCoordinator: NavigationCoordinator,
     private val userService: UserService,
+    @InjectedParam private val router: AccountRouter,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState
@@ -35,21 +35,13 @@ class LoginViewModel(
 
         try {
             userService.login(usernameState.text.toString(), passwordState.text.toString())
-            navigationCoordinator.navigateTo(ProfileNav.Profile) {
-                popUpTo(ProfileNav.Profile) { inclusive = true }
-            }
+            router.onSuccess()
         } finally {
             _uiState.update { it.copy(loading = false) }
         }
     }
 
-    fun toRegister() = viewModelScope.launch {
-        navigationCoordinator.navigateTo(ProfileNav.AccountRegister)
-    }
+    fun toRegister() = viewModelScope.launch { router.toOpposite() }
 
-    fun onCancel() = viewModelScope.launch {
-        navigationCoordinator.navigateTo(ProfileNav.Profile) {
-            popUpTo(ProfileNav.Profile) { inclusive = true }
-        }
-    }
+    fun onCancel() = viewModelScope.launch { router.onCancel() }
 }

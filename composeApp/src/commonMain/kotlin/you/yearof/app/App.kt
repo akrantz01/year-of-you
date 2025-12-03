@@ -36,6 +36,9 @@ import you.yearof.app.navigation.NavigationRoute
 import you.yearof.app.navigation.sharedViewModel
 import you.yearof.app.onboarding.CameraPermissionsScreen
 import you.yearof.app.onboarding.InitializationScreen
+import you.yearof.app.onboarding.AccountLoginScreen
+import you.yearof.app.onboarding.AccountPromptScreen
+import you.yearof.app.onboarding.AccountRegistrationScreen
 import you.yearof.app.onboarding.NotificationPermissionsScreen
 import you.yearof.app.onboarding.Onboarding
 import you.yearof.app.onboarding.OnboardingRoute
@@ -50,8 +53,8 @@ import you.yearof.app.screens.feed.FeedScreen
 import you.yearof.app.screens.MainGraph
 import you.yearof.app.screens.ProfileGraph
 import you.yearof.app.screens.ProfileNav
-import you.yearof.app.screens.account.LoginScreen
-import you.yearof.app.screens.account.RegisterScreen
+import you.yearof.app.screens.profile.ProfileLoginScreen
+import you.yearof.app.screens.profile.ProfileRegistrationScreen
 import you.yearof.app.screens.profile.ProfileScreen
 
 @Serializable
@@ -143,6 +146,23 @@ private fun AppNavigation(
                     val viewModel: OnboardingViewModel = backStackEntry.sharedViewModel(navController)
                     NotificationPermissionsScreen(viewModel = viewModel)
                 }
+
+                composable<OnboardingRoute.AccountPrompt> { backStackEntry ->
+                    val viewModel: OnboardingViewModel = backStackEntry.sharedViewModel(navController)
+                    AccountPromptScreen(viewModel = viewModel)
+                }
+
+                composable<OnboardingRoute.AccountRegistration> { backStackEntry ->
+                    val viewModel: OnboardingViewModel = backStackEntry.sharedViewModel(navController)
+                    AccountRegistrationScreen(viewModel = viewModel)
+                }
+
+                composable<OnboardingRoute.AccountConfirmation> { TODO() }
+
+                composable<OnboardingRoute.AccountLogin> { backStackEntry ->
+                    val viewModel: OnboardingViewModel = backStackEntry.sharedViewModel(navController)
+                    AccountLoginScreen(viewModel = viewModel)
+                }
             }
 
             navigation<MainGraph>(startDestination = FeedGraph) {
@@ -160,8 +180,8 @@ private fun AppNavigation(
 
                 navigation<ProfileGraph>(startDestination = ProfileNav.Profile) {
                     composable<ProfileNav.Profile> { ProfileScreen() }
-                    composable<ProfileNav.AccountLogin> { LoginScreen() }
-                    composable<ProfileNav.AccountRegister> { RegisterScreen() }
+                    composable<ProfileNav.AccountLogin> { ProfileLoginScreen() }
+                    composable<ProfileNav.AccountRegister> { ProfileRegistrationScreen() }
                 }
             }
         }

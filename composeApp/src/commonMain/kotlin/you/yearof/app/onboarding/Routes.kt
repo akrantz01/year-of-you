@@ -13,4 +13,16 @@ sealed interface OnboardingRoute : NavigationRoute {
 
     @Serializable
     data object Notifications : OnboardingRoute
+
+    @Serializable
+    data object AccountPrompt : OnboardingRoute
+
+    @Serializable
+    data object AccountRegistration : OnboardingRoute
+
+    @Serializable
+    data object AccountConfirmation : OnboardingRoute
+
+    @Serializable
+    data object AccountLogin : OnboardingRoute
 }

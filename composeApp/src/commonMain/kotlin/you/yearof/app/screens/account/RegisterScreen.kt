@@ -24,13 +24,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 import you.yearof.app.ui.LoadingButton
 import you.yearof.app.ui.PasswordTextField
 import you.yearof.app.ui.UsernameTextField
 import you.yearof.app.util.then
 
 @Composable
-fun RegisterScreen(modifier: Modifier = Modifier, viewModel: RegisterViewModel = koinViewModel()) {
+fun RegisterScreen(
+    modifier: Modifier = Modifier,
+    router: AccountRouter,
+    viewModel: RegisterViewModel = koinViewModel(parameters = { parametersOf(router) }),
+) {
     val state by viewModel.uiState.collectAsState()
 
     Column(
