@@ -1,8 +1,6 @@
 package you.yearof.app.screens.capture
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -21,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import app.composeapp.generated.resources.Res
@@ -29,6 +28,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 import you.yearof.app.dto.CompletedCapture
 import you.yearof.app.ui.PictureInPicture
+import you.yearof.app.ui.Switch
 
 @Composable
 fun CapturePreviewScreen(
@@ -37,6 +37,7 @@ fun CapturePreviewScreen(
     viewModel: CapturePreviewViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val authenticated by viewModel.authenticated.collectAsState()
     val containerScroll = rememberScrollState()
 
     Column(modifier = modifier.fillMaxSize().verticalScroll(containerScroll)) {
@@ -71,13 +72,20 @@ fun CapturePreviewScreen(
                     ),
             )
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End,
+            if (authenticated) {
+                Switch(
+                    label = "Share with friends?",
+                    checked = uiState.share,
+                    onChange = viewModel::onShareChange,
+                )
+            }
+
+            Button(
+                modifier = Modifier.align(Alignment.End),
+                onClick = { viewModel.onSave(capture) },
+                enabled = !uiState.loading,
             ) {
-                Button(onClick = { viewModel.onSave(capture) }) {
-                    Text("Save")
-                }
+                Text("Save")
             }
         }
     }

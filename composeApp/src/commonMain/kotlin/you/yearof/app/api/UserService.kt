@@ -14,6 +14,11 @@ sealed interface AuthenticationState {
     data class Authenticated(val id: UInt, val name: String, val username: String): AuthenticationState
 }
 
+fun AuthenticationState.isAuthenticated() = when (this) {
+    is AuthenticationState.Authenticated -> true
+    else -> false
+}
+
 @Single
 class UserService(
     private val api: Client,
