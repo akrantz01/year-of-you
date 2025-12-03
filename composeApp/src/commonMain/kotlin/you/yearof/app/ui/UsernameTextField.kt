@@ -52,7 +52,7 @@ private class UsernameTransformation() : InputTransformation {
                         val lower = c.lowercaseChar()
                         val keep = lower in 'a'..'z' || lower in '0'..'9' || lower == '_'
                         if (keep) append(lower)
-                        changed = lower != c || !keep
+                        changed = changed || lower != c || !keep
                     }
                 }
 
