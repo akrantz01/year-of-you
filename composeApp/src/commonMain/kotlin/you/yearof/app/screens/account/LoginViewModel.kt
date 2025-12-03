@@ -48,6 +48,8 @@ class LoginViewModel(
     }
 
     fun onCancel() = viewModelScope.launch {
-        navigationCoordinator.navigateUp()
+        navigationCoordinator.navigateTo(ProfileNav.Profile) {
+            popUpTo(ProfileNav.Profile) { inclusive = true }
+        }
     }
 }

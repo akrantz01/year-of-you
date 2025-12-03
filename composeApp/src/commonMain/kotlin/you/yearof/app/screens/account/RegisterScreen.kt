@@ -1,18 +1,16 @@
 package you.yearof.app.screens.account
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.input.InputTransformation
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.maxLength
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults.iconButtonColors
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -25,9 +23,6 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import app.composeapp.generated.resources.Res
-import app.composeapp.generated.resources.arrow_left
-import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 import you.yearof.app.ui.LoadingButton
 import you.yearof.app.ui.PasswordTextField
@@ -38,26 +33,18 @@ import you.yearof.app.util.then
 fun RegisterScreen(modifier: Modifier = Modifier, viewModel: RegisterViewModel = koinViewModel()) {
     val state by viewModel.uiState.collectAsState()
 
-    Column(modifier = modifier.fillMaxSize()) {
-        IconButton(
-            onClick = viewModel::onCancel,
-            colors = iconButtonColors(contentColor = MaterialTheme.colorScheme.onBackground),
-        ) {
-            Icon(
-                modifier = Modifier.size(24.dp),
-                painter = painterResource(Res.drawable.arrow_left),
-                contentDescription = "Back",
-            )
-        }
+    Column(
+        modifier = modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        Text(text = "Create your account!", style = MaterialTheme.typography.headlineLarge)
 
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Text(text = "Create your account!", style = MaterialTheme.typography.headlineLarge)
-
-            Spacer(modifier = Modifier.height(16.dp))
-
             TextField(
                 state = viewModel.displayNameState,
                 label = { Text("What should we call you?") },
@@ -83,26 +70,37 @@ fun RegisterScreen(modifier: Modifier = Modifier, viewModel: RegisterViewModel =
                 error = !viewModel.passwordsMatch,
                 supportingText = viewModel.passwordsMatch.not().then { { Text("Passwords do not match") } },
             )
+        }
 
-            // TODO: allow configuring server
-            Spacer(modifier = Modifier.height(16.dp))
+        // TODO: allow configuring server
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceAround,
+        ) {
+            OutlinedButton(
+                onClick = viewModel::onCancel,
+                enabled = !state.loading,
+            ) {
+                Text("Cancel")
+            }
 
             LoadingButton(
-                text = "Create",
+                text = "Let's go!",
                 onClick = viewModel::onRegister,
                 enabled = viewModel.canRegister,
                 loading = state.loading,
             )
-
-            Text(
-                modifier = Modifier.clickable { viewModel.toLogin() },
-                text = buildAnnotatedString {
-                    append("Already have an account? ")
-                    withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)) {
-                        append("Sign in!")
-                    }
-                },
-            )
         }
+
+        Text(
+            modifier = Modifier.clickable { viewModel.toLogin() },
+            text = buildAnnotatedString {
+                append("Already have an account? ")
+                withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)) {
+                    append("Sign in!")
+                }
+            },
+        )
     }
 }
