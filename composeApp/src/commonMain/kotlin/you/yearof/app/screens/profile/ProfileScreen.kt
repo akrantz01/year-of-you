@@ -75,18 +75,18 @@ private fun ProfileCard(
 private fun UnauthenticatedProfileCard(onClick: () -> Unit, modifier: Modifier = Modifier) {
     BaseProfileCard(modifier = modifier, onClick = onClick) {
         Icon(
-            modifier = Modifier.size(80.dp).align(Alignment.CenterVertically),
+            modifier = Modifier.size(80.dp),
             painter = painterResource(Res.drawable.circle_user),
             contentDescription = "Empty profile",
         )
 
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = "Share with friends!", style = MaterialTheme.typography.headlineMedium)
+            Text(text = "Share with friends!", style = MaterialTheme.typography.titleLarge)
             Text(text = "Sign in or create an account to share your captures with friends!", style = MaterialTheme.typography.bodySmall)
         }
 
         Icon(
-            modifier = Modifier.size(32.dp).align(Alignment.CenterVertically),
+            modifier = Modifier.size(32.dp),
             painter = painterResource(Res.drawable.chevron_right),
             contentDescription = "Sign in or register",
         )
@@ -132,12 +132,12 @@ private fun AuthenticatedProfileCard(
         }
 
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = displayName, style = MaterialTheme.typography.headlineMedium)
+            Text(text = displayName, style = MaterialTheme.typography.titleLarge)
             Text(text = username, style = MaterialTheme.typography.bodyMedium, fontStyle = FontStyle.Italic)
         }
 
         Icon(
-            modifier = Modifier.size(32.dp).align(Alignment.CenterVertically),
+            modifier = Modifier.size(32.dp),
             painter = painterResource(Res.drawable.chevron_right),
             contentDescription = "Account settings",
         )
@@ -169,7 +169,7 @@ private fun BaseProfileCard(
     ) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(8.dp),
-            verticalAlignment = Alignment.Top,
+            verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(2.dp),
         ) {
             content()
