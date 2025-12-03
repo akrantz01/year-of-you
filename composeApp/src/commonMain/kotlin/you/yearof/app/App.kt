@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
@@ -16,6 +17,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -33,6 +35,7 @@ import you.yearof.app.navigation.BottomBar
 import you.yearof.app.navigation.NavigationCoordinator
 import you.yearof.app.navigation.NavigationEvent
 import you.yearof.app.navigation.NavigationRoute
+import you.yearof.app.navigation.TopBar
 import you.yearof.app.navigation.sharedViewModel
 import you.yearof.app.onboarding.CameraPermissionsScreen
 import you.yearof.app.onboarding.InitializationScreen
@@ -86,6 +89,7 @@ private fun AppNavigation(
 ) {
     val navController = rememberNavController()
     val scope = rememberCoroutineScope()
+    val scrollBehaviour = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     // Centralized navigation handling
     LaunchedEffect(navigationCoordinator) {
@@ -111,6 +115,13 @@ private fun AppNavigation(
     }
 
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehaviour.nestedScrollConnection),
+        topBar = {
+            TopBar(
+                navController = navController,
+                scrollBehaviour = scrollBehaviour,
+            )
+        },
         bottomBar = {
             val borderColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.25f)
             BottomBar(

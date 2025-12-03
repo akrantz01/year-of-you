@@ -89,6 +89,7 @@ kotlin {
         }
 
         all {
+            languageSettings.optIn("androidx.compose.material3.ExperimentalMaterial3Api")
             languageSettings.optIn("kotlin.time.ExperimentalTime")
             languageSettings.optIn("kotlin.uuid.ExperimentalUuidApi")
             languageSettings.optIn("kotlinx.cinterop.BetaInteropApi")

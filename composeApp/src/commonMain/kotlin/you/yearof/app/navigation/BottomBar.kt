@@ -69,7 +69,6 @@ fun BottomBar(
     val backStackEntry by navController.currentBackStackEntryAsState()
     val destination = backStackEntry?.destination
 
-    val show = destination?.hierarchy?.any { it.hasRoute<MainGraph>() } ?: false
     val selected =
         destination?.hierarchy?.firstNotNullOfOrNull { destination ->
             when {
@@ -80,7 +79,7 @@ fun BottomBar(
             }
         }
 
-    if (show) {
+    NavGraphGuard(graph = MainGraph::class, navController = navController) {
         NavigationBar(
             modifier = modifier,
             containerColor = MaterialTheme.colorScheme.background,
