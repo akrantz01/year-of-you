@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -110,10 +111,11 @@ private fun CaptureItem(
             )
 
             if (capture.caption.isNotBlank()) {
-                // TODO: limit to 3ish lines (when rendered) before clipping to "show more..."
                 Text(
                     modifier = Modifier.padding(horizontal = 8.dp),
                     text = capture.caption,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
         }
