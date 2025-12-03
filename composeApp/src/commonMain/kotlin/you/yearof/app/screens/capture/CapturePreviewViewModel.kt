@@ -78,7 +78,7 @@ class CapturePreviewViewModel(
             Capture(
                 frontPath = frontPath.toString(),
                 backPath = backPath.toString(),
-                atMillis = capture.timestamp.toEpochMilliseconds(),
+                at = capture.timestamp,
                 swapped = capture.swapped,
                 caption = captionState.text.toString(),
             ),

@@ -14,13 +14,10 @@ data class Capture(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @ColumnInfo(name = "front_path") val frontPath: String,
     @ColumnInfo(name = "back_path") val backPath: String,
-    @ColumnInfo(name = "at") val atMillis: Long,
+    @ColumnInfo(name = "at") val at: Instant,
     @ColumnInfo(defaultValue = "false") val swapped: Boolean = false,
     @ColumnInfo(defaultValue = "") val caption: String = "",
-) {
-    val at: Instant
-        get() = Instant.fromEpochMilliseconds(atMillis)
-}
+)
 
 @Dao
 interface CaptureDao {
