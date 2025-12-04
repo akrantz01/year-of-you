@@ -26,8 +26,11 @@ data class Capture(
 @Dao
 interface CaptureDao {
     @Insert
-    suspend fun insert(capture: Capture)
+    suspend fun insert(capture: Capture): Long
 
     @Query("SELECT * FROM captures ORDER BY at DESC")
     fun all(): PagingSource<Int, Capture>
+
+    @Query("UPDATE captures SET uploaded_at = :at WHERE id = :id")
+    suspend fun markUploaded(id: Int, at: Instant = Clock.System.now())
 }

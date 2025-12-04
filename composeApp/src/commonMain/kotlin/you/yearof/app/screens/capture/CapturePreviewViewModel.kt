@@ -3,6 +3,8 @@ package you.yearof.app.screens.capture
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -15,6 +17,7 @@ import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import org.koin.android.annotation.KoinViewModel
 import org.koin.core.annotation.Provided
+import you.yearof.app.api.Client
 import you.yearof.app.api.UserService
 import you.yearof.app.api.isAuthenticated
 import you.yearof.app.database.Capture
@@ -23,16 +26,18 @@ import you.yearof.app.dto.CompletedCapture
 import you.yearof.app.navigation.NavigationCoordinator
 import you.yearof.app.screens.CaptureNav
 import you.yearof.app.screens.FeedNav
+import you.yearof.app.util.Log
 import you.yearof.app.util.Paths
 
 data class CapturePreviewUiState(
     val share: Boolean = false,
     val loading: Boolean = false,
-    val error: String? = null,
+    val uploadProgress: Float? = null,
 )
 
 @KoinViewModel
 class CapturePreviewViewModel(
+    private val api: Client,
     @Provided private val captures: CaptureDao,
     @Provided private val paths: Paths,
     private val navigationCoordinator: NavigationCoordinator,
@@ -52,13 +57,14 @@ class CapturePreviewViewModel(
     }
 
     fun onSave(capture: CompletedCapture) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             _uiState.update { it.copy(loading = true) }
 
             try {
                 doSave(capture)
             } catch (e: Exception) {
-                _uiState.update { it.copy(loading = false, error = e.message ?: "Failed to save capture") }
+                Log.error("CapturePreviewViewModel", "failed to save capture: ${e.message}")
+                _uiState.update { it.copy(loading = false, uploadProgress = null) }
             }
         }
     }
@@ -75,7 +81,7 @@ class CapturePreviewViewModel(
         val backPath = Path(base, "back.jpeg")
         SystemFileSystem.atomicMove(source = Path(capture.backPath), destination = backPath)
 
-        captures.insert(
+        val created = captures.insert(
             Capture(
                 frontPath = frontPath,
                 backPath = backPath,
@@ -86,7 +92,22 @@ class CapturePreviewViewModel(
             ),
         )
 
-        // TODO: start capture upload
+        // TODO: gracefully handle upload failure
+        if (state.share) {
+            // TODO: abstract behind capture service
+            api.uploadCapture(
+                front = frontPath,
+                back = backPath,
+                swapped = capture.swapped,
+                at = capture.timestamp,
+            ) { bytesSentTotal, contentLength ->
+                contentLength?.let { contentLength ->
+                    _uiState.update { it.copy(uploadProgress = bytesSentTotal.toFloat() / contentLength.toFloat()) }
+                }
+            }
+
+            captures.markUploaded(created.toInt())
+        }
 
         navigationCoordinator.navigateTo(FeedNav.Feed) {
             popUpTo(CaptureNav.Capture) { inclusive = false }
@@ -97,9 +118,5 @@ class CapturePreviewViewModel(
         viewModelScope.launch {
             navigationCoordinator.navigateUp()
         }
-    }
-
-    fun clearError() {
-        _uiState.value = _uiState.value.copy(error = null)
     }
 }

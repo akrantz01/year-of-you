@@ -11,6 +11,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults.iconButtonColors
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -27,6 +28,7 @@ import kotlinx.io.files.Path
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 import you.yearof.app.dto.CompletedCapture
+import you.yearof.app.ui.LoadingButton
 import you.yearof.app.ui.PictureInPicture
 import you.yearof.app.ui.Switch
 
@@ -80,13 +82,20 @@ fun CapturePreviewScreen(
                 )
             }
 
-            Button(
-                modifier = Modifier.align(Alignment.End),
-                onClick = { viewModel.onSave(capture) },
-                enabled = !uiState.loading,
-            ) {
-                Text("Save")
+            val progress = uiState.uploadProgress
+            if (uiState.loading && progress != null) {
+                LinearProgressIndicator(
+                    modifier = Modifier.fillMaxWidth(),
+                    progress = { progress },
+                )
             }
+
+            LoadingButton(
+                modifier = Modifier.align(Alignment.End),
+                text = "Save",
+                onClick = { viewModel.onSave(capture) },
+                loading = uiState.loading,
+            )
         }
     }
 }
