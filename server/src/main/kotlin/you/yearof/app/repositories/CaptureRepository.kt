@@ -19,4 +19,6 @@ interface CaptureRepository {
     ): Capture
 
     suspend fun list(limit: Int, after: CaptureCursor? = null): List<Capture>
+
+    suspend fun get(id: UInt): Capture?
 }

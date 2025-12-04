@@ -14,6 +14,7 @@ fun Application.capturesRoutes(
         authenticate {
             listRoute(captures)
             uploadRoute(accounts, captures)
+            imagesRoutes(captures)
         }
     }
 }

@@ -3,6 +3,8 @@ package you.yearof.app.routes.captures
 import io.ktor.server.resources.get
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
+import io.ktor.util.decodeBase64String
+import io.ktor.util.encodeBase64
 import you.yearof.app.api.Routes
 import you.yearof.app.exceptions.BadRequestException
 import you.yearof.app.api.responses.CaptureListItem
@@ -10,24 +12,24 @@ import you.yearof.app.api.responses.CapturePage
 import you.yearof.app.exceptions.validate
 import you.yearof.app.repositories.CaptureCursor
 import you.yearof.app.repositories.CaptureRepository
-import java.util.Base64
+import you.yearof.app.util.href
 import kotlin.time.Instant
 
 internal fun Route.listRoute(captures: CaptureRepository) {
-    get<Routes.Captures> { capture ->
-        validate(capture.limit > 0) { "limit must be positive" }
+    get<Routes.Captures.List> { route ->
+        validate(route.limit > 0) { "limit must be positive" }
 
         val cursor =
-            capture.cursor?.let { encoded ->
+            route.cursor?.let { encoded ->
                 runCatching { decodeCursor(encoded) }.getOrElse { throw BadRequestException("invalid cursor") }
             }
-        val all = captures.list(limit = capture.limit, after = cursor).map {
+        val all = captures.list(limit = route.limit, after = cursor).map {
+            val id = it.id.value
             CaptureListItem(
-                id = it.id.value,
+                id = id,
                 accountId = it.accountId.value,
-                // TODO: build URLs for front and back
-                front = it.front,
-                back = it.back,
+                front = href(Routes.Captures.Id.Front.make(id)),
+                back = href(Routes.Captures.Id.Back.make(id)),
                 swapped = it.swapped,
                 takenAt = it.takenAt,
                 uploadedAt = it.uploadedAt,
@@ -35,7 +37,7 @@ internal fun Route.listRoute(captures: CaptureRepository) {
         }
 
         val nextCursor =
-            if (all.size < capture.limit) {
+            if (all.size < route.limit) {
                 null
             } else {
                 all.lastOrNull()?.let {
@@ -48,7 +50,7 @@ internal fun Route.listRoute(captures: CaptureRepository) {
 }
 
 private fun decodeCursor(encoded: String): CaptureCursor {
-    val decoded = Base64.getUrlDecoder().decode(encoded).decodeToString()
+    val decoded = encoded.decodeBase64String()
     val parts = decoded.split("|")
     validate(parts.size == 2) { "invalid cursor format" }
 
@@ -57,7 +59,4 @@ private fun decodeCursor(encoded: String): CaptureCursor {
     return CaptureCursor(uploadedAt = uploadedAt, id = id)
 }
 
-private fun encodeCursor(cursor: CaptureCursor): String =
-    Base64.getUrlEncoder()
-        .withoutPadding()
-        .encodeToString("${cursor.uploadedAt}|${cursor.id}".encodeToByteArray())
+private fun encodeCursor(cursor: CaptureCursor): String = "${cursor.uploadedAt}|${cursor.id}".encodeBase64()

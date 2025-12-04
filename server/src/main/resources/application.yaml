@@ -16,6 +16,7 @@ ktor:
   deployment:
     port: ${PORT:8080}
     sslPort: $?SSL_PORT
+    host: ${HOST:0.0.0.0}
   security:
     ssl:
       keyStore: $?SSL_KEY_STORE

@@ -144,7 +144,7 @@ class Client(
         check(response.status == HttpStatusCode.NoContent)
     }
 
-    suspend fun allCaptures(limit: Int = 20, cursor: String? = null): CapturePage = get(Routes.Captures(limit, cursor))
+    suspend fun allCaptures(limit: Int = 20, cursor: String? = null): CapturePage = get(Routes.Captures.List(limit, cursor))
 
     private suspend fun setTokens(access: String, refresh: String?) {
         secureStorage.put(AccessTokenKey, access)

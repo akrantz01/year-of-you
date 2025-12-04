@@ -54,4 +54,6 @@ class SqlCaptureRepository(
                 .limit(limit)
                 .toList()
         }
+
+    override suspend fun get(id: UInt): Capture? = suspendTransaction(db) { Capture.findById(id) }
 }
