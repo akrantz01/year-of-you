@@ -1,13 +1,8 @@
 package you.yearof.app.screens.feed
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.itemKey
 import app.composeapp.generated.resources.Res
 import app.composeapp.generated.resources.globe
 import app.composeapp.generated.resources.globe_wifi
@@ -23,24 +18,12 @@ fun LocalFeedScreen(
     modifier: Modifier = Modifier,
     viewModel: LocalFeedViewModel = koinViewModel(),
 ) {
-    val captures = viewModel.latestCaptures.collectAsLazyPagingItems()
-
-    LazyColumn(
+    BaseCaptureFeed(
         modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-    ) {
-        items(
-            count = captures.itemCount,
-            key = captures.itemKey { it.id },
-        ) { index ->
-            val capture = captures[index]
-            if (capture != null) {
-                CaptureCard(capture = capture)
-            } else {
-                // TODO: show loading spinner/state
-            }
-        }
-    }
+        captures = viewModel.latestCaptures,
+        key = { it.id },
+        item = ::CaptureCard,
+    )
 }
 
 @Composable
