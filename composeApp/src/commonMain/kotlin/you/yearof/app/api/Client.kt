@@ -137,7 +137,7 @@ class Client(
 
     suspend fun uploadCapture(front: Path, back: Path, swapped: Boolean, at: Instant, onUpload: ((Long, Long?) -> Unit)? = null) {
         val request = UploadRequest(frontPath = front, backPath = back, swapped = swapped, taken = at)
-        val response = inner.post(Routes.Captures) {
+        val response = inner.post(Routes.Captures()) {
             setBody(MultiPartFormDataContent(parts = request.toFormData()))
             onUpload(onUpload)
         }
