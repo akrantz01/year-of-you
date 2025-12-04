@@ -24,7 +24,7 @@ fun LocalFeedScreen(
         onSwitch = viewModel::toSharedFeed,
         captures = viewModel.latestCaptures,
         key = { it.id },
-        item = ::CaptureCard,
+        item = { CaptureCard(capture = it) },
     )
 }
 

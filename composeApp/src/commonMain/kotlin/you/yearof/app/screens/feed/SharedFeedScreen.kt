@@ -22,7 +22,7 @@ fun SharedFeedScreen(
         onSwitch = viewModel::toLocalFeed,
         captures = viewModel.feed,
         key = { it.id },
-        item = ::CaptureCard,
+        item = { CaptureCard(capture = it) },
     )
 }
 
