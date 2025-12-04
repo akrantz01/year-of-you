@@ -104,7 +104,7 @@ class CapturePreviewViewModel(
             captures.markUploaded(created.toInt())
         }
 
-        navigationCoordinator.navigateTo(FeedNav.Feed) {
+        navigationCoordinator.navigateTo(FeedNav.LocalFeed) {
             popUpTo(CaptureNav.Capture) { inclusive = false }
         }
     }

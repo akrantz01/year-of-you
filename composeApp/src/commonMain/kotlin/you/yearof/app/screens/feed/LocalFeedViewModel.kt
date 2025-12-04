@@ -10,7 +10,7 @@ import org.koin.core.annotation.Provided
 import you.yearof.app.database.CaptureDao
 
 @KoinViewModel
-class FeedViewModel(
+class LocalFeedViewModel(
     @Provided private val captures: CaptureDao,
 ) : ViewModel() {
     private val pager = Pager(PagingConfig(10)) { captures.all() }

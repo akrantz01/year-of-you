@@ -24,18 +24,29 @@ import coil3.compose.AsyncImage
 import kotlinx.io.files.Path
 import you.yearof.app.util.asOkioPath
 
+sealed interface ImageSource {
+    val model: Any // coil handles the type internally
+
+    data class Remote(override val model: String) : ImageSource
+    class Local(path: Path) : ImageSource {
+        constructor(path: String) : this(Path(path))
+
+        // TODO: use kotlinx.io once supported by coil
+        override val model: okio.Path = path.asOkioPath()
+    }
+}
+
 @Composable
 fun PictureInPicture(
-    front: Path,
-    back: Path,
+    front: ImageSource,
+    back: ImageSource,
     initiallySwapped: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     var swapped by remember { mutableStateOf(initiallySwapped) }
 
-    // TODO: migrate to kotlinx.io once supported by coil
-    val frontModel = remember(front) { front.asOkioPath() }
-    val backModel = remember(back) { back.asOkioPath() }
+    val frontModel = remember(front) { front.model }
+    val backModel = remember(back) { back.model }
 
     val baseModel = if (swapped) frontModel else backModel
     val overlayModel = if (swapped) backModel else frontModel

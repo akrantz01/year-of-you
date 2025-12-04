@@ -24,10 +24,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import app.composeapp.generated.resources.Res
 import app.composeapp.generated.resources.arrow_left
-import kotlinx.io.files.Path
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 import you.yearof.app.dto.CompletedCapture
+import you.yearof.app.ui.ImageSource
 import you.yearof.app.ui.LoadingButton
 import you.yearof.app.ui.PictureInPicture
 import you.yearof.app.ui.Switch
@@ -56,8 +56,8 @@ fun CapturePreviewScreen(
 
         PictureInPicture(
             modifier = Modifier.fillMaxWidth(),
-            front = Path(capture.frontPath),
-            back = Path(capture.backPath),
+            front = ImageSource.Local(capture.frontPath),
+            back = ImageSource.Local(capture.backPath),
             initiallySwapped = capture.swapped,
         )
 

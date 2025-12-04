@@ -52,7 +52,7 @@ import you.yearof.app.screens.capture.CapturePreviewScreen
 import you.yearof.app.screens.capture.CaptureScreen
 import you.yearof.app.screens.FeedGraph
 import you.yearof.app.screens.FeedNav
-import you.yearof.app.screens.feed.FeedScreen
+import you.yearof.app.screens.feed.LocalFeedScreen
 import you.yearof.app.screens.MainGraph
 import you.yearof.app.screens.ProfileGraph
 import you.yearof.app.screens.ProfileNav
@@ -177,8 +177,9 @@ private fun AppNavigation(
             }
 
             navigation<MainGraph>(startDestination = FeedGraph) {
-                navigation<FeedGraph>(startDestination = FeedNav.Feed) {
-                    composable<FeedNav.Feed> { FeedScreen() }
+                navigation<FeedGraph>(startDestination = FeedNav.LocalFeed) {
+                    composable<FeedNav.LocalFeed> { LocalFeedScreen() }
+                    composable<FeedNav.SharedFeed> { TODO() }
                 }
 
                 navigation<CaptureGraph>(startDestination = CaptureNav.Capture) {

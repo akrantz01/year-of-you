@@ -26,7 +26,10 @@ data object ProfileGraph : NavigationRoute
 @Serializable
 sealed interface FeedNav : NavigationRoute {
     @Serializable
-    data object Feed : FeedNav
+    data object LocalFeed : FeedNav
+
+    @Serializable
+    data object SharedFeed : FeedNav
 }
 
 @Serializable

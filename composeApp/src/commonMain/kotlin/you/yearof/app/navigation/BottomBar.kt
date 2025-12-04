@@ -39,7 +39,7 @@ sealed class BottomTab(
     val selectedIcon: DrawableResource,
 ) {
     data object Feed : BottomTab(
-        route = FeedNav.Feed,
+        route = FeedNav.LocalFeed,
         label = "Feed",
         icon = Res.drawable.house,
         selectedIcon = Res.drawable.house_solid,

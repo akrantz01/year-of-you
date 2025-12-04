@@ -1,47 +1,27 @@
 package you.yearof.app.screens.feed
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Card
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import app.composeapp.generated.resources.Res
 import app.composeapp.generated.resources.globe
 import app.composeapp.generated.resources.globe_wifi
 import app.composeapp.generated.resources.mobile
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.format
-import kotlinx.datetime.format.MonthNames
-import kotlinx.datetime.format.char
-import kotlinx.datetime.toLocalDateTime
-import org.jetbrains.compose.resources.DrawableResource
-import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 import you.yearof.app.database.Capture
-import you.yearof.app.ui.PictureInPicture
+import you.yearof.app.ui.BaseCaptureCard
+import you.yearof.app.ui.ImageSource
+import you.yearof.app.ui.StatusLine
 
 @Composable
-fun FeedScreen(
+fun LocalFeedScreen(
     modifier: Modifier = Modifier,
-    viewModel: FeedViewModel = koinViewModel(),
+    viewModel: LocalFeedViewModel = koinViewModel(),
 ) {
     val captures = viewModel.latestCaptures.collectAsLazyPagingItems()
 
@@ -55,7 +35,7 @@ fun FeedScreen(
         ) { index ->
             val capture = captures[index]
             if (capture != null) {
-                CaptureItem(capture = capture)
+                CaptureCard(capture = capture)
             } else {
                 // TODO: show loading spinner/state
             }
@@ -63,56 +43,19 @@ fun FeedScreen(
     }
 }
 
-val dateFormat =
-    LocalDate.Format {
-        monthName(MonthNames.ENGLISH_ABBREVIATED)
-        char(' ')
-        day()
-        chars(", ")
-        year()
-    }
-
-val timeFormat =
-    LocalTime.Format {
-        amPmHour()
-        char(':')
-        minute()
-        char(':')
-        second()
-        char(' ')
-        amPmMarker("AM", "PM")
-    }
-
 @Composable
-private fun CaptureItem(
+private fun CaptureCard(
     capture: Capture,
     modifier: Modifier = Modifier,
 ) {
-    val timestamp = capture.at.toLocalDateTime(TimeZone.currentSystemDefault())
-
-    Card(modifier = modifier) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            Row(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp, vertical = 4.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Text(
-                    modifier = Modifier.alignByBaseline(),
-                    text = timestamp.date.format(dateFormat),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 22.sp,
-                )
-                Text(
-                    modifier = Modifier.alignByBaseline(),
-                    text = timestamp.time.format(timeFormat),
-                    fontStyle = FontStyle.Italic,
-                    fontSize = 14.sp,
-                )
-            }
-
+    BaseCaptureCard(
+        modifier = modifier,
+        timestamp = capture.at,
+        front = ImageSource.Local(capture.frontPath),
+        back = ImageSource.Local(capture.backPath),
+        swapped = capture.swapped,
+        caption = capture.caption,
+        statusLine = {
             if (capture.shared) {
                 if (capture.uploadedAt != null) {
                     StatusLine(
@@ -134,46 +77,6 @@ private fun CaptureItem(
                     description = "Local only",
                 )
             }
-
-            PictureInPicture(
-                modifier = Modifier.padding(2.dp),
-                front = capture.frontPath,
-                back = capture.backPath,
-                initiallySwapped = capture.swapped,
-            )
-
-            if (capture.caption.isNotBlank()) {
-                Text(
-                    modifier = Modifier.padding(horizontal = 8.dp),
-                    text = capture.caption,
-                    maxLines = 3,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
         }
-    }
-}
-
-@Composable
-private fun StatusLine(
-    icon: DrawableResource,
-    iconDescription: String,
-    description: String,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 2.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-    ) {
-        Icon(
-            modifier = Modifier.size(16.dp),
-            painter = painterResource(icon),
-            contentDescription = iconDescription,
-        )
-        Text(description, fontStyle = FontStyle.Italic)
-    }
+    )
 }
