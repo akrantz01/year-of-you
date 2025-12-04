@@ -1,6 +1,5 @@
 - custom icon
 - splash screen
-- app name
 - ios verification
 - profile screen
   - account settings
