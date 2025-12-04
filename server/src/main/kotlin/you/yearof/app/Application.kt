@@ -6,6 +6,8 @@ import io.ktor.serialization.JsonConvertException
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
+import io.ktor.server.auth.Authentication
+import io.ktor.server.auth.jwt.jwt
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.UnsupportedMediaTypeException
 import io.ktor.server.plugins.callid.CallId
@@ -19,31 +21,22 @@ import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
+import you.yearof.app.api.DefaultRealm
 import kotlin.uuid.Uuid
 import you.yearof.app.api.responses.ErrorResponse
 import you.yearof.app.api.responses.ValidationErrorDetails
 import you.yearof.app.exceptions.StructuredHttpException
+import you.yearof.app.services.TokenService
+import you.yearof.app.services.TokenUsage
 
 fun main(args: Array<String>) {
     io.ktor.server.netty.EngineMain
         .main(args)
 }
 
-fun Application.module() {
-    install(CallId) {
-        generate { Uuid.random().toString() }
-        replyToHeader(HttpHeaders.XRequestId)
-    }
-    install(CallLogging) {
-        callIdMdc("call-id")
-    }
-
-    install(ContentNegotiation) {
-        json()
-    }
-
-    install(Resources)
-
+fun Application.plugins(
+    tokens: TokenService,
+) {
     install(StatusPages) {
         exception<StructuredHttpException> { call, exception ->
             call.respond(
@@ -93,6 +86,31 @@ fun Application.module() {
                 status = HttpStatusCode.InternalServerError,
                 message = ErrorResponse(message = "an internal error occurred")
             )
+        }
+    }
+
+    install(Resources)
+
+    install(CallId) {
+        generate { Uuid.random().toString() }
+        replyToHeader(HttpHeaders.XRequestId)
+    }
+    install(CallLogging) {
+        callIdMdc("call-id")
+    }
+
+    install(ContentNegotiation) {
+        json()
+    }
+
+    install(Authentication) {
+        jwt {
+            realm = DefaultRealm
+            verifier(tokens.verifier)
+
+            validate { credential ->
+                tokens.validate(TokenUsage.Access, credential)
+            }
         }
     }
 

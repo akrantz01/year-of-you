@@ -8,9 +8,9 @@ ktor:
       - you.yearof.app.scheduler.LockKt.databaseLock
       - you.yearof.app.scheduler.LockKt.taskExecutor
     modules:
-      - you.yearof.app.ApplicationKt.module
-      - you.yearof.app.routes.authentication.ModuleKt.authenticationRoutes
+      - you.yearof.app.ApplicationKt.plugins
       - you.yearof.app.routes.accounts.ModuleKt.accountsRoutes
+      - you.yearof.app.routes.authentication.ModuleKt.authenticationRoutes
       - you.yearof.app.routes.captures.ModuleKt.capturesRoutes
       - you.yearof.app.scheduler.SchedulerKt.scheduler
   deployment:
