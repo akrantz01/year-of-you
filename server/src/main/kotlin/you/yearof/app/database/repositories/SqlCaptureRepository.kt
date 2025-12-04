@@ -1,9 +1,16 @@
 package you.yearof.app.database.repositories
 
+import org.jetbrains.exposed.v1.core.SortOrder
+import org.jetbrains.exposed.v1.core.and
+import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.core.less
+import org.jetbrains.exposed.v1.core.or
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.transactions.suspendTransaction
 import you.yearof.app.database.entities.Account
 import you.yearof.app.database.entities.Capture
+import you.yearof.app.database.tables.Captures
+import you.yearof.app.repositories.CaptureCursor
 import you.yearof.app.repositories.CaptureRepository
 import kotlin.time.Instant
 
@@ -27,12 +34,24 @@ class SqlCaptureRepository(
             }
         }
 
-    override suspend fun list(limit: Int, offset: Int): List<Capture> =
+    override suspend fun list(limit: Int, after: CaptureCursor?): List<Capture> =
         suspendTransaction(db) {
-            Capture
-                .all()
+            val base =
+                if (after == null) {
+                    Capture.all()
+                } else {
+                    Capture.find {
+                        (Captures.uploadedAt less after.uploadedAt) or
+                        ((Captures.uploadedAt eq after.uploadedAt) and (Captures.id less after.id))
+                    }
+                }
+
+            base
+                .orderBy(
+                    Captures.uploadedAt to SortOrder.DESC,
+                    Captures.id to SortOrder.DESC,
+                )
                 .limit(limit)
-                .offset(offset.toLong())
-                .sortedByDescending { it.uploadedAt }
+                .toList()
         }
 }

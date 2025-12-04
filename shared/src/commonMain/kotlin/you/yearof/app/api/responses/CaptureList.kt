@@ -5,7 +5,15 @@ import kotlinx.serialization.Serializable
 import kotlin.time.Instant
 
 @Serializable
-data class CaptureList(
+data class CapturePage(
+    val items: List<CaptureListItem>,
+    @SerialName("next_cursor")
+    val nextCursor: String? = null,
+)
+
+@Serializable
+data class CaptureListItem(
+    val id: UInt,
     @SerialName("account_id")
     val accountId: UInt,
     val front: String,
