@@ -6,10 +6,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -18,6 +21,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
+import app.composeapp.generated.resources.Res
+import app.composeapp.generated.resources.globe
+import app.composeapp.generated.resources.globe_wifi
+import app.composeapp.generated.resources.mobile
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
@@ -25,6 +32,8 @@ import kotlinx.datetime.format
 import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.char
 import kotlinx.datetime.toLocalDateTime
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 import you.yearof.app.database.Capture
 import you.yearof.app.ui.PictureInPicture
@@ -103,6 +112,29 @@ private fun CaptureItem(
                     fontSize = 14.sp,
                 )
             }
+
+            if (capture.shared) {
+                if (capture.uploadedAt != null) {
+                    StatusLine(
+                        icon = Res.drawable.globe,
+                        iconDescription = "Globe icon",
+                        description = "Shared",
+                    )
+                } else {
+                    StatusLine(
+                        icon = Res.drawable.globe_wifi,
+                        iconDescription = "Globe with wi-fi icon",
+                        description = "Waiting for network...",
+                    )
+                }
+            } else {
+                StatusLine(
+                    icon = Res.drawable.mobile,
+                    iconDescription = "Mobile phone",
+                    description = "Local only",
+                )
+            }
+
             PictureInPicture(
                 modifier = Modifier.padding(2.dp),
                 front = capture.frontPath,
@@ -119,5 +151,29 @@ private fun CaptureItem(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun StatusLine(
+    icon: DrawableResource,
+    iconDescription: String,
+    description: String,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 2.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        Icon(
+            modifier = Modifier.size(16.dp),
+            painter = painterResource(icon),
+            contentDescription = iconDescription,
+        )
+        Text(description, fontStyle = FontStyle.Italic)
     }
 }
