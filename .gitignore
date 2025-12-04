@@ -23,4 +23,4 @@ uploads/
 *.p12
 
 # Negative ignores
-!server/src/main/kotlin/you/yearof/app/routes/captures
+!server/src/main/kotlin/you/yearof/server/routes/captures

@@ -1,18 +1,18 @@
 ktor:
   application:
     dependencies:
-      - you.yearof.app.database.DatabaseKt.provideDatabase
-      - you.yearof.app.database.repositories.ProvidersKt.accountRepository
-      - you.yearof.app.database.repositories.ProvidersKt.captureRepository
-      - you.yearof.app.services.TokenServiceKt.provide
-      - you.yearof.app.scheduler.LockKt.databaseLock
-      - you.yearof.app.scheduler.LockKt.taskExecutor
+      - you.yearof.server.database.DatabaseKt.provideDatabase
+      - you.yearof.server.database.repositories.ProvidersKt.accountRepository
+      - you.yearof.server.database.repositories.ProvidersKt.captureRepository
+      - you.yearof.server.services.TokenServiceKt.provide
+      - you.yearof.server.scheduler.LockKt.databaseLock
+      - you.yearof.server.scheduler.LockKt.taskExecutor
     modules:
-      - you.yearof.app.ApplicationKt.plugins
-      - you.yearof.app.routes.accounts.ModuleKt.accountsRoutes
-      - you.yearof.app.routes.authentication.ModuleKt.authenticationRoutes
-      - you.yearof.app.routes.captures.ModuleKt.capturesRoutes
-      - you.yearof.app.scheduler.SchedulerKt.scheduler
+      - you.yearof.server.ApplicationKt.plugins
+      - you.yearof.server.routes.accounts.ModuleKt.accountsRoutes
+      - you.yearof.server.routes.authentication.ModuleKt.authenticationRoutes
+      - you.yearof.server.routes.captures.ModuleKt.capturesRoutes
+      - you.yearof.server.scheduler.SchedulerKt.scheduler
   deployment:
     port: ${PORT:8080}
     sslPort: $?SSL_PORT

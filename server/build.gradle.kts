@@ -7,7 +7,7 @@ plugins {
     id("you.yearof.build.toolchain")
 }
 
-group = "you.yearof.app"
+group = "you.yearof.server"
 version = "1.0.0"
 application {
     mainClass = "io.ktor.server.netty.EngineMain"
@@ -75,5 +75,5 @@ tasks.register<JavaExec>("generateMigration") {
     description = "Generate a new database migration"
 
     classpath = sourceSets.getByName("main").runtimeClasspath
-    mainClass = "you.yearof.app.GenerateMigrationKt"
+    mainClass = "you.yearof.server.GenerateMigrationKt"
 }
