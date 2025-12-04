@@ -47,6 +47,8 @@ class ApiService(
         httpService.setTokens(response.accessToken, response.refreshToken)
     }
 
+    suspend fun authenticated(): Boolean = httpService.hasTokens()
+
     suspend fun logout() = httpService.clearTokens()
 
     suspend fun uploadCapture(front: Path, back: Path, swapped: Boolean, at: Instant, onUpload: ((Long, Long?) -> Unit)? = null) {

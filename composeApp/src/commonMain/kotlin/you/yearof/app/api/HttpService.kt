@@ -98,6 +98,8 @@ class HttpService(
             }
         }
 
+    suspend fun hasTokens(): Boolean = secureStorage.has(AccessTokenKey) && secureStorage.has(RefreshTokenKey)
+
     suspend fun setTokens(access: String, refresh: String?) {
         secureStorage.put(AccessTokenKey, access)
         refresh?.let { secureStorage.put(RefreshTokenKey, it) }

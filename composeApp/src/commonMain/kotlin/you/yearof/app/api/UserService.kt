@@ -28,6 +28,11 @@ class UserService(
     val state = _state.asStateFlow()
 
     suspend fun load() {
+        if (!api.authenticated()) {
+            _state.update { AuthenticationState.Unauthenticated }
+            return
+        }
+
         val cached = preferences.user.firstOrNull()
         if (cached != null) {
             Log.info("UserService", "found cached user: id=${cached.id}")
