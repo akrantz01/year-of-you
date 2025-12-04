@@ -42,6 +42,12 @@ class AndroidSecureStorage(
         }
     }
 
+    override suspend fun has(key: String): Boolean =
+        datastore.data
+            .firstOrNull()
+            ?.contains(byteArrayPreferencesKey(key))
+            ?: false
+
     override suspend fun get(key: String): String? =
         datastore.data
             .firstOrNull()

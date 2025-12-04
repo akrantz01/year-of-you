@@ -60,6 +60,10 @@ class IosSecureStorage : SecureStorage {
         }
     }
 
+    override suspend fun has(key: String): Boolean = withContext(Dispatchers.Default) {
+        exists(key)
+    }
+
     override suspend fun get(key: String): String? = withContext(Dispatchers.Default) {
         value(key)?.toByteArray()?.decodeToString()
     }
