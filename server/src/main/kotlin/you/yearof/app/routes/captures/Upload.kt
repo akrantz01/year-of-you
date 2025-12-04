@@ -11,6 +11,7 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.util.cio.writeChannel
 import io.ktor.utils.io.copyAndClose
+import kotlinx.io.files.Path
 import you.yearof.app.api.Routes
 import you.yearof.app.api.requests.UploadRequest
 import you.yearof.app.repositories.AccountRepository
@@ -38,8 +39,8 @@ internal fun Route.uploadRoute(
 
         captures.create(
             account = account,
-            front = request.frontPath,
-            back = request.backPath,
+            front = request.frontPath.name,
+            back = request.backPath.name,
             swapped = request.swapped,
             taken = request.taken,
         )
@@ -73,8 +74,8 @@ private class UploadRequestBuilder {
         require(taken <= Clock.System.now()) { "taken timestamp cannot be in the future" }
 
         return UploadRequest(
-            frontPath = checkNotNull(frontPath) { "no front capture uploaded" },
-            backPath = checkNotNull(backPath) { "no back capture uploaded" },
+            frontPath = Path(checkNotNull(frontPath) { "no front capture uploaded" }),
+            backPath = Path(checkNotNull(backPath) { "no back capture uploaded" }),
             swapped = checkNotNull(swapped) { "missing swapped status" },
             taken = taken,
         )

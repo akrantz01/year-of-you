@@ -33,6 +33,7 @@ dependencies {
     implementation(libs.flyway)
     implementation(libs.flyway.database.postgresql)
     implementation(libs.flyway.database.mysql)
+    implementation(libs.kotlinx.io.core)
     implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.ktor.server.auth)
     implementation(libs.ktor.server.auth.jwt)
