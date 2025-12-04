@@ -15,9 +15,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import app.composeapp.generated.resources.Res
-import app.composeapp.generated.resources.eye
-import app.composeapp.generated.resources.eye_slash
+import you.yearof.app.resources.Res
+import you.yearof.app.resources.eye
+import you.yearof.app.resources.eye_slash
 import org.jetbrains.compose.resources.painterResource
 
 @Composable

@@ -18,7 +18,6 @@ import io.ktor.client.plugins.resources.Resources
 import io.ktor.client.plugins.resources.get
 import io.ktor.client.plugins.resources.post
 import io.ktor.client.request.setBody
-import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
@@ -26,10 +25,12 @@ import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
 import org.koin.core.annotation.Provided
 import org.koin.core.annotation.Single
-import you.yearof.app.api.requests.RefreshRequest
-import you.yearof.app.api.responses.RefreshSuccess
+import you.yearof.shared.api.requests.RefreshRequest
+import you.yearof.shared.api.responses.RefreshSuccess
 import you.yearof.app.util.Log
 import you.yearof.app.util.SecureStorage
+import you.yearof.shared.api.DefaultRealm
+import you.yearof.shared.api.Routes
 
 private const val AccessTokenKey = "access-token"
 private const val RefreshTokenKey = "refresh-token"

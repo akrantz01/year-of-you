@@ -25,9 +25,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
-import app.composeapp.generated.resources.Res
-import app.composeapp.generated.resources.chevron_right
-import app.composeapp.generated.resources.circle_user
+import you.yearof.app.resources.Res
+import you.yearof.app.resources.chevron_right
+import you.yearof.app.resources.circle_user
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 import you.yearof.app.api.AuthenticationState

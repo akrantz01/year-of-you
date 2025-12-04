@@ -110,7 +110,7 @@ android {
             .toInt()
 
     defaultConfig {
-        applicationId = "you.yearof.app"
+        applicationId = "you.yearof.app.android"
         minSdk =
             libs.versions.android.minSdk
                 .get()
@@ -152,6 +152,10 @@ dependencies {
     add("kspAndroid", libs.koin.compiler)
     add("kspIosSimulatorArm64", libs.koin.compiler)
     add("kspIosArm64", libs.koin.compiler)
+}
+
+compose.resources {
+    packageOfResClass = "you.yearof.app.resources"
 }
 
 ksp {

@@ -19,12 +19,13 @@ import kotlinx.io.files.FileSystem
 import kotlinx.io.files.SystemFileSystem
 import org.koin.core.annotation.Provided
 import org.koin.core.annotation.Single
-import you.yearof.app.api.requests.LoginRequest
-import you.yearof.app.api.requests.RegisterRequest
-import you.yearof.app.api.requests.UploadRequest
-import you.yearof.app.api.responses.CapturePage
-import you.yearof.app.api.responses.CurrentUser
-import you.yearof.app.api.responses.LoginSuccess
+import you.yearof.shared.api.requests.LoginRequest
+import you.yearof.shared.api.requests.RegisterRequest
+import you.yearof.shared.api.requests.UploadRequest
+import you.yearof.shared.api.responses.CapturePage
+import you.yearof.shared.api.responses.CurrentUser
+import you.yearof.shared.api.responses.LoginSuccess
+import you.yearof.shared.api.Routes
 import kotlin.time.Instant
 
 @Single

@@ -3,8 +3,8 @@ package you.yearof.app.screens.feed
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import app.composeapp.generated.resources.Res
-import app.composeapp.generated.resources.user_solid
+import you.yearof.app.resources.Res
+import you.yearof.app.resources.user_solid
 import org.koin.compose.viewmodel.koinViewModel
 import you.yearof.app.database.RemoteCapture
 import you.yearof.app.ui.BaseCaptureCard

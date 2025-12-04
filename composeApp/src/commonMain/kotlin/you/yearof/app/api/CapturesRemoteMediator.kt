@@ -3,7 +3,7 @@ package you.yearof.app.api
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
-import you.yearof.app.api.responses.CaptureListItem
+import you.yearof.shared.api.responses.CaptureListItem
 import you.yearof.app.database.RemoteCapture
 import you.yearof.app.database.RemoteCaptureDao
 

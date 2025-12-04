@@ -22,8 +22,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import app.composeapp.generated.resources.Res
-import app.composeapp.generated.resources.arrow_left
+import you.yearof.app.resources.Res
+import you.yearof.app.resources.arrow_left
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 import you.yearof.app.dto.CompletedCapture
