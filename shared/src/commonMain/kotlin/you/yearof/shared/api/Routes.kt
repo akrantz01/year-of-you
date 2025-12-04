@@ -1,4 +1,4 @@
-package you.yearof.app.api
+package you.yearof.shared.api
 
 import io.ktor.resources.Resource
 

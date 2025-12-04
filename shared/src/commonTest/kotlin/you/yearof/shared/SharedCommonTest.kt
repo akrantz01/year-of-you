@@ -1,4 +1,4 @@
-package you.yearof.app
+package you.yearof.shared
 
 import kotlin.test.Test
 import kotlin.test.assertEquals

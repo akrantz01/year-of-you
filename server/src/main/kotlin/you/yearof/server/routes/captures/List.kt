@@ -5,10 +5,10 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.util.decodeBase64String
 import io.ktor.util.encodeBase64
-import you.yearof.app.api.Routes
+import you.yearof.shared.api.Routes
 import you.yearof.server.exceptions.BadRequestException
-import you.yearof.app.api.responses.CaptureListItem
-import you.yearof.app.api.responses.CapturePage
+import you.yearof.shared.api.responses.CaptureListItem
+import you.yearof.shared.api.responses.CapturePage
 import you.yearof.server.exceptions.validate
 import you.yearof.server.repositories.CaptureCursor
 import you.yearof.server.repositories.CaptureRepository

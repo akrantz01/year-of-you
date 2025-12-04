@@ -5,9 +5,9 @@ import io.ktor.server.request.receive
 import io.ktor.server.resources.post
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
-import you.yearof.app.api.Routes
-import you.yearof.app.api.requests.RefreshRequest
-import you.yearof.app.api.responses.RefreshSuccess
+import you.yearof.shared.api.Routes
+import you.yearof.shared.api.requests.RefreshRequest
+import you.yearof.shared.api.responses.RefreshSuccess
 import you.yearof.server.repositories.AccountRepository
 import you.yearof.server.services.TokenService
 

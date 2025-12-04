@@ -1,7 +1,9 @@
 package you.yearof.server.exceptions
 
 import io.ktor.http.*
-import you.yearof.app.api.responses.*
+import you.yearof.shared.api.responses.ConflictErrorDetails
+import you.yearof.shared.api.responses.ErrorDetails
+import you.yearof.shared.api.responses.NotFoundErrorDetails
 
 sealed class StructuredHttpException(
     override val message: String,

@@ -8,8 +8,8 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import you.yearof.app.api.Routes
-import you.yearof.app.api.requests.RegisterRequest
+import you.yearof.shared.api.Routes
+import you.yearof.shared.api.requests.RegisterRequest
 import you.yearof.server.database.tables.DisplayNameMaxLength
 import you.yearof.server.database.tables.UsernameMaxLength
 import you.yearof.server.repositories.AccountRepository

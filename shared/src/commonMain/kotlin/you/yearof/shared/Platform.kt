@@ -1,4 +1,4 @@
-package you.yearof.app
+package you.yearof.shared
 
 interface Platform {
     val name: String

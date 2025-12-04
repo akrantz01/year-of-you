@@ -1,4 +1,4 @@
-package you.yearof.app.api.requests
+package you.yearof.shared.api.requests
 
 import kotlinx.io.files.Path
 import kotlin.time.Instant

@@ -1,4 +1,4 @@
-package you.yearof.app.api.requests
+package you.yearof.shared.api.requests
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

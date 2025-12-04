@@ -1,4 +1,4 @@
-package you.yearof.app.api.responses
+package you.yearof.shared.api.responses
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

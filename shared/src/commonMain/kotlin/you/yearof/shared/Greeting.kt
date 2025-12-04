@@ -1,4 +1,4 @@
-package you.yearof.app
+package you.yearof.shared
 
 class Greeting {
     private val platform = getPlatform()

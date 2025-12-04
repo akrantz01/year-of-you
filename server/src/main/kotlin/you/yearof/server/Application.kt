@@ -25,11 +25,11 @@ import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
-import you.yearof.app.Greeting
-import you.yearof.app.api.DefaultRealm
+import you.yearof.shared.Greeting
+import you.yearof.shared.api.DefaultRealm
 import kotlin.uuid.Uuid
-import you.yearof.app.api.responses.ErrorResponse
-import you.yearof.app.api.responses.ValidationErrorDetails
+import you.yearof.shared.api.responses.ErrorResponse
+import you.yearof.shared.api.responses.ValidationErrorDetails
 import you.yearof.server.exceptions.StructuredHttpException
 import you.yearof.server.services.TokenService
 import you.yearof.server.services.TokenUsage

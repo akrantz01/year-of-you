@@ -12,8 +12,8 @@ import io.ktor.server.routing.Route
 import io.ktor.util.cio.writeChannel
 import io.ktor.utils.io.copyAndClose
 import kotlinx.io.files.Path
-import you.yearof.app.api.Routes
-import you.yearof.app.api.requests.UploadRequest
+import you.yearof.shared.api.Routes
+import you.yearof.shared.api.requests.UploadRequest
 import you.yearof.server.exceptions.validate
 import you.yearof.server.exceptions.validateNotNull
 import you.yearof.server.repositories.AccountRepository

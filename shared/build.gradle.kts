@@ -31,7 +31,7 @@ kotlin {
 }
 
 android {
-    namespace = "you.yearof.app.shared"
+    namespace = "you.yearof.shared"
     compileSdk =
         libs.versions.android.compileSdk
             .get()

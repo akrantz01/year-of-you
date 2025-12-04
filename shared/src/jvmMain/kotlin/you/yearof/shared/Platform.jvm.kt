@@ -1,4 +1,4 @@
-package you.yearof.app
+package you.yearof.shared
 
 class JVMPlatform : Platform {
     override val name: String = "Java ${System.getProperty("java.version")}"

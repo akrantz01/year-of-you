@@ -5,8 +5,8 @@ import io.ktor.server.auth.principal
 import io.ktor.server.routing.Route
 import io.ktor.server.resources.get
 import io.ktor.server.response.respond
-import you.yearof.app.api.Routes
-import you.yearof.app.api.responses.CurrentUser
+import you.yearof.shared.api.Routes
+import you.yearof.shared.api.responses.CurrentUser
 import you.yearof.server.repositories.AccountRepository
 
 fun Route.meRoute(accounts: AccountRepository) {

@@ -5,9 +5,9 @@ import io.ktor.server.resources.post
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import kotlinx.coroutines.delay
-import you.yearof.app.api.Routes
-import you.yearof.app.api.requests.LoginRequest
-import you.yearof.app.api.responses.LoginSuccess
+import you.yearof.shared.api.Routes
+import you.yearof.shared.api.requests.LoginRequest
+import you.yearof.shared.api.responses.LoginSuccess
 import you.yearof.server.exceptions.UnauthorizedException
 import you.yearof.server.repositories.AccountRepository
 import you.yearof.server.services.PasswordService
