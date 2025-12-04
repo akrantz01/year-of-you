@@ -41,6 +41,7 @@ import you.yearof.app.api.requests.LoginRequest
 import you.yearof.app.api.requests.RefreshRequest
 import you.yearof.app.api.requests.RegisterRequest
 import you.yearof.app.api.requests.UploadRequest
+import you.yearof.app.api.responses.CaptureList
 import you.yearof.app.api.responses.CurrentUser
 import you.yearof.app.api.responses.LoginSuccess
 import you.yearof.app.api.responses.RefreshSuccess
@@ -142,6 +143,8 @@ class Client(
         }
         check(response.status == HttpStatusCode.NoContent)
     }
+
+    suspend fun allCaptures(limit: Int = 0, offset: Int = 0): List<CaptureList> = get(Routes.Captures(limit, offset))
 
     private suspend fun setTokens(access: String, refresh: String?) {
         secureStorage.put(AccessTokenKey, access)
