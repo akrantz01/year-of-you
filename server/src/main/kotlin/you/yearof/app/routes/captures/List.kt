@@ -3,8 +3,8 @@ package you.yearof.app.routes.captures
 import io.ktor.server.resources.get
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
-import io.ktor.server.plugins.BadRequestException
 import you.yearof.app.api.Routes
+import you.yearof.app.exceptions.BadRequestException
 import you.yearof.app.api.responses.CaptureListItem
 import you.yearof.app.api.responses.CapturePage
 import you.yearof.app.repositories.CaptureCursor
