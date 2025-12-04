@@ -43,6 +43,7 @@ dependencies {
     implementation(libs.ktor.server.contentNegotiation)
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.di)
+    implementation(libs.ktor.server.forwardedHeader)
     implementation(libs.ktor.server.host.common)
     implementation(libs.ktor.server.netty)
     implementation(libs.ktor.network.tlsCertificates)

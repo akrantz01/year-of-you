@@ -8,17 +8,21 @@ import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.auth.Authentication
 import io.ktor.server.auth.jwt.jwt
+import io.ktor.server.config.propertyOrNull
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.plugins.UnsupportedMediaTypeException
 import io.ktor.server.plugins.callid.CallId
 import io.ktor.server.plugins.callid.callIdMdc
 import io.ktor.server.plugins.calllogging.CallLogging
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.plugins.forwardedheaders.ForwardedHeaders
+import io.ktor.server.plugins.forwardedheaders.XForwardedHeaders
 import io.ktor.server.plugins.requestvalidation.RequestValidationException
 import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.resources.Resources
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
+import io.ktor.server.routing.Routing
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
 import you.yearof.app.api.DefaultRealm
@@ -111,6 +115,15 @@ fun Application.plugins(
             validate { credential ->
                 tokens.validate(TokenUsage.Access, credential)
             }
+        }
+    }
+
+    propertyOrNull<Int>("ktor.deployment.proxies")?.let { count ->
+        install(ForwardedHeaders) {
+            skipLastProxies(count)
+        }
+        install(XForwardedHeaders) {
+            skipLastProxies(count)
         }
     }
 

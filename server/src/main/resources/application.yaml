@@ -17,6 +17,7 @@ ktor:
     port: ${PORT:8080}
     sslPort: $?SSL_PORT
     host: ${HOST:0.0.0.0}
+    proxies: $?SKIP_PROXIES
   security:
     ssl:
       keyStore: $?SSL_KEY_STORE
