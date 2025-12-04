@@ -6,6 +6,8 @@
 	<string>Year of You</string>
 	<key>NSCameraUsageDescription</key>
 	<string>This app requires camera access to capture photos of you throughout the year.</string>
+    <key>NSLocalNetworkUsageDescription</key>
+    <string>This app requires local network access only when you set the server URL to a local IP address and enable social features.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 </dict>
