@@ -7,6 +7,7 @@ import you.yearof.app.api.Routes
 import you.yearof.app.exceptions.BadRequestException
 import you.yearof.app.api.responses.CaptureListItem
 import you.yearof.app.api.responses.CapturePage
+import you.yearof.app.exceptions.validate
 import you.yearof.app.repositories.CaptureCursor
 import you.yearof.app.repositories.CaptureRepository
 import java.util.Base64
@@ -14,7 +15,7 @@ import kotlin.time.Instant
 
 internal fun Route.listRoute(captures: CaptureRepository) {
     get<Routes.Captures> { capture ->
-        require(capture.limit > 0) { "limit must be positive" }
+        validate(capture.limit > 0) { "limit must be positive" }
 
         val cursor =
             capture.cursor?.let { encoded ->
@@ -49,7 +50,7 @@ internal fun Route.listRoute(captures: CaptureRepository) {
 private fun decodeCursor(encoded: String): CaptureCursor {
     val decoded = Base64.getUrlDecoder().decode(encoded).decodeToString()
     val parts = decoded.split("|")
-    require(parts.size == 2) { "invalid cursor format" }
+    validate(parts.size == 2) { "invalid cursor format" }
 
     val uploadedAt = Instant.parse(parts[0])
     val id = parts[1].toUInt()

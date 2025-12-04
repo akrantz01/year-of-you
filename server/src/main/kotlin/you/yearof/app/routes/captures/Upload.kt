@@ -14,6 +14,8 @@ import io.ktor.utils.io.copyAndClose
 import kotlinx.io.files.Path
 import you.yearof.app.api.Routes
 import you.yearof.app.api.requests.UploadRequest
+import you.yearof.app.exceptions.validate
+import you.yearof.app.exceptions.validateNotNull
 import you.yearof.app.repositories.AccountRepository
 import you.yearof.app.repositories.CaptureRepository
 import java.io.File
@@ -64,48 +66,48 @@ private class UploadRequestBuilder {
         )
 
     suspend fun handlePart(part: PartData) {
-        val handler = requireNotNull(handlers[part.name]) { "unknown field: ${part.name}" }
+        val handler = validateNotNull(handlers[part.name]) { "unknown field: ${part.name}" }
         handler(part)
         part.dispose()
     }
 
     fun finish(): UploadRequest {
-        val taken = checkNotNull(taken) { "missing taken timestamp" }
-        require(taken <= Clock.System.now()) { "taken timestamp cannot be in the future" }
+        val taken = validateNotNull(taken) { "missing taken timestamp" }
+        validate(taken <= Clock.System.now()) { "taken timestamp cannot be in the future" }
 
         return UploadRequest(
-            frontPath = Path(checkNotNull(frontPath) { "no front capture uploaded" }),
-            backPath = Path(checkNotNull(backPath) { "no back capture uploaded" }),
-            swapped = checkNotNull(swapped) { "missing swapped status" },
+            frontPath = Path(validateNotNull(frontPath) { "no front capture uploaded" }),
+            backPath = Path(validateNotNull(backPath) { "no back capture uploaded" }),
+            swapped = validateNotNull(swapped) { "missing swapped status" },
             taken = taken,
         )
     }
 
     private suspend fun setBack(item: PartData) {
-        require(item is PartData.FileItem) { "back capture must be a file" }
-        check(backPath == null) { "back capture already uploaded" }
+        validate(item is PartData.FileItem) { "back capture must be a file" }
+        validate(backPath == null) { "back capture already uploaded" }
         backPath = saveFile(item)
     }
 
     private suspend fun setFront(item: PartData) {
-        require(item is PartData.FileItem) { "front capture must be a file" }
-        check(frontPath == null) { "front capture already uploaded" }
+        validate(item is PartData.FileItem) { "front capture must be a file" }
+        validate(frontPath == null) { "front capture already uploaded" }
         frontPath = saveFile(item)
     }
 
     private suspend fun setSwapped(item: PartData) {
-        require(item is PartData.FormItem) { "swapped must be a form item" }
+        validate(item is PartData.FormItem) { "swapped must be a form item" }
 
-        check(swapped == null) { "value for swapped already provided" }
+        validate(swapped == null) { "value for swapped already provided" }
         swapped = item.value.toBooleanStrict()
     }
 
     private suspend fun setTaken(item: PartData) {
-        require(item is PartData.FormItem) { "timestamp must be a form item" }
+        validate(item is PartData.FormItem) { "timestamp must be a form item" }
 
-        check(taken == null) { "value for taken already provided" }
+        validate(taken == null) { "value for taken already provided" }
         val parsed = Instant.parse(item.value)
-        require(parsed <= Clock.System.now()) { "taken timestamp cannot be in the future" }
+        validate(parsed <= Clock.System.now()) { "taken timestamp cannot be in the future" }
         taken = parsed
     }
 
