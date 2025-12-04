@@ -20,6 +20,8 @@ fun LocalFeedScreen(
 ) {
     BaseCaptureFeed(
         modifier = modifier.fillMaxSize(),
+        type = FeedType.Local,
+        onSwitch = viewModel::toSharedFeed,
         captures = viewModel.latestCaptures,
         key = { it.id },
         item = ::CaptureCard,
