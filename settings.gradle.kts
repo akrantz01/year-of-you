@@ -1,4 +1,4 @@
-rootProject.name = "app"
+rootProject.name = "year-of-you"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 if (JavaVersion.current() != JavaVersion.VERSION_21) {
