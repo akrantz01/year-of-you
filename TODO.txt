@@ -1,9 +1,17 @@
+- custom icon
+- splash screen
+- app name
+- ios verification
+- profile screen
+  - account settings
+  - clear cache
+- client error handling
 - empty state for feed screen
-- notifications
-  - schedule daily notifications
-  - set notification preferences
-  - handle tapped notifications (deep links)
 - loading states
   - initialization
   - feed
-- profile screen
+
+- notifications (PUNTED)
+  - schedule daily notifications
+  - set notification preferences
+  - handle tapped notifications (deep links)
