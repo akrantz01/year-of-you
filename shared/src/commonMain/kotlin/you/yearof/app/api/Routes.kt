@@ -16,5 +16,9 @@ object Routes {
     object Refresh
 
     @Resource("/captures")
-    object Captures
+    class Captures(
+        // can't use UInts since passing a negative will be interpreted as positive
+        val limit: Int = 10,
+        val offset: Int = 0,
+    )
 }

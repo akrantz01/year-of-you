@@ -10,6 +10,7 @@ class Capture(
 ) : UIntEntity(id) {
     companion object : UIntEntityClass<Capture>(Captures)
 
+    var accountId by Captures.account
     var account by Account referencedOn Captures.account
     var front by Captures.front
     var back by Captures.back

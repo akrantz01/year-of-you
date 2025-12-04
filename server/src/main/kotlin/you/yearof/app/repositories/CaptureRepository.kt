@@ -12,4 +12,6 @@ interface CaptureRepository {
         swapped: Boolean,
         taken: Instant,
     ): Capture
+
+    suspend fun list(limit: Int = 0, offset: Int = 0): List<Capture>
 }

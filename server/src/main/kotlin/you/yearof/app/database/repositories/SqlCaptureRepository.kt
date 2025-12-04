@@ -26,4 +26,13 @@ class SqlCaptureRepository(
                 this.takenAt = taken
             }
         }
+
+    override suspend fun list(limit: Int, offset: Int): List<Capture> =
+        suspendTransaction(db) {
+            Capture
+                .all()
+                .limit(limit)
+                .offset(offset.toLong())
+                .sortedByDescending { it.uploadedAt }
+        }
 }
