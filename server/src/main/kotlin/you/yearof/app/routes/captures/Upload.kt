@@ -112,7 +112,7 @@ private class UploadRequestBuilder {
     private suspend fun saveFile(item: PartData.FileItem): String {
         // TODO: verify uploads are actually images
         // TODO: allow saving to local disk or cloud storage
-        val file = File("uploads/${Uuid.random()}")
+        val file = File("uploads/${Uuid.random().toHexString()}")
         item.provider().copyAndClose(file.writeChannel())
         return file.absolutePath
     }
