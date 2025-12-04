@@ -116,6 +116,7 @@ detekt-rules-compose = { module = "io.nlopez.compose.rules:detekt", version.ref 
 ktlint = { module = "com.pinterest.ktlint:ktlint-cli", version.ref = "ktlint" }
 ktlint-rules-compose = { module = "io.nlopez.compose.rules:ktlint", version.ref = "composeRuleset" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
+coil-network-ktor3 = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil" }
 okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 koin-annotations = { module = "io.insert-koin:koin-annotations", version.ref = "koinAnnotations" }

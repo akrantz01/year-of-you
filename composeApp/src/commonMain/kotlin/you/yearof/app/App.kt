@@ -26,10 +26,16 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import coil3.ImageLoader
 import coil3.compose.setSingletonImageLoaderFactory
+import coil3.disk.DiskCache
+import coil3.network.ktor3.KtorNetworkFetcherFactory
+import coil3.request.CachePolicy
 import coil3.request.crossfade
+import coil3.util.DebugLogger
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import okio.FileSystem
 import org.koin.compose.koinInject
+import you.yearof.app.api.HttpService
 import you.yearof.app.api.UserService
 import you.yearof.app.navigation.BottomBar
 import you.yearof.app.navigation.NavigationCoordinator
@@ -56,6 +62,7 @@ import you.yearof.app.screens.feed.LocalFeedScreen
 import you.yearof.app.screens.MainGraph
 import you.yearof.app.screens.ProfileGraph
 import you.yearof.app.screens.ProfileNav
+import you.yearof.app.screens.feed.SharedFeedScreen
 import you.yearof.app.screens.profile.ProfileLoginScreen
 import you.yearof.app.screens.profile.ProfileRegistrationScreen
 import you.yearof.app.screens.profile.ProfileScreen
@@ -65,8 +72,23 @@ data object Initialization : NavigationRoute
 
 @Composable
 fun App(modifier: Modifier = Modifier) {
+    val httpService: HttpService = koinInject()
     setSingletonImageLoaderFactory { context ->
-        ImageLoader.Builder(context).crossfade(true).build()
+        ImageLoader.Builder(context)
+            .crossfade(true)
+            .logger(DebugLogger()) // TODO: disable in production builds
+            .networkCachePolicy(CachePolicy.ENABLED)
+            .diskCachePolicy(CachePolicy.ENABLED)
+            .diskCache {
+                DiskCache.Builder()
+                    .directory(FileSystem.SYSTEM_TEMPORARY_DIRECTORY / "images")
+                    .maxSizeBytes(128L * 1024 * 1024) // 128 MB
+                    .build()
+            }
+            .components {
+                add(KtorNetworkFetcherFactory(httpService.client))
+            }
+            .build()
     }
 
     val colorScheme = if (isSystemInDarkTheme()) darkColorScheme() else lightColorScheme()
@@ -179,7 +201,7 @@ private fun AppNavigation(
             navigation<MainGraph>(startDestination = FeedGraph) {
                 navigation<FeedGraph>(startDestination = FeedNav.LocalFeed) {
                     composable<FeedNav.LocalFeed> { LocalFeedScreen() }
-                    composable<FeedNav.SharedFeed> { TODO() }
+                    composable<FeedNav.SharedFeed> { SharedFeedScreen() }
                 }
 
                 navigation<CaptureGraph>(startDestination = CaptureNav.Capture) {

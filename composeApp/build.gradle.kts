@@ -60,6 +60,7 @@ kotlin {
                 implementation(libs.androidx.datastore)
                 implementation(libs.androidx.datastore.preferences)
                 implementation(libs.coil.compose)
+                implementation(libs.coil.network.ktor3)
                 implementation(libs.okio)
                 implementation(libs.androidx.paging.common)
                 implementation(libs.androidx.paging.compose)
