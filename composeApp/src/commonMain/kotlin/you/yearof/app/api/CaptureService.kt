@@ -11,7 +11,7 @@ import kotlin.time.Instant
 
 @Single
 class CaptureService(
-    private val api: Client,
+    private val api: ApiService,
     @Provided private val remoteCaptures: RemoteCaptureDao,
 ) {
     fun all(pageSize: Int = 20): Pager<Int, RemoteCapture> =

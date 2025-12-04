@@ -11,7 +11,7 @@ private const val DefaultPageSize = 20
 private const val CursorId = "remote-capture-feed"
 
 class CapturesRemoteMediator(
-    private val api: Client,
+    private val api: ApiService,
     private val remoteCaptures: RemoteCaptureDao,
     private val pageSize: Int = DefaultPageSize,
 ) : RemoteMediator<Int, RemoteCapture>() {

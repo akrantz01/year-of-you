@@ -21,7 +21,7 @@ fun AuthenticationState.isAuthenticated() = when (this) {
 
 @Single
 class UserService(
-    private val api: Client,
+    private val api: ApiService,
     private val preferences: Preferences,
 ) {
     private val _state = MutableStateFlow<AuthenticationState>(AuthenticationState.Loading)
