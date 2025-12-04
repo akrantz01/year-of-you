@@ -10,4 +10,9 @@ class DatabaseModule {
     fun captures(
         @Provided database: AppDatabase,
     ): CaptureDao = database.captures()
+
+    @Factory
+    fun remoteCaptures(
+        @Provided database: AppDatabase,
+    ): RemoteCaptureDao = database.remoteCaptures()
 }

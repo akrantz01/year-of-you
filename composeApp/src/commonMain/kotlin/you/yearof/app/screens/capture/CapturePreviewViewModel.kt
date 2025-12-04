@@ -17,7 +17,7 @@ import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import org.koin.android.annotation.KoinViewModel
 import org.koin.core.annotation.Provided
-import you.yearof.app.api.Client
+import you.yearof.app.api.CaptureService
 import you.yearof.app.api.UserService
 import you.yearof.app.api.isAuthenticated
 import you.yearof.app.database.Capture
@@ -26,7 +26,6 @@ import you.yearof.app.dto.CompletedCapture
 import you.yearof.app.navigation.NavigationCoordinator
 import you.yearof.app.screens.CaptureNav
 import you.yearof.app.screens.FeedNav
-import you.yearof.app.util.Log
 import you.yearof.app.util.Paths
 
 data class CapturePreviewUiState(
@@ -37,8 +36,8 @@ data class CapturePreviewUiState(
 
 @KoinViewModel
 class CapturePreviewViewModel(
-    private val api: Client,
     @Provided private val captures: CaptureDao,
+    private val captureService: CaptureService,
     @Provided private val paths: Paths,
     private val navigationCoordinator: NavigationCoordinator,
     userService: UserService,
@@ -62,8 +61,7 @@ class CapturePreviewViewModel(
 
             try {
                 doSave(capture)
-            } catch (e: Exception) {
-                Log.error("CapturePreviewViewModel", "failed to save capture: ${e.message}")
+            } finally {
                 _uiState.update { it.copy(loading = false, uploadProgress = null) }
             }
         }
@@ -94,16 +92,13 @@ class CapturePreviewViewModel(
 
         // TODO: gracefully handle upload failure
         if (state.share) {
-            // TODO: abstract behind capture service
-            api.uploadCapture(
+            captureService.upload(
                 front = frontPath,
                 back = backPath,
                 swapped = capture.swapped,
                 at = capture.timestamp,
-            ) { bytesSentTotal, contentLength ->
-                contentLength?.let { contentLength ->
-                    _uiState.update { it.copy(uploadProgress = bytesSentTotal.toFloat() / contentLength.toFloat()) }
-                }
+            ) { progress ->
+                if (progress != null) _uiState.update { it.copy(uploadProgress = progress) }
             }
 
             captures.markUploaded(created.toInt())
