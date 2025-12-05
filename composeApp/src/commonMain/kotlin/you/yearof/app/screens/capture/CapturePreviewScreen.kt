@@ -4,13 +4,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults.iconButtonColors
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -22,9 +18,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import you.yearof.app.resources.Res
-import you.yearof.app.resources.arrow_left
-import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 import you.yearof.app.dto.CompletedCapture
 import you.yearof.app.ui.ImageSource
@@ -43,17 +36,6 @@ fun CapturePreviewScreen(
     val containerScroll = rememberScrollState()
 
     Column(modifier = modifier.fillMaxSize().verticalScroll(containerScroll)) {
-        IconButton(
-            onClick = viewModel::onCancel,
-            colors = iconButtonColors(contentColor = MaterialTheme.colorScheme.onBackground),
-        ) {
-            Icon(
-                modifier = Modifier.size(24.dp),
-                painter = painterResource(Res.drawable.arrow_left),
-                contentDescription = "Back",
-            )
-        }
-
         PictureInPicture(
             modifier = Modifier
                 .fillMaxWidth()

@@ -105,13 +105,7 @@ class CapturePreviewViewModel(
         }
 
         navigationCoordinator.navigateTo(FeedNav.LocalFeed) {
-            popUpTo(CaptureNav.Capture) { inclusive = false }
-        }
-    }
-
-    fun onCancel() {
-        viewModelScope.launch {
-            navigationCoordinator.navigateUp()
+            popUpTo(CaptureNav.Capture) { inclusive = true }
         }
     }
 }
