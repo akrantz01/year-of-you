@@ -2,12 +2,21 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>UILaunchScreen</key>
+	<dict>
+		<key>UIColorName</key>
+		<string>LaunchScreenBackground</string>
+		<key>UIImageName</key>
+		<string>LaunchScreenForeground</string>
+		<key>UIImageRespectsSafeAreaInsets</key>
+		<true/>
+	</dict>
 	<key>CFBundleDisplayName</key>
 	<string>Year of You</string>
 	<key>NSCameraUsageDescription</key>
 	<string>This app requires camera access to capture photos of you throughout the year.</string>
-    <key>NSLocalNetworkUsageDescription</key>
-    <string>This app requires local network access only when you set the server URL to a local IP address and enable social features.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>This app requires local network access only when you set the server URL to a local IP address and enable social features.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 </dict>
