@@ -1,0 +1,67 @@
+package you.yearof.server.routes.accounts
+
+import io.ktor.http.HttpStatusCode
+import io.ktor.server.auth.jwt.JWTPrincipal
+import io.ktor.server.auth.principal
+import io.ktor.server.request.receive
+import io.ktor.server.resources.patch
+import io.ktor.server.response.respond
+import io.ktor.server.routing.Route
+import you.yearof.server.repositories.AccountRepository
+import you.yearof.shared.api.Routes
+import you.yearof.shared.api.requests.UpdateRequest
+import io.ktor.server.plugins.requestvalidation.RequestValidation
+import io.ktor.server.plugins.requestvalidation.ValidationResult
+import you.yearof.server.database.tables.DisplayNameMaxLength
+import you.yearof.server.database.tables.UsernameMaxLength
+import you.yearof.server.database.tables.UsernameRegex
+import you.yearof.shared.api.responses.CurrentUser
+
+internal fun Route.updateRoute(accounts: AccountRepository) {
+    install(RequestValidation) {
+        validate<UpdateRequest> { request ->
+            val issues = mutableListOf<String>()
+
+            request.displayName?.let { displayName ->
+                if (displayName.isBlank()) {
+                    issues.add("a display name is required")
+                } else if (displayName.length > UsernameMaxLength) {
+                    issues.add("display name must be $DisplayNameMaxLength characters or less")
+                }
+            }
+
+            request.username?.let { username ->
+                if (username.isBlank()) {
+                    issues.add("a username is required")
+                } else if (username.length > UsernameMaxLength) {
+                    issues.add("a username must be $UsernameMaxLength characters or less")
+                } else if (!username.matches(UsernameRegex)) {
+                    issues.add("username can only consist of lowercase alphanumeric characters and underscore")
+                }
+            }
+
+            if (issues.isEmpty()) ValidationResult.Valid
+            else ValidationResult.Invalid(issues)
+        }
+    }
+
+    patch<Routes.CurrentUser> {
+        val principal = call.principal<JWTPrincipal>()!!
+        val account = accounts.get(principal.subject!!.toUInt())
+        checkNotNull(account)
+
+        val requested = call.receive<UpdateRequest>()
+        requested.displayName?.let { account.displayName = it }
+        requested.username?.let { account.username = it }
+
+        accounts.update(account)
+
+        call.respond(
+            CurrentUser(
+                id = account.id.value,
+                displayName = account.displayName,
+                username = account.username,
+            ),
+        )
+    }
+}

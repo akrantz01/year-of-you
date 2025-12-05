@@ -12,4 +12,6 @@ interface AccountRepository {
     suspend fun get(id: UInt): Account?
 
     suspend fun findByUsername(username: String): Account?
+
+    suspend fun update(account: Account)
 }

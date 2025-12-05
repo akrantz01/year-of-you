@@ -12,10 +12,9 @@ import you.yearof.shared.api.Routes
 import you.yearof.shared.api.requests.RegisterRequest
 import you.yearof.server.database.tables.DisplayNameMaxLength
 import you.yearof.server.database.tables.UsernameMaxLength
+import you.yearof.server.database.tables.UsernameRegex
 import you.yearof.server.repositories.AccountRepository
 import you.yearof.server.services.PasswordService
-
-private val UsernameRegex = Regex("^[a-z0-9_]+$")
 
 @Serializable
 data class RegisterResponse(

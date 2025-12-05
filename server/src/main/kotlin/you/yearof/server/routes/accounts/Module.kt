@@ -9,6 +9,7 @@ fun Application.accountsRoutes(accounts: AccountRepository) {
     routing {
         authenticate {
             meRoute(accounts)
+            updateRoute(accounts)
         }
     }
 }

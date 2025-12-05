@@ -32,4 +32,13 @@ class SqlAccountRepository(
         suspendTransaction(db) {
             Account.find { Accounts.username eq username }.firstOrNull()
         }
+
+    override suspend fun update(account: Account) =
+        suspendTransaction(db) {
+            Account.findByIdAndUpdate(account.id.value) {
+                it.displayName = account.displayName
+                it.username = account.username
+            }
+            Unit
+        }
 }
