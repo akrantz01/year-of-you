@@ -12,11 +12,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
@@ -36,10 +38,15 @@ import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import kotlinx.coroutines.flow.Flow
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
+import you.yearof.app.resources.Res
+import you.yearof.app.resources.globe
+import you.yearof.app.resources.mobile
 import kotlin.math.roundToInt
 
-enum class FeedType {
-    Local, Shared
+enum class FeedType(val icon: DrawableResource) {
+    Local(Res.drawable.mobile), Shared(Res.drawable.globe);
 }
 
 @Composable
@@ -52,14 +59,12 @@ fun <T : Any> BaseCaptureFeed(
     showTabBar: Boolean = true,
     modifier: Modifier = Modifier,
 ) {
-    val index = FeedType.entries.indexOf(type)
-
     if (showTabBar) {
         FloatingTabBar(
             modifier = modifier.fillMaxSize(),
-            options = FeedType.entries.map { it.name },
-            selected = index,
-            onSelect = { if (it != index) onSwitch() },
+            options = FeedType.entries,
+            selected = type,
+            onSelect = { if (it != type) onSwitch() },
         ) { padding ->
             CaptureFeedImpl(
                 padding = padding,
@@ -154,9 +159,9 @@ private fun EmptyFeedState(modifier: Modifier = Modifier) {
 
 @Composable
 private fun FloatingTabBar(
-    options: List<String>,
-    selected: Int,
-    onSelect: (Int) -> Unit,
+    options: List<FeedType>,
+    selected: FeedType,
+    onSelect: (FeedType) -> Unit,
     modifier: Modifier = Modifier,
     barShape: Shape = RoundedCornerShape(24.dp),
     tonalElevation: Dp = 6.dp,
@@ -183,13 +188,20 @@ private fun FloatingTabBar(
                         ) {
                             options.forEachIndexed { index, label ->
                                 SegmentedButton(
-                                    selected = index == selected,
-                                    onClick = { onSelect(index) },
+                                    selected = label == selected,
+                                    onClick = { onSelect(label) },
                                     shape = SegmentedButtonDefaults.itemShape(index, options.size),
                                     modifier = Modifier.defaultMinSize(minHeight = 48.dp),
+                                    icon = {
+                                        Icon(
+                                            painter = painterResource(label.icon),
+                                            contentDescription = null,
+                                            modifier = Modifier.size(SegmentedButtonDefaults.IconSize),
+                                        )
+                                    },
                                 ) {
                                     Text(
-                                        text = label,
+                                        text = label.name,
                                         style = MaterialTheme.typography.labelSmall,
                                     )
                                 }
