@@ -68,6 +68,7 @@ import you.yearof.app.screens.feed.SharedFeedScreen
 import you.yearof.app.screens.profile.ProfileLoginScreen
 import you.yearof.app.screens.profile.ProfileRegistrationScreen
 import you.yearof.app.screens.profile.ProfileScreen
+import you.yearof.app.screens.profile.AccountSettingsScreen
 
 @Serializable
 data object Initialization : NavigationRoute
@@ -220,6 +221,7 @@ private fun AppNavigation(
                     composable<ProfileNav.Profile> { ProfileScreen() }
                     composable<ProfileNav.AccountLogin> { ProfileLoginScreen() }
                     composable<ProfileNav.AccountRegister> { ProfileRegistrationScreen() }
+                    composable<ProfileNav.AccountSettings> { AccountSettingsScreen() }
                 }
             }
         }

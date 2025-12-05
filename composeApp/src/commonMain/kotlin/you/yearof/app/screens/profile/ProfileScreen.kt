@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -16,6 +15,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -31,19 +31,32 @@ import you.yearof.app.resources.circle_user
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 import you.yearof.app.api.AuthenticationState
+import you.yearof.app.api.isAuthenticated
 import you.yearof.app.ui.SkeletonText
 
 @Composable
 fun ProfileScreen(modifier: Modifier = Modifier, viewModel: ProfileViewModel = koinViewModel()) {
     val authState by viewModel.authState.collectAsState()
 
-    Column(modifier = modifier.fillMaxSize()) {
+    Column(
+        modifier = modifier.fillMaxSize().padding(horizontal = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
         ProfileCard(
             state = authState,
-            onClickAuthenticated = viewModel::logout,
-            onClickUnauthenticated = viewModel::showProfile,
+            onClickAuthenticated = viewModel::toSettings,
+            onClickUnauthenticated = viewModel::toLogin,
             modifier = Modifier.fillMaxWidth(),
         )
+
+        if (authState.isAuthenticated()) {
+            OutlinedButton(
+                modifier = Modifier.align(Alignment.End),
+                onClick = viewModel::logout,
+            ) {
+                Text("Log out")
+            }
+        }
     }
 }
 
@@ -117,7 +130,7 @@ private fun AuthenticatedProfileCard(
         Box(
             modifier = Modifier
                 .size(80.dp)
-                .padding(8.dp)
+                .padding(5.dp)
                 .background(
                     color = MaterialTheme.colorScheme.primaryContainer,
                     shape = CircleShape,
@@ -163,14 +176,11 @@ private fun BaseProfileCard(
     onClick: () -> Unit = {},
     content: @Composable RowScope.() -> Unit,
 ) {
-    Card(
-        modifier = modifier.padding(16.dp),
-        onClick = onClick,
-    ) {
+    Card(modifier = modifier, onClick = onClick) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(8.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(2.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             content()
         }

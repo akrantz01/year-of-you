@@ -15,8 +15,12 @@ class ProfileViewModel(
 ) : ViewModel() {
     val authState = userService.state
 
-    fun showProfile() = viewModelScope.launch {
+    fun toLogin() = viewModelScope.launch {
         navigationCoordinator.navigateTo(ProfileNav.AccountLogin)
+    }
+
+    fun toSettings() = viewModelScope.launch {
+        navigationCoordinator.navigateTo(ProfileNav.AccountSettings)
     }
 
     fun logout() = viewModelScope.launch {

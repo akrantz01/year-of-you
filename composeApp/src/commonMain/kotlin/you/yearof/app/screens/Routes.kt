@@ -70,6 +70,9 @@ sealed interface ProfileNav : NavigationRoute {
     data object Profile : ProfileNav
 
     @Serializable
+    data object AccountSettings : ProfileNav
+
+    @Serializable
     data object AccountLogin : ProfileNav
 
     @Serializable
