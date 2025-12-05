@@ -1,4 +1,3 @@
-- ios verification
 - profile screen
   - account settings
   - clear cache
