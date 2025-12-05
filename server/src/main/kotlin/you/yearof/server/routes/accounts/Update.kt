@@ -12,9 +12,12 @@ import you.yearof.shared.api.Routes
 import you.yearof.shared.api.requests.UpdateRequest
 import io.ktor.server.plugins.requestvalidation.RequestValidation
 import io.ktor.server.plugins.requestvalidation.ValidationResult
+import org.jetbrains.exposed.v1.exceptions.ExposedSQLException
 import you.yearof.server.database.tables.DisplayNameMaxLength
 import you.yearof.server.database.tables.UsernameMaxLength
 import you.yearof.server.database.tables.UsernameRegex
+import you.yearof.server.exceptions.ConflictException
+import you.yearof.server.util.isUniqueConstraintViolation
 import you.yearof.shared.api.responses.CurrentUser
 
 internal fun Route.updateRoute(accounts: AccountRepository) {
@@ -54,7 +57,12 @@ internal fun Route.updateRoute(accounts: AccountRepository) {
         requested.displayName?.let { account.displayName = it }
         requested.username?.let { account.username = it }
 
-        accounts.update(account)
+        try {
+            accounts.update(account)
+        } catch (e: ExposedSQLException) {
+            if (e.isUniqueConstraintViolation) throw ConflictException("username already in use")
+            else throw e
+        }
 
         call.respond(
             CurrentUser(

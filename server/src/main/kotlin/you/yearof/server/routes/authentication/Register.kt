@@ -6,14 +6,17 @@ import io.ktor.server.request.receive
 import io.ktor.server.resources.post
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
+import org.jetbrains.exposed.v1.exceptions.ExposedSQLException
 import you.yearof.shared.api.Routes
 import you.yearof.shared.api.requests.RegisterRequest
 import you.yearof.server.database.tables.DisplayNameMaxLength
 import you.yearof.server.database.tables.UsernameMaxLength
 import you.yearof.server.database.tables.UsernameRegex
+import you.yearof.server.exceptions.ConflictException
 import you.yearof.server.repositories.AccountRepository
 import you.yearof.server.services.PasswordService
 import you.yearof.server.services.TokenService
+import you.yearof.server.util.isUniqueConstraintViolation
 import you.yearof.shared.api.responses.LoginSuccess
 
 internal fun Route.registerRoute(
@@ -60,12 +63,16 @@ internal fun Route.registerRoute(
 
     post<Routes.Register> {
         val requested = call.receive<RegisterRequest>()
-        val account =
+        val account = try {
             accounts.create(
                 displayName = requested.displayName,
                 username = requested.username,
                 password = PasswordService.hash(requested.password),
             )
+        } catch (e: ExposedSQLException) {
+            if (e.isUniqueConstraintViolation) throw ConflictException("username already in use")
+            else throw e
+        }
 
         // TODO: confirm account via email or something
         val token = tokens.issue(account)

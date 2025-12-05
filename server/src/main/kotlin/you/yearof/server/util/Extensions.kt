@@ -6,6 +6,8 @@ import io.ktor.resources.href
 import io.ktor.server.plugins.origin
 import io.ktor.server.resources.Resources
 import io.ktor.server.routing.RoutingContext
+import org.jetbrains.exposed.v1.exceptions.ExposedSQLException
+import java.sql.SQLException
 
 inline fun <reified T: Any> RoutingContext.href(resource: T): String {
     val origin = call.request.origin
@@ -21,3 +23,6 @@ inline fun <reified T: Any> RoutingContext.href(resource: T): String {
     )
     return builder.toString()
 }
+
+val ExposedSQLException.isUniqueConstraintViolation: Boolean
+    get() = sqlState.startsWith("23")
