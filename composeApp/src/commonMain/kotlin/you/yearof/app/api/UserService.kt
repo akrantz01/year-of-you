@@ -59,7 +59,8 @@ class UserService(
 
     suspend fun register(displayName: String, username: String, password: String) {
         api.register(displayName, username, password)
-        // TODO: this won't work correctly till registration is sorted out
+        // TODO: temporarily issues tokens until confirmation is sorted
+        refresh()
     }
 
     suspend fun login(username: String, password: String) {

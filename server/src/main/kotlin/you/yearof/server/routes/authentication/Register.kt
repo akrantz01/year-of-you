@@ -6,8 +6,6 @@ import io.ktor.server.request.receive
 import io.ktor.server.resources.post
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import you.yearof.shared.api.Routes
 import you.yearof.shared.api.requests.RegisterRequest
 import you.yearof.server.database.tables.DisplayNameMaxLength
@@ -15,16 +13,13 @@ import you.yearof.server.database.tables.UsernameMaxLength
 import you.yearof.server.database.tables.UsernameRegex
 import you.yearof.server.repositories.AccountRepository
 import you.yearof.server.services.PasswordService
+import you.yearof.server.services.TokenService
+import you.yearof.shared.api.responses.LoginSuccess
 
-@Serializable
-data class RegisterResponse(
-    val id: UInt,
-    @SerialName("display_name")
-    val displayName: String,
-    val username: String,
-)
-
-internal fun Route.registerRoute(accounts: AccountRepository) {
+internal fun Route.registerRoute(
+    accounts: AccountRepository,
+    tokens: TokenService,
+) {
     install(RequestValidation) {
         validate<RegisterRequest> { request ->
             when {
@@ -72,13 +67,8 @@ internal fun Route.registerRoute(accounts: AccountRepository) {
                 password = PasswordService.hash(requested.password),
             )
 
-        // TODO: generate valid token after registration
-        call.respond(
-            RegisterResponse(
-                id = account.id.value,
-                displayName = account.displayName,
-                username = account.username,
-            ),
-        )
+        // TODO: confirm account via email or something
+        val token = tokens.issue(account)
+        call.respond(LoginSuccess(accessToken = token.accessToken, refreshToken = token.refreshToken))
     }
 }

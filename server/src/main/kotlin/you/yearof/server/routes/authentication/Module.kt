@@ -10,7 +10,7 @@ fun Application.authenticationRoutes(
     tokens: TokenService,
 ) {
     routing {
-        registerRoute(accounts)
+        registerRoute(accounts, tokens)
         loginRoute(accounts, tokens)
         refreshRoute(accounts, tokens)
     }

@@ -40,8 +40,11 @@ class ApiService(
         else response.body()
     }
 
-    suspend fun register(displayName: String, username: String, password: String): CurrentUser =
-        httpService.post(Routes.Register, RegisterRequest(displayName, username, password))
+    suspend fun register(displayName: String, username: String, password: String) {
+        val response: LoginSuccess = httpService.post(Routes.Register, RegisterRequest(displayName, username, password))
+        // TODO: replace with confirmation stuff once sorted
+        httpService.setTokens(response.accessToken, response.refreshToken)
+    }
 
     suspend fun login(username: String, password: String) {
         val response: LoginSuccess = httpService.post(Routes.Login, LoginRequest(username, password))

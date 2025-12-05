@@ -131,9 +131,11 @@ class OnboardingViewModel(
 
     fun registrationAccountRouter(): AccountRouter = object : AccountRouter {
         override suspend fun onSuccess() {
-            navigationCoordinator.navigateTo(OnboardingRoute.AccountConfirmation) {
-                launchSingleTop = true
-            }
+            // TODO: implement account confirmation
+            // navigationCoordinator.navigateTo(OnboardingRoute.AccountConfirmation) {
+            //    launchSingleTop = true
+            // }
+            completeAccountOnboarding()
         }
 
         override suspend fun toOpposite() {
