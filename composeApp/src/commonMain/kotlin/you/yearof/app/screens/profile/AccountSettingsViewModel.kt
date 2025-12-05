@@ -12,6 +12,7 @@ import org.koin.android.annotation.KoinViewModel
 import you.yearof.app.api.AuthenticationState
 import you.yearof.app.api.UserService
 import you.yearof.app.navigation.NavigationCoordinator
+import you.yearof.app.notifications.SnackbarManager
 
 data class AccountSettingsUiState(
     val displayNameSaving: Boolean = false,
@@ -22,6 +23,7 @@ data class AccountSettingsUiState(
 class AccountSettingsViewModel(
     private val navigationCoordinator: NavigationCoordinator,
     private val userService: UserService,
+    private val snackbarManager: SnackbarManager,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AccountSettingsUiState())
     val uiState = _uiState.asStateFlow()
@@ -47,7 +49,7 @@ class AccountSettingsViewModel(
 
         try {
             userService.update(displayName = displayNameState.text.toString())
-            // TODO: show notification on success
+            snackbarManager.success("Your display name has been saved!")
         } finally {
             _uiState.update { it.copy(displayNameSaving = false) }
         }
@@ -58,7 +60,7 @@ class AccountSettingsViewModel(
 
         try {
             userService.update(username = usernameState.text.toString())
-            // TODO: show notification on success
+            snackbarManager.success("Your username has been saved!")
         } finally {
             _uiState.update { it.copy(usernameSaving = false) }
         }

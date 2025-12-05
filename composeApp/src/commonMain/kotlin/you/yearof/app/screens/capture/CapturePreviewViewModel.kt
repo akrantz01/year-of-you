@@ -24,6 +24,7 @@ import you.yearof.app.database.Capture
 import you.yearof.app.database.CaptureDao
 import you.yearof.app.dto.CompletedCapture
 import you.yearof.app.navigation.NavigationCoordinator
+import you.yearof.app.notifications.SnackbarManager
 import you.yearof.app.screens.CaptureNav
 import you.yearof.app.screens.FeedNav
 import you.yearof.app.util.Paths
@@ -41,6 +42,7 @@ class CapturePreviewViewModel(
     @Provided private val paths: Paths,
     private val navigationCoordinator: NavigationCoordinator,
     userService: UserService,
+    private val snackbarManager: SnackbarManager,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CapturePreviewUiState())
     val uiState: StateFlow<CapturePreviewUiState> = _uiState.asStateFlow()
@@ -88,18 +90,25 @@ class CapturePreviewViewModel(
             ),
         )
 
-        // TODO: gracefully handle upload failure
         if (state.share) {
-            captureService.upload(
-                front = frontPath,
-                back = backPath,
-                swapped = capture.swapped,
-                at = capture.timestamp,
-            ) { progress ->
-                if (progress != null) _uiState.update { it.copy(uploadProgress = progress) }
-            }
+            try {
+                captureService.upload(
+                    front = frontPath,
+                    back = backPath,
+                    swapped = capture.swapped,
+                    at = capture.timestamp,
+                ) { progress ->
+                    if (progress != null) _uiState.update { it.copy(uploadProgress = progress) }
+                }
 
-            captures.markUploaded(created.toInt())
+                captures.markUploaded(created.toInt())
+                snackbarManager.success("Capture shared!")
+            } catch (e: Throwable) {
+                // TODO: gracefully handle upload failure
+                snackbarManager.error("Failed to upload capture, will retry later")
+            }
+        } else {
+            snackbarManager.info("Capture saved!")
         }
 
         navigationCoordinator.navigateTo(FeedNav.LocalFeed) {

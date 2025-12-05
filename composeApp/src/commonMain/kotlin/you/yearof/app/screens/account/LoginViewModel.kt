@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
 import org.koin.core.annotation.InjectedParam
 import you.yearof.app.api.UserService
+import you.yearof.app.notifications.SnackbarManager
 import you.yearof.app.screens.account.AccountRouter
 import you.yearof.app.ui.ServerSelectorController
 import you.yearof.app.util.Preferences
@@ -23,11 +24,12 @@ class LoginViewModel(
     private val userService: UserService,
     @InjectedParam private val router: AccountRouter,
     preferences: Preferences,
+    snackbarManager: SnackbarManager,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState
 
-    val serverSelector = ServerSelectorController(viewModelScope, preferences)
+    val serverSelector = ServerSelectorController(viewModelScope, preferences, snackbarManager)
 
     val usernameState = TextFieldState(initialText = "")
     val passwordState = TextFieldState(initialText = "")

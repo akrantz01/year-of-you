@@ -38,6 +38,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
+import you.yearof.app.notifications.SnackbarManager
 import you.yearof.app.resources.Res
 import you.yearof.app.resources.chevron_right
 import you.yearof.app.util.Preferences
@@ -124,6 +125,7 @@ data class ServerSelectorState(
 class ServerSelectorController(
     private val scope: CoroutineScope,
     private val preferences: Preferences,
+    private val snackbarManager: SnackbarManager,
 ) {
     private val _uiState = MutableStateFlow(ServerSelectorState())
     val uiState = _uiState.asStateFlow()
@@ -164,6 +166,7 @@ class ServerSelectorController(
 
     fun setDefault() = scope.launch {
         preferences.setUrl(DefaultUrl)
+        snackbarManager.success("Server updated to $DefaultUrl")
         closeMenu()
     }
 
@@ -189,6 +192,7 @@ class ServerSelectorController(
 
         // TODO: verify URL is reachable
         preferences.setUrl(validated)
+        snackbarManager.success("Server updated to $validated")
         closeDialog()
     }
 
