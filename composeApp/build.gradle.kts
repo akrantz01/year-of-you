@@ -39,6 +39,7 @@ kotlin {
             implementation(libs.androidx.camera.extensions)
             implementation(libs.androidx.camera.lifecycle)
             implementation(libs.androidx.camera.view)
+            implementation(libs.androidx.splashscreen)
             implementation(libs.koin.android)
             implementation(libs.androidx.sqlite.framework)
             implementation(libs.ktor.client.okhttp)
