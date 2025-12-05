@@ -1,8 +1,14 @@
 package you.yearof.app.api
 
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import org.koin.core.annotation.Single
 import you.yearof.app.util.Log
@@ -26,6 +32,14 @@ class UserService(
 ) {
     private val _state = MutableStateFlow<AuthenticationState>(AuthenticationState.Loading)
     val state = _state.asStateFlow()
+
+    val authenticated = state.map { it.isAuthenticated() }
+
+    fun authenticatedAsState(
+        scope: CoroutineScope,
+        started: SharingStarted = SharingStarted.Eagerly,
+    ): StateFlow<Boolean> =
+        authenticated.stateIn(scope = scope, started = started, initialValue = false)
 
     suspend fun load() {
         if (!api.authenticated()) {

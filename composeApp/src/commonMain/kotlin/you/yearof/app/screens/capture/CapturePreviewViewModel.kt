@@ -45,9 +45,7 @@ class CapturePreviewViewModel(
     private val _uiState = MutableStateFlow(CapturePreviewUiState())
     val uiState: StateFlow<CapturePreviewUiState> = _uiState.asStateFlow()
 
-    val authenticated = userService.state
-        .map { it.isAuthenticated() }
-        .stateIn(scope = viewModelScope, started = SharingStarted.Eagerly, initialValue = false)
+    val authenticated = userService.authenticatedAsState(viewModelScope)
 
     val captionState = TextFieldState()
 
