@@ -1,5 +1,7 @@
 package you.yearof.app
 
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -164,6 +166,8 @@ private fun AppNavigation(
             navController = navController,
             startDestination = Initialization,
             modifier = Modifier.padding(paddingValues),
+            enterTransition = { fadeIn() },
+            exitTransition = { fadeOut() },
         ) {
             composable<Initialization> {
                 InitializationScreen()
