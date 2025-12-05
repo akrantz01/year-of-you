@@ -41,8 +41,7 @@ private fun CaptureCard(
             StatusLine(
                 icon = Res.drawable.user_solid,
                 iconDescription = "Author",
-                // TODO: resolve to username
-                description = "By user ${capture.accountId}",
+                description = "By ${capture.accountUsername}",
             )
         }
     )
