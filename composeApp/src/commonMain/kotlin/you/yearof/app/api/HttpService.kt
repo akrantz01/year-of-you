@@ -5,12 +5,12 @@ import io.ktor.client.call.body
 import io.ktor.client.engine.HttpClientEngineConfig
 import io.ktor.client.engine.HttpClientEngineFactory
 import io.ktor.client.plugins.addDefaultResponseValidation
+import io.ktor.client.plugins.api.createClientPlugin
 import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.plugins.compression.ContentEncoding
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
@@ -22,13 +22,16 @@ import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
+import io.ktor.http.encodeURLPath
 import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.coroutines.flow.first
 import org.koin.core.annotation.Provided
 import org.koin.core.annotation.Single
 import you.yearof.shared.api.requests.RefreshRequest
 import you.yearof.shared.api.responses.RefreshSuccess
 import you.yearof.app.util.Log
+import you.yearof.app.util.Preferences
 import you.yearof.app.util.SecureStorage
 import you.yearof.shared.api.DefaultRealm
 import you.yearof.shared.api.Routes
@@ -40,6 +43,7 @@ internal expect val engine: HttpClientEngineFactory<HttpClientEngineConfig>
 
 @Single
 class HttpService(
+    private val preferences: Preferences,
     @Provided private val secureStorage: SecureStorage,
 ) {
     val client =
@@ -92,11 +96,11 @@ class HttpService(
                 }
             }
 
-            addDefaultResponseValidation()
-            defaultRequest {
-                // TODO: pull from preferences or a mutable flow or something
-                url("https://10.0.0.33:8443")
+            install(UrlPlugin) {
+                preferencesStore = preferences
             }
+
+            addDefaultResponseValidation()
         }
 
     suspend fun hasTokens(): Boolean = secureStorage.has(AccessTokenKey) && secureStorage.has(RefreshTokenKey)
@@ -125,4 +129,22 @@ class HttpService(
             contentType(ContentType.Application.Json)
             setBody(body)
         }.body<Response>()
+}
+
+private class UrlPluginConfig {
+    lateinit var preferencesStore: Preferences
+}
+
+private val UrlPlugin = createClientPlugin(name = "url", ::UrlPluginConfig) {
+    val preferences = pluginConfig.preferencesStore
+
+    onRequest { request, _ ->
+        val baseUrl = preferences.urlParsed.first()
+        request.url {
+            protocol = baseUrl.protocol
+            host = baseUrl.host
+            port = baseUrl.port
+            encodedPathSegments = (baseUrl.segments + request.url.pathSegments).map { it.encodeURLPath() }
+        }
+    }
 }

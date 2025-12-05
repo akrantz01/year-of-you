@@ -5,10 +5,12 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import io.ktor.http.Url
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.koin.core.annotation.Provided
 import org.koin.core.annotation.Single
+import you.yearof.shared.api.DefaultUrl
 
 @Single
 class Preferences(
@@ -31,6 +33,10 @@ class Preferences(
         prefs[accountOnboardingSeenKey] ?: false
     }
 
+    val url: Flow<String> = dataStore.data.map { prefs -> prefs[urlKey] ?: DefaultUrl }
+
+    val urlParsed: Flow<Url> = url.map(::Url)
+
     suspend fun setUser(id: UInt, username: String, name: String) {
         dataStore.edit { prefs ->
             prefs[idKey] = id.toInt()
@@ -42,6 +48,12 @@ class Preferences(
     suspend fun setAccountOnboardingSeen(seen: Boolean = true) {
         dataStore.edit { prefs ->
             prefs[accountOnboardingSeenKey] = seen
+        }
+    }
+
+    suspend fun setUrl(url: String) {
+        dataStore.edit { prefs ->
+            prefs[urlKey] = url
         }
     }
 
@@ -60,6 +72,7 @@ class Preferences(
         private val usernameKey = stringPreferencesKey("username")
         private val displayNameKey = stringPreferencesKey("displayName")
         private val accountOnboardingSeenKey = booleanPreferencesKey("accountOnboardingSeen")
+        private val urlKey = stringPreferencesKey("url")
     }
 }
 
