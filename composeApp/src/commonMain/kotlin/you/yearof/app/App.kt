@@ -6,15 +6,19 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -45,6 +49,9 @@ import you.yearof.app.navigation.NavigationEvent
 import you.yearof.app.navigation.NavigationRoute
 import you.yearof.app.navigation.TopBar
 import you.yearof.app.navigation.sharedViewModel
+import you.yearof.app.notifications.BindSnackbarHost
+import you.yearof.app.notifications.NotificationSnackbarHost
+import you.yearof.app.notifications.SnackbarManager
 import you.yearof.app.onboarding.CameraPermissionsScreen
 import you.yearof.app.onboarding.InitializationScreen
 import you.yearof.app.onboarding.AccountLoginScreen
@@ -111,10 +118,12 @@ fun App(modifier: Modifier = Modifier) {
 private fun AppNavigation(
     navigationCoordinator: NavigationCoordinator = koinInject(),
     userService: UserService = koinInject(),
+    snackbarManager: SnackbarManager = koinInject(),
 ) {
     val navController = rememberNavController()
     val scope = rememberCoroutineScope()
     val scrollBehaviour = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     // Centralized navigation handling
     LaunchedEffect(navigationCoordinator) {
@@ -139,6 +148,11 @@ private fun AppNavigation(
         }
     }
 
+    BindSnackbarHost(
+        snackbarManager = snackbarManager,
+        hostState = snackbarHostState,
+    )
+
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehaviour.nestedScrollConnection),
         topBar = {
@@ -161,6 +175,9 @@ private fun AppNavigation(
                     },
                 navController = navController,
             )
+        },
+        snackbarHost = {
+            NotificationSnackbarHost(hostState = snackbarHostState)
         },
     ) { paddingValues ->
         NavHost(
