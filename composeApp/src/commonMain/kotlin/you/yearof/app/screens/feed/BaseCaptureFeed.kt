@@ -43,46 +43,71 @@ fun <T : Any> BaseCaptureFeed(
     captures: Flow<PagingData<T>>,
     key: (T) -> Any,
     item: @Composable (T) -> Unit,
+    showTabBar: Boolean = true,
     modifier: Modifier = Modifier,
 ) {
     val index = FeedType.entries.indexOf(type)
+
+    if (showTabBar) {
+        FloatingTabBar(
+            modifier = modifier.fillMaxSize(),
+            options = FeedType.entries.map { it.name },
+            selected = index,
+            onSelect = { if (it != index) onSwitch() },
+        ) { padding ->
+            CaptureFeedImpl(
+                padding = padding,
+                captures = captures,
+                key = key,
+                item = item,
+            )
+        }
+    } else {
+        CaptureFeedImpl(
+            captures = captures,
+            key = key,
+            item = item,
+        )
+    }
+}
+
+@Composable
+private fun <T : Any> CaptureFeedImpl(
+    captures: Flow<PagingData<T>>,
+    key: (T) -> Any,
+    item: @Composable (T) -> Unit,
+    padding: PaddingValues = PaddingValues(0.dp),
+) {
     val captures = captures.collectAsLazyPagingItems()
 
-    FloatingTabBar(
-        modifier = modifier.fillMaxSize(),
-        options = FeedType.entries.map { it.name },
-        selected = index,
-        onSelect = { if (it != index) onSwitch() },
-    ) { padding ->
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = padding,
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-        ) {
-            items(
-                count = captures.itemCount,
-                key = captures.itemKey(key),
-            ) { index ->
-                val capture = captures[index]
-                if (capture != null) {
-                    item(capture)
-                } else {
-                    // TODO: show loading spinner/state
-                }
+    LazyColumn(
+        modifier = Modifier.fillMaxSize().padding(horizontal = 4.dp),
+        contentPadding = padding,
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        items(
+            count = captures.itemCount,
+            key = captures.itemKey(key),
+        ) { index ->
+            val capture = captures[index]
+            if (capture != null) {
+                item(capture)
+            } else {
+                // TODO: show loading spinner/state
             }
         }
     }
 }
 
 @Composable
-fun FloatingTabBar(
+private fun FloatingTabBar(
     options: List<String>,
     selected: Int,
     onSelect: (Int) -> Unit,
     modifier: Modifier = Modifier,
     barShape: Shape = RoundedCornerShape(24.dp),
     tonalElevation: Dp = 6.dp,
-    shadowElevation: Dp = 12.dp,
+    shadowElevation: Dp = 8.dp,
     bottomMargin: Dp = 16.dp,
     maxBarWidth: Dp = 360.dp,
     content: @Composable (PaddingValues) -> Unit

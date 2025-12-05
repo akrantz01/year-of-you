@@ -2,6 +2,8 @@ package you.yearof.app.screens.feed
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import you.yearof.app.resources.Res
 import you.yearof.app.resources.globe
@@ -18,10 +20,13 @@ fun LocalFeedScreen(
     modifier: Modifier = Modifier,
     viewModel: LocalFeedViewModel = koinViewModel(),
 ) {
+    val authenticated by viewModel.authenticated.collectAsState()
+
     BaseCaptureFeed(
         modifier = modifier.fillMaxSize(),
         type = FeedType.Local,
         onSwitch = viewModel::toSharedFeed,
+        showTabBar = authenticated,
         captures = viewModel.latestCaptures,
         key = { it.id },
         item = { CaptureCard(capture = it) },

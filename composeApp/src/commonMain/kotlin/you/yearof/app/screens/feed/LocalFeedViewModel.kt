@@ -8,6 +8,7 @@ import androidx.paging.cachedIn
 import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
 import org.koin.core.annotation.Provided
+import you.yearof.app.api.UserService
 import you.yearof.app.database.CaptureDao
 import you.yearof.app.navigation.NavigationCoordinator
 import you.yearof.app.screens.FeedNav
@@ -16,9 +17,12 @@ import you.yearof.app.screens.FeedNav
 class LocalFeedViewModel(
     @Provided private val captures: CaptureDao,
     private val navigationCoordinator: NavigationCoordinator,
+    userService: UserService,
 ) : ViewModel() {
     private val pager = Pager(PagingConfig(10)) { captures.all() }
     val latestCaptures = pager.flow.cachedIn(viewModelScope)
+
+    val authenticated = userService.authenticatedAsState(viewModelScope)
 
     fun toSharedFeed() = viewModelScope.launch {
         navigationCoordinator.navigateTo(FeedNav.SharedFeed)
