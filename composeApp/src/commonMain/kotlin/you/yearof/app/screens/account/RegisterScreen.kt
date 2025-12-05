@@ -27,6 +27,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import you.yearof.app.ui.LoadingButton
 import you.yearof.app.ui.PasswordTextField
+import you.yearof.app.ui.ServerSelector
 import you.yearof.app.ui.UsernameTextField
 import you.yearof.app.util.then
 
@@ -77,7 +78,7 @@ fun RegisterScreen(
             )
         }
 
-        // TODO: allow configuring server
+        ServerSelector(controller = viewModel.serverSelector)
 
         Row(
             modifier = Modifier.fillMaxWidth(),

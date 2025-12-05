@@ -11,6 +11,8 @@ import org.koin.android.annotation.KoinViewModel
 import org.koin.core.annotation.InjectedParam
 import you.yearof.app.api.UserService
 import you.yearof.app.screens.account.AccountRouter
+import you.yearof.app.ui.ServerSelectorController
+import you.yearof.app.util.Preferences
 
 data class RegisterUiState(
     val loading: Boolean = false,
@@ -20,6 +22,7 @@ data class RegisterUiState(
 class RegisterViewModel(
     private val userService: UserService,
     @InjectedParam private val router: AccountRouter,
+    preferences: Preferences,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(RegisterUiState())
     val uiState = _uiState.asStateFlow()
@@ -36,6 +39,8 @@ class RegisterViewModel(
 
     val passwordsMatch: Boolean
         get() = passwordState.text == passwordConfirmationState.text
+
+    val serverSelector = ServerSelectorController(viewModelScope, preferences)
 
     fun onRegister() = viewModelScope.launch {
         _uiState.update { it.copy(loading = true) }

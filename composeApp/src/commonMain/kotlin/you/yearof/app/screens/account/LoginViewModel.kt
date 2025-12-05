@@ -11,6 +11,8 @@ import org.koin.android.annotation.KoinViewModel
 import org.koin.core.annotation.InjectedParam
 import you.yearof.app.api.UserService
 import you.yearof.app.screens.account.AccountRouter
+import you.yearof.app.ui.ServerSelectorController
+import you.yearof.app.util.Preferences
 
 data class LoginUiState(
     val loading: Boolean = false,
@@ -20,9 +22,12 @@ data class LoginUiState(
 class LoginViewModel(
     private val userService: UserService,
     @InjectedParam private val router: AccountRouter,
+    preferences: Preferences,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState
+
+    val serverSelector = ServerSelectorController(viewModelScope, preferences)
 
     val usernameState = TextFieldState(initialText = "")
     val passwordState = TextFieldState(initialText = "")
