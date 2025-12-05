@@ -46,7 +46,8 @@ class CapturesRemoteMediator(
 private fun mapCapture(item: CaptureListItem): RemoteCapture =
     RemoteCapture(
         id = item.id.toLong(),
-        accountId = item.accountId.toLong(),
+        accountId = item.account.id.toLong(),
+        accountUsername = item.account.username,
         frontUrl = item.front,
         backUrl = item.back,
         swapped = item.swapped,

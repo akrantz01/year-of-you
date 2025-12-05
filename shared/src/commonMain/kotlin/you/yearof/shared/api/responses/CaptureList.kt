@@ -14,8 +14,7 @@ data class CapturePage(
 @Serializable
 data class CaptureListItem(
     val id: UInt,
-    @SerialName("account_id")
-    val accountId: UInt,
+    val account: AccountListItem,
     val front: String,
     val back: String,
     val swapped: Boolean,
@@ -23,4 +22,10 @@ data class CaptureListItem(
     val takenAt: Instant,
     @SerialName("uploaded_at")
     val uploadedAt: Instant,
+)
+
+@Serializable
+data class AccountListItem(
+    val id: UInt,
+    val username: String,
 )

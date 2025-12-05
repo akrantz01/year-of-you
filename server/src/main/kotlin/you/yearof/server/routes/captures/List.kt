@@ -13,6 +13,7 @@ import you.yearof.server.exceptions.validate
 import you.yearof.server.repositories.CaptureCursor
 import you.yearof.server.repositories.CaptureRepository
 import you.yearof.server.util.href
+import you.yearof.shared.api.responses.AccountListItem
 import kotlin.time.Instant
 
 internal fun Route.listRoute(captures: CaptureRepository) {
@@ -27,7 +28,10 @@ internal fun Route.listRoute(captures: CaptureRepository) {
             val id = it.id.value
             CaptureListItem(
                 id = id,
-                accountId = it.accountId.value,
+                account = AccountListItem(
+                    id = it.account.id.value,
+                    username = it.account.username,
+                ),
                 front = href(Routes.Captures.Id.Front.make(id)),
                 back = href(Routes.Captures.Id.Back.make(id)),
                 swapped = it.swapped,

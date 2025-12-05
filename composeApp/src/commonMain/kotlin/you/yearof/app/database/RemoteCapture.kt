@@ -16,6 +16,8 @@ import kotlin.time.Instant
 data class RemoteCapture(
     @PrimaryKey val id: Long,
     @ColumnInfo(name = "account_id") val accountId: Long,
+    // TODO: find better way of caching info about other users
+    @ColumnInfo(name = "account_username", defaultValue = "") val accountUsername: String,
     @ColumnInfo(name = "front_url") val frontUrl: String,
     @ColumnInfo(name = "back_url") val backUrl: String,
     val swapped: Boolean,

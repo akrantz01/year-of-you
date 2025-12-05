@@ -5,6 +5,7 @@ import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.core.less
 import org.jetbrains.exposed.v1.core.or
+import org.jetbrains.exposed.v1.dao.with
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.transactions.suspendTransaction
 import you.yearof.server.database.entities.Account
@@ -47,6 +48,7 @@ class SqlCaptureRepository(
                 }
 
             base
+                .with(Capture::account)
                 .orderBy(
                     Captures.uploadedAt to SortOrder.DESC,
                     Captures.id to SortOrder.DESC,
