@@ -69,13 +69,19 @@ class UserService(
     }
 
     private suspend fun refresh() {
-        val current = api.currentUser()
-        if (current != null) {
-            Log.info("UserService", "got user: id=${current.id}")
-            _state.update { AuthenticationState.Authenticated(current.id, current.displayName, current.username) }
-            preferences.setUser(current.id, current.username, current.displayName)
-        } else {
-            Log.info("UserService", "no user found")
+        try {
+            val current = api.currentUser()
+            if (current != null) {
+                Log.info("UserService", "got user: id=${current.id}")
+                _state.update { AuthenticationState.Authenticated(current.id, current.displayName, current.username) }
+                preferences.setUser(current.id, current.username, current.displayName)
+            } else {
+                Log.info("UserService", "no user found")
+                _state.update { AuthenticationState.Unauthenticated }
+                preferences.clearUser()
+            }
+        } catch (e: ApiException) {
+            Log.error("UserService", "failed to refresh user: $e")
             _state.update { AuthenticationState.Unauthenticated }
             preferences.clearUser()
         }

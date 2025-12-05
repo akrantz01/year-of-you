@@ -4,7 +4,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.HttpClientEngineConfig
 import io.ktor.client.engine.HttpClientEngineFactory
-import io.ktor.client.plugins.addDefaultResponseValidation
+import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.api.createClientPlugin
 import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.BearerTokens
@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.first
 import org.koin.core.annotation.Provided
 import org.koin.core.annotation.Single
 import you.yearof.shared.api.requests.RefreshRequest
+import you.yearof.shared.api.responses.ErrorResponse
 import you.yearof.shared.api.responses.RefreshSuccess
 import you.yearof.app.util.Log
 import you.yearof.app.util.Preferences
@@ -100,7 +101,23 @@ class HttpService(
                 preferencesStore = preferences
             }
 
-            addDefaultResponseValidation()
+            HttpResponseValidator {
+                validateResponse { response ->
+                    val statusCode = response.status.value
+                    if (statusCode in 200..299) return@validateResponse
+
+                    val errorResponse = response.body<ErrorResponse>()
+                    throw when (statusCode) {
+                        400 -> BadRequestException(errorResponse)
+                        401 -> UnauthorizedException(errorResponse)
+                        403 -> ForbiddenException(errorResponse)
+                        404 -> NotFoundException(errorResponse)
+                        409 -> ConflictException(errorResponse)
+                        in 500..599 -> ServerErrorException(errorResponse)
+                        else -> ClientErrorException(response.status, errorResponse)
+                    }
+                }
+            }
         }
 
     suspend fun hasTokens(): Boolean = secureStorage.has(AccessTokenKey) && secureStorage.has(RefreshTokenKey)
