@@ -2,10 +2,6 @@
   - account settings
   - clear cache
 - client error handling
-- empty state for feed screen
-- loading states
-  - initialization
-  - feed
 
 - notifications (PUNTED)
   - schedule daily notifications
