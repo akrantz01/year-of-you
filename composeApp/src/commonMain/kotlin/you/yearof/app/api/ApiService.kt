@@ -26,6 +26,7 @@ import you.yearof.shared.api.responses.CapturePage
 import you.yearof.shared.api.responses.CurrentUser
 import you.yearof.shared.api.responses.LoginSuccess
 import you.yearof.shared.api.Routes
+import you.yearof.shared.api.requests.UpdateRequest
 import kotlin.time.Instant
 
 @Single
@@ -50,6 +51,9 @@ class ApiService(
     suspend fun authenticated(): Boolean = httpService.hasTokens()
 
     suspend fun logout() = httpService.clearTokens()
+
+    suspend fun updateAccount(displayName: String? = null, username: String? = null): CurrentUser =
+        httpService.patch(Routes.CurrentUser, UpdateRequest(displayName, username))
 
     suspend fun uploadCapture(front: Path, back: Path, swapped: Boolean, at: Instant, onUpload: ((Long, Long?) -> Unit)? = null) {
         val request = UploadRequest(frontPath = front, backPath = back, swapped = swapped, taken = at)

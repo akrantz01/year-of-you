@@ -80,6 +80,13 @@ class UserService(
         }
     }
 
+    suspend fun update(displayName: String? = null, username: String? = null) {
+        if (displayName == null && username == null) return
+
+        val updated = api.updateAccount(displayName, username)
+        _state.update { AuthenticationState.Authenticated(updated.id, updated.displayName, updated.username) }
+    }
+
     suspend fun logout() {
         api.logout()
         preferences.clearUser()

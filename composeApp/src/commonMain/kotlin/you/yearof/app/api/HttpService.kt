@@ -16,6 +16,7 @@ import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.resources.Resources
 import io.ktor.client.plugins.resources.get
+import io.ktor.client.plugins.resources.patch
 import io.ktor.client.plugins.resources.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
@@ -115,6 +116,12 @@ class HttpService(
 
     suspend inline fun <reified Route: Any, reified Request, reified Response> post(route: Route, body: Request): Response =
         client.post(route) {
+            contentType(ContentType.Application.Json)
+            setBody(body)
+        }.body<Response>()
+
+    suspend inline fun <reified Route: Any, reified Request, reified Response> patch(route: Route, body: Request): Response =
+        client.patch(route) {
             contentType(ContentType.Application.Json)
             setBody(body)
         }.body<Response>()
