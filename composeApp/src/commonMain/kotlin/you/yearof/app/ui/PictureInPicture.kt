@@ -51,7 +51,7 @@ fun PictureInPicture(
     val baseModel = if (swapped) frontModel else backModel
     val overlayModel = if (swapped) backModel else frontModel
 
-    Box(modifier = modifier.fillMaxWidth().aspectRatio(3f / 4f)) {
+    Box(modifier = modifier.aspectRatio(3f / 4f)) {
         AsyncImage(
             modifier =
                 Modifier

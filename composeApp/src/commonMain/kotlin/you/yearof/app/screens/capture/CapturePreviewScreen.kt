@@ -55,7 +55,9 @@ fun CapturePreviewScreen(
         }
 
         PictureInPicture(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp),
             front = ImageSource.Local(capture.frontPath),
             back = ImageSource.Local(capture.backPath),
             initiallySwapped = capture.swapped,
