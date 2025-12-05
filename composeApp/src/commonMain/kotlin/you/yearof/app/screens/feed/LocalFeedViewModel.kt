@@ -19,7 +19,7 @@ class LocalFeedViewModel(
     private val navigationCoordinator: NavigationCoordinator,
     userService: UserService,
 ) : ViewModel() {
-    private val pager = Pager(PagingConfig(10)) { captures.all() }
+    private val pager = Pager(PagingConfig(pageSize = 10, enablePlaceholders = false)) { captures.all() }
     val latestCaptures = pager.flow.cachedIn(viewModelScope)
 
     val authenticated = userService.authenticatedAsState(viewModelScope)

@@ -16,7 +16,7 @@ class CaptureService(
 ) {
     fun all(pageSize: Int = 20): Pager<Int, RemoteCapture> =
         Pager(
-            config = PagingConfig(pageSize = pageSize),
+            config = PagingConfig(pageSize = pageSize, enablePlaceholders = false),
             remoteMediator = CapturesRemoteMediator(api, remoteCaptures, pageSize),
             pagingSourceFactory = { remoteCaptures.paging() },
         )

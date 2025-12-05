@@ -2,11 +2,13 @@ package you.yearof.app.screens.feed
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
@@ -14,6 +16,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
@@ -21,11 +24,14 @@ import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.SubcomposeLayout
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
@@ -80,22 +86,69 @@ private fun <T : Any> CaptureFeedImpl(
 ) {
     val captures = captures.collectAsLazyPagingItems()
 
-    LazyColumn(
-        modifier = Modifier.fillMaxSize().padding(horizontal = 4.dp),
-        contentPadding = padding,
-        verticalArrangement = Arrangement.spacedBy(4.dp),
+    val loadState = captures.loadState
+    val isInitialLoading = loadState.refresh is LoadState.Loading && captures.itemCount == 0
+    val isEmpty = loadState.refresh is LoadState.NotLoading &&
+        loadState.append.endOfPaginationReached &&
+        captures.itemCount == 0
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 4.dp)
     ) {
-        items(
-            count = captures.itemCount,
-            key = captures.itemKey(key),
-        ) { index ->
-            val capture = captures[index]
-            if (capture != null) {
-                item(capture)
-            } else {
-                // TODO: show loading spinner/state
+        when {
+            isInitialLoading -> {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            }
+
+            isEmpty -> {
+                EmptyFeedState(modifier = Modifier.align(Alignment.Center))
+            }
+
+            else -> {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = padding,
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                    items(
+                        count = captures.itemCount,
+                        key = captures.itemKey(key),
+                    ) { index ->
+                        captures[index]?.let { item(it) }
+                    }
+
+                    if (loadState.append is LoadState.Loading) {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 12.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator()
+                            }
+                        }
+                    }
+                }
             }
         }
+    }
+}
+
+@Composable
+private fun EmptyFeedState(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(
+            text = "No captures yet",
+            style = MaterialTheme.typography.titleMedium,
+            textAlign = TextAlign.Center,
+        )
     }
 }
 
