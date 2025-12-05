@@ -17,6 +17,7 @@ import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import org.koin.android.annotation.KoinViewModel
 import org.koin.core.annotation.Provided
+import you.yearof.app.api.ApiException
 import you.yearof.app.api.CaptureService
 import you.yearof.app.api.UserService
 import you.yearof.app.api.isAuthenticated
@@ -27,6 +28,7 @@ import you.yearof.app.navigation.NavigationCoordinator
 import you.yearof.app.notifications.SnackbarManager
 import you.yearof.app.screens.CaptureNav
 import you.yearof.app.screens.FeedNav
+import you.yearof.app.util.Log
 import you.yearof.app.util.Paths
 
 data class CapturePreviewUiState(
@@ -103,9 +105,9 @@ class CapturePreviewViewModel(
 
                 captures.markUploaded(created.toInt())
                 snackbarManager.success("Capture shared!")
-            } catch (e: Throwable) {
-                // TODO: gracefully handle upload failure
-                snackbarManager.error("Failed to upload capture, will retry later")
+            } catch (e: ApiException) {
+                Log.error("CapturePreviewViewModel", "api exception: $e")
+                snackbarManager.error("Unexpected server error, please try again later")
             }
         } else {
             snackbarManager.info("Capture saved!")

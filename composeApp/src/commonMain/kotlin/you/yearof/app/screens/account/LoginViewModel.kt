@@ -9,10 +9,13 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
 import org.koin.core.annotation.InjectedParam
+import you.yearof.app.api.ApiException
+import you.yearof.app.api.UnauthorizedException
 import you.yearof.app.api.UserService
 import you.yearof.app.notifications.SnackbarManager
 import you.yearof.app.screens.account.AccountRouter
 import you.yearof.app.ui.ServerSelectorController
+import you.yearof.app.util.Log
 import you.yearof.app.util.Preferences
 
 data class LoginUiState(
@@ -24,7 +27,7 @@ class LoginViewModel(
     private val userService: UserService,
     @InjectedParam private val router: AccountRouter,
     preferences: Preferences,
-    snackbarManager: SnackbarManager,
+    private val snackbarManager: SnackbarManager,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState
@@ -43,6 +46,11 @@ class LoginViewModel(
         try {
             userService.login(usernameState.text.toString(), passwordState.text.toString())
             router.onSuccess()
+        } catch (_: UnauthorizedException) {
+            snackbarManager.error("Invalid username or password")
+        } catch (e: ApiException) {
+            Log.error("LoginViewModel", "api exception: $e")
+            snackbarManager.error("Unexpected server error, please try again later")
         } finally {
             _uiState.update { it.copy(loading = false) }
         }

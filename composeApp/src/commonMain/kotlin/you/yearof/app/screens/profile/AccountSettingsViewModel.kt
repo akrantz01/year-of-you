@@ -9,10 +9,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
+import you.yearof.app.api.ApiException
 import you.yearof.app.api.AuthenticationState
+import you.yearof.app.api.BadRequestException
+import you.yearof.app.api.ConflictException
 import you.yearof.app.api.UserService
 import you.yearof.app.navigation.NavigationCoordinator
 import you.yearof.app.notifications.SnackbarManager
+import you.yearof.app.util.Log
 
 data class AccountSettingsUiState(
     val displayNameSaving: Boolean = false,
@@ -42,14 +46,17 @@ class AccountSettingsViewModel(
         }
     }
 
-    // TODO: handle error handling for updates
-
     fun onDisplayNameSave() = viewModelScope.launch {
         _uiState.update { it.copy(displayNameSaving = true) }
 
         try {
             userService.update(displayName = displayNameState.text.toString())
             snackbarManager.success("Your display name has been saved!")
+        } catch (e: BadRequestException) {
+            snackbarManager.error("Invalid display name: ${e.message}")
+        } catch (e: ApiException) {
+            Log.error("AccountSettingsViewModel", "api exception: $e")
+            snackbarManager.error("Unexpected server error, please try again later")
         } finally {
             _uiState.update { it.copy(displayNameSaving = false) }
         }
@@ -61,6 +68,13 @@ class AccountSettingsViewModel(
         try {
             userService.update(username = usernameState.text.toString())
             snackbarManager.success("Your username has been saved!")
+        } catch (_: ConflictException) {
+            snackbarManager.error("Username already exists")
+        } catch (e: BadRequestException) {
+            snackbarManager.error("Invalid username: ${e.message}")
+        } catch (e: ApiException) {
+            Log.error("AccountSettingsViewModel", "api exception: $e")
+            snackbarManager.error("Unexpected server error, please try again later")
         } finally {
             _uiState.update { it.copy(usernameSaving = false) }
         }
