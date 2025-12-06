@@ -20,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavGraph
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import org.jetbrains.compose.resources.painterResource
@@ -37,7 +38,9 @@ fun TopBar(
 ) {
     NavGraphGuard(graph = MainGraph::class, navController = navController) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val isBackButtonVisible = navBackStackEntry != null && navController.previousBackStackEntry != null
+        val isBackButtonVisible =
+            navBackStackEntry != null &&
+                navController.previousBackStackEntry?.destination?.let { it !is NavGraph } == true
 
         val transition = updateTransition(targetState = isBackButtonVisible, label = "Back button")
         val iconWidth by transition.animateDp(
