@@ -15,7 +15,7 @@ jobs:
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: 21
+          java-version-file: .java-version
       - uses: gradle/actions/setup-gradle@v5
 
       - run: ./gradlew :composeApp:assembleDebug
@@ -35,8 +35,38 @@ jobs:
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: 21
+          java-version-file: .java-version
       - uses: gradle/actions/setup-gradle@v5
 
-#      - run: ./gradlew :composeApp:linkDebugFrameworkIosArm64
-      - run: ls -la /Applications | grep Xcode
+      - name: Set Xcode version
+        run: sudo xcode-select -s /Applications/Xcode_26.1.1.app
+
+      - name: Build App
+        run: |
+          xcodebuild \
+            -project iosApp/iosApp.xcodeproj \
+            -scheme iosApp \
+            -configuration Debug \
+            -sdk iphoneos \
+            -destination "generic/platform=iOS" \
+            -archivePath build/iosApp.xcarchive \
+            -allowProvisioningUpdates \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            archive
+
+      # TODO: sort out code signing
+      # - name: Export IPA
+      #   run: |
+      #     xcodebuild \
+      #       -exportArchive \
+      #       -archivePath build/iosApp.xcarchive \
+      #       -exportPath build \
+      #       -exportOptionsPlist iosApp/ExportOptions-Debug.plist
+
+      # - uses: actions/upload-artifact@v5
+      #   with:
+      #     name: ios-debug.ipa
+      #     path: build/app.ipa
+      #     if-no-files-found: error
