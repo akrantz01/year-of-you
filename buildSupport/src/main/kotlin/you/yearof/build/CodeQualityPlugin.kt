@@ -4,6 +4,7 @@ import com.diffplug.gradle.spotless.BaseKotlinExtension
 import com.diffplug.gradle.spotless.SpotlessCheck
 import com.diffplug.gradle.spotless.SpotlessExtension
 import io.gitlab.arturbosch.detekt.Detekt
+import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -83,12 +84,24 @@ class CodeQualityPlugin : Plugin<Project> {
             buildUponDefaultConfig = true
             allRules = false
 
-            config.setFrom(target.rootProject.files("detekt.yml"))
+            val configs = buildList {
+                add(target.rootProject.file("detekt.yml"))
+                val moduleConfig = target.file("detekt.yml")
+                if (moduleConfig.exists()) add(moduleConfig)
+            }
+            config.setFrom(configs)
             baseline = target.rootProject.file("detekt-baseline.xml")
         }
 
         val composeRules = catalog.library("detekt-rules-compose")
         target.dependencies.add("detektPlugins", composeRules)
+
+        target.tasks.withType(Detekt::class.java).configureEach {
+            exclude { it.file.invariantSeparatorsPath.contains("/build/generated/") }
+        }
+        target.tasks.withType(DetektCreateBaselineTask::class.java).configureEach {
+            exclude { it.file.invariantSeparatorsPath.contains("/build/generated/") }
+        }
     }
 
     fun applyPlugin(

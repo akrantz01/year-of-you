@@ -169,6 +169,10 @@ room {
     schemaDirectory("$projectDir/schemas")
 }
 
+tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().matching { it.name.contains("Metadata") }.configureEach {
+    dependsOn("kspCommonMainKotlinMetadata")
+}
+
 tasks.matching { it.name.startsWith("ksp") && it.name != "kspCommonMainKotlinMetadata" }.configureEach {
     dependsOn("kspCommonMainKotlinMetadata")
 }
