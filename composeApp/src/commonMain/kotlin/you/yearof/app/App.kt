@@ -6,8 +6,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -17,7 +15,6 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -45,8 +42,8 @@ import you.yearof.app.api.HttpService
 import you.yearof.app.api.UserService
 import you.yearof.app.navigation.BottomBar
 import you.yearof.app.navigation.NavigationCoordinator
-import you.yearof.app.navigation.NavigationEvent
 import you.yearof.app.navigation.NavigationRoute
+import you.yearof.app.navigation.BindNavigationCoordinator
 import you.yearof.app.navigation.TopBar
 import you.yearof.app.navigation.sharedViewModel
 import you.yearof.app.notifications.BindSnackbarHost
@@ -125,19 +122,7 @@ private fun AppNavigation(
     val scrollBehaviour = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    // Centralized navigation handling
-    LaunchedEffect(navigationCoordinator) {
-        navigationCoordinator.navigationEvents.collect { event ->
-            when (event) {
-                is NavigationEvent.NavigateTo -> {
-                    navController.navigate(event.route) {
-                        event.navOptions?.invoke(this)
-                    }
-                }
-                is NavigationEvent.NavigateUp -> navController.navigateUp()
-            }
-        }
-    }
+    BindNavigationCoordinator(navController = navController, navigationCoordinator = navigationCoordinator)
 
     DisposableEffect(userService) {
         val job = scope.launch {

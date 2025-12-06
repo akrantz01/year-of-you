@@ -12,26 +12,57 @@ import org.koin.core.annotation.Single
  */
 @Single
 class NavigationCoordinator {
-    private val _navigationEvents = MutableSharedFlow<NavigationEvent>()
-    val navigationEvents: SharedFlow<NavigationEvent> = _navigationEvents.asSharedFlow()
+    private val _commands = MutableSharedFlow<NavCommand>(
+        replay = 0,
+        extraBufferCapacity = 1,
+    )
+    val commands: SharedFlow<NavCommand> = _commands.asSharedFlow()
 
+    // New, higher-level API (callers will migrate to these)
+    fun go(route: NavigationRoute, singleTop: Boolean = true) {
+        _commands.tryEmit(NavCommand.Go(route, singleTop))
+    }
+
+    fun replaceRoot(route: NavigationRoute) {
+        _commands.tryEmit(NavCommand.ReplaceRoot(route))
+    }
+
+    fun popTo(route: NavigationRoute, inclusive: Boolean = false) {
+        _commands.tryEmit(NavCommand.PopTo(route, inclusive))
+    }
+
+    fun navigateUp() {
+        _commands.tryEmit(NavCommand.Up)
+    }
+
+    // Legacy entry points preserved during migration
     suspend fun navigateTo(
         route: NavigationRoute,
         options: (NavOptionsBuilder.() -> Unit)? = null,
     ) {
-        _navigationEvents.emit(NavigationEvent.NavigateTo(route, options))
-    }
-
-    suspend fun navigateUp() {
-        _navigationEvents.emit(NavigationEvent.NavigateUp)
+        _commands.emit(NavCommand.Raw(route, options))
     }
 }
 
-sealed class NavigationEvent {
-    data class NavigateTo(
+sealed interface NavCommand {
+    data class Go(
+        val route: NavigationRoute,
+        val singleTop: Boolean = true,
+    ) : NavCommand
+
+    data class ReplaceRoot(
+        val route: NavigationRoute,
+    ) : NavCommand
+
+    data class PopTo(
+        val route: NavigationRoute,
+        val inclusive: Boolean,
+    ) : NavCommand
+
+    data class Raw(
         val route: NavigationRoute,
         val navOptions: (NavOptionsBuilder.() -> Unit)? = null,
-    ) : NavigationEvent()
+    ) : NavCommand
 
-    data object NavigateUp : NavigationEvent()
+    data object Up : NavCommand
 }
