@@ -25,6 +25,6 @@ class LocalFeedViewModel(
     val authenticated = userService.authenticatedAsState(viewModelScope)
 
     fun toSharedFeed() = viewModelScope.launch {
-        navigationCoordinator.navigateTo(FeedNav.SharedFeed)
+        navigationCoordinator.go(FeedNav.SharedFeed)
     }
 }

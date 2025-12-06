@@ -85,15 +85,8 @@ class OnboardingViewModel(
     fun onContinueClicked() {
         viewModelScope.launch {
             when (val route = nextStep()) {
-                null ->
-                    navigationCoordinator.navigateTo(MainGraph) {
-                        popUpTo(Onboarding) { inclusive = true }
-                        launchSingleTop = true
-                    }
-                else ->
-                    navigationCoordinator.navigateTo(route) {
-                        launchSingleTop = true
-                    }
+                null -> navigationCoordinator.replaceRoot(MainGraph)
+                else -> navigationCoordinator.go(route, singleTop = true)
             }
         }
     }
@@ -103,14 +96,10 @@ class OnboardingViewModel(
             val next = nextStep()
 
             if (next == null) {
-                navigationCoordinator.navigateTo(MainGraph) {
-                    popUpTo(Initialization) { inclusive = true }
-                }
+                navigationCoordinator.replaceRoot(MainGraph)
             } else {
-                navigationCoordinator.navigateTo(Onboarding) {
-                    popUpTo(Initialization) { inclusive = true }
-                }
-                navigationCoordinator.navigateTo(next)
+                navigationCoordinator.replaceRoot(Onboarding)
+                navigationCoordinator.go(next)
             }
         }
     }
@@ -121,9 +110,7 @@ class OnboardingViewModel(
         }
 
         override suspend fun toOpposite() {
-            navigationCoordinator.navigateTo(OnboardingRoute.AccountRegistration) {
-                launchSingleTop = true
-            }
+            navigationCoordinator.go(OnboardingRoute.AccountRegistration, singleTop = true)
         }
 
         override suspend fun onCancel() = completeAccountOnboarding()
@@ -139,9 +126,7 @@ class OnboardingViewModel(
         }
 
         override suspend fun toOpposite() {
-            navigationCoordinator.navigateTo(OnboardingRoute.AccountLogin) {
-                launchSingleTop = true
-            }
+            navigationCoordinator.go(OnboardingRoute.AccountLogin, singleTop = true)
         }
 
         override suspend fun onCancel() = completeAccountOnboarding()
@@ -155,18 +140,13 @@ class OnboardingViewModel(
 
     fun onAccountPromptStart() {
         viewModelScope.launch {
-            navigationCoordinator.navigateTo(OnboardingRoute.AccountRegistration) {
-                launchSingleTop = true
-            }
+            navigationCoordinator.go(OnboardingRoute.AccountRegistration, singleTop = true)
         }
     }
 
     private suspend fun completeAccountOnboarding() {
         markAccountOnboardingSeen()
-        navigationCoordinator.navigateTo(MainGraph) {
-            popUpTo(Onboarding) { inclusive = true }
-            launchSingleTop = true
-        }
+        navigationCoordinator.replaceRoot(MainGraph)
     }
 
     private suspend fun markAccountOnboardingSeen() {

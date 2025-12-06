@@ -80,5 +80,5 @@ class AccountSettingsViewModel(
         }
     }
 
-    fun back() = viewModelScope.launch { navigationCoordinator.navigateUp() }
+    fun back() = viewModelScope.launch { navigationCoordinator.up() }
 }

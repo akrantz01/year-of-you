@@ -22,18 +22,14 @@ class ProfileRegisterRouter(
     private val navigationCoordinator: NavigationCoordinator,
 ) : AccountRouter {
     override suspend fun onSuccess() {
-        navigationCoordinator.navigateTo(ProfileNav.Profile) {
-            popUpTo(ProfileNav.Profile) { inclusive = true }
-        }
+        navigationCoordinator.replaceRoot(ProfileNav.Profile)
     }
 
     override suspend fun toOpposite() {
-        navigationCoordinator.navigateTo(ProfileNav.AccountLogin)
+        navigationCoordinator.go(ProfileNav.AccountLogin)
     }
 
     override suspend fun onCancel() {
-        navigationCoordinator.navigateTo(ProfileNav.Profile) {
-            popUpTo(ProfileNav.Profile) { inclusive = true }
-        }
+        navigationCoordinator.replaceRoot(ProfileNav.Profile)
     }
 }

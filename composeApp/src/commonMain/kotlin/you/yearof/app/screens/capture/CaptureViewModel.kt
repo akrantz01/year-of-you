@@ -14,9 +14,9 @@ class CaptureViewModel(
 ) : ViewModel() {
     fun onCaptureComplete(capture: CompletedCapture) {
         viewModelScope.launch {
-            navigationCoordinator.navigateTo(
+            navigationCoordinator.go(
                 CaptureNav.CapturePreview.from(capture),
-                options = { launchSingleTop = true },
+                singleTop = true,
             )
         }
     }

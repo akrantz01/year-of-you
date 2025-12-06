@@ -113,8 +113,6 @@ class CapturePreviewViewModel(
             snackbarManager.info("Capture saved!")
         }
 
-        navigationCoordinator.navigateTo(FeedNav.LocalFeed) {
-            popUpTo(CaptureNav.Capture) { inclusive = true }
-        }
+        navigationCoordinator.replaceRoot(FeedNav.LocalFeed)
     }
 }

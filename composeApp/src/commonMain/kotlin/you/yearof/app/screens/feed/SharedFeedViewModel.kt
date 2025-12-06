@@ -19,6 +19,6 @@ class SharedFeedViewModel(
     val feed = pager.flow.cachedIn(viewModelScope)
 
     fun toLocalFeed() = viewModelScope.launch {
-        navigationCoordinator.navigateTo(FeedNav.LocalFeed)
+        navigationCoordinator.go(FeedNav.LocalFeed)
     }
 }
