@@ -25,8 +25,6 @@ fun BindNavigationCoordinator(
                     }
                 }
 
-                is NavCommand.PopTo -> navController.popBackStack(command.route, command.inclusive)
-
                 is NavCommand.Raw -> {
                     navController.navigate(command.route) {
                         command.navOptions?.invoke(this)
