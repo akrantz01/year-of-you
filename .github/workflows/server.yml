@@ -1,0 +1,33 @@
+name: Server
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version-file: .java-version
+      - uses: gradle/actions/setup-gradle@v5
+
+      - run: ./gradlew :server:distTar :server:distZip
+
+      - uses: actions/upload-artifact@v5
+        with:
+          name: server.tar
+          path: server/build/distributions/server-*.tar
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v5
+        with:
+          name: server.zip
+          path: server/build/distributions/server-*.zip
+          if-no-files-found: error
