@@ -40,39 +40,39 @@ import okio.FileSystem
 import org.koin.compose.koinInject
 import you.yearof.app.api.HttpService
 import you.yearof.app.api.UserService
+import you.yearof.app.navigation.BindNavigationCoordinator
 import you.yearof.app.navigation.BottomBar
 import you.yearof.app.navigation.NavigationCoordinator
 import you.yearof.app.navigation.NavigationRoute
-import you.yearof.app.navigation.BindNavigationCoordinator
 import you.yearof.app.navigation.TopBar
 import you.yearof.app.navigation.sharedViewModel
 import you.yearof.app.notifications.BindSnackbarHost
 import you.yearof.app.notifications.NotificationSnackbarHost
 import you.yearof.app.notifications.SnackbarManager
-import you.yearof.app.onboarding.CameraPermissionsScreen
-import you.yearof.app.onboarding.InitializationScreen
 import you.yearof.app.onboarding.AccountLoginScreen
 import you.yearof.app.onboarding.AccountPromptScreen
 import you.yearof.app.onboarding.AccountRegistrationScreen
+import you.yearof.app.onboarding.CameraPermissionsScreen
+import you.yearof.app.onboarding.InitializationScreen
 import you.yearof.app.onboarding.NotificationPermissionsScreen
 import you.yearof.app.onboarding.Onboarding
 import you.yearof.app.onboarding.OnboardingRoute
 import you.yearof.app.onboarding.OnboardingViewModel
 import you.yearof.app.screens.CaptureGraph
 import you.yearof.app.screens.CaptureNav
-import you.yearof.app.screens.capture.CapturePreviewScreen
-import you.yearof.app.screens.capture.CaptureScreen
 import you.yearof.app.screens.FeedGraph
 import you.yearof.app.screens.FeedNav
-import you.yearof.app.screens.feed.LocalFeedScreen
 import you.yearof.app.screens.MainGraph
 import you.yearof.app.screens.ProfileGraph
 import you.yearof.app.screens.ProfileNav
+import you.yearof.app.screens.capture.CapturePreviewScreen
+import you.yearof.app.screens.capture.CaptureScreen
+import you.yearof.app.screens.feed.LocalFeedScreen
 import you.yearof.app.screens.feed.SharedFeedScreen
+import you.yearof.app.screens.profile.AccountSettingsScreen
 import you.yearof.app.screens.profile.ProfileLoginScreen
 import you.yearof.app.screens.profile.ProfileRegistrationScreen
 import you.yearof.app.screens.profile.ProfileScreen
-import you.yearof.app.screens.profile.AccountSettingsScreen
 
 @Serializable
 data object Initialization : NavigationRoute
@@ -81,21 +81,21 @@ data object Initialization : NavigationRoute
 fun App(modifier: Modifier = Modifier) {
     val httpService: HttpService = koinInject()
     setSingletonImageLoaderFactory { context ->
-        ImageLoader.Builder(context)
+        ImageLoader
+            .Builder(context)
             .crossfade(true)
             .logger(DebugLogger()) // TODO: disable in production builds
             .networkCachePolicy(CachePolicy.ENABLED)
             .diskCachePolicy(CachePolicy.ENABLED)
             .diskCache {
-                DiskCache.Builder()
+                DiskCache
+                    .Builder()
                     .directory(FileSystem.SYSTEM_TEMPORARY_DIRECTORY / "images")
                     .maxSizeBytes(128L * 1024 * 1024) // 128 MB
                     .build()
-            }
-            .components {
+            }.components {
                 add(KtorNetworkFetcherFactory(httpService.client))
-            }
-            .build()
+            }.build()
     }
 
     val colorScheme = if (isSystemInDarkTheme()) darkColorScheme() else lightColorScheme()
@@ -125,9 +125,10 @@ private fun AppNavigation(
     BindNavigationCoordinator(navController = navController, navigationCoordinator = navigationCoordinator)
 
     DisposableEffect(userService) {
-        val job = scope.launch {
-            userService.load()
-        }
+        val job =
+            scope.launch {
+                userService.load()
+            }
         onDispose {
             job.cancel()
         }

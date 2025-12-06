@@ -23,12 +23,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import you.yearof.app.resources.Res
-import you.yearof.app.resources.bolt
-import you.yearof.app.resources.bolt_auto
-import you.yearof.app.resources.bolt_slash
-import you.yearof.app.resources.camera_rotate
-import you.yearof.app.resources.circle
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -38,6 +32,12 @@ import you.yearof.app.camera.CameraPreview
 import you.yearof.app.camera.FlashMode
 import you.yearof.app.camera.rememberCameraController
 import you.yearof.app.dto.CompletedCapture
+import you.yearof.app.resources.Res
+import you.yearof.app.resources.bolt
+import you.yearof.app.resources.bolt_auto
+import you.yearof.app.resources.bolt_slash
+import you.yearof.app.resources.camera_rotate
+import you.yearof.app.resources.circle
 
 @Composable
 fun CaptureScreen(

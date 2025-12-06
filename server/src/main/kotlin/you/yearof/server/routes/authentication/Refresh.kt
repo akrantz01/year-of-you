@@ -5,11 +5,11 @@ import io.ktor.server.request.receive
 import io.ktor.server.resources.post
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
+import you.yearof.server.repositories.AccountRepository
+import you.yearof.server.services.TokenService
 import you.yearof.shared.api.Routes
 import you.yearof.shared.api.requests.RefreshRequest
 import you.yearof.shared.api.responses.RefreshSuccess
-import you.yearof.server.repositories.AccountRepository
-import you.yearof.server.services.TokenService
 
 internal fun Route.refreshRoute(
     accounts: AccountRepository,
@@ -19,7 +19,7 @@ internal fun Route.refreshRoute(
         val request = call.receive<RefreshRequest>()
         val principal = tokens.verifyRefresh(request.token) ?: return@post call.respond(HttpStatusCode.Unauthorized)
 
-        val account = accounts.get(principal.subject!!.toUInt())
+        val account = principal.subject?.toUInt()?.let { id -> accounts.get(id) }
         checkNotNull(account) // TODO: handle properly
 
         val refreshed = tokens.refresh(account, principal)

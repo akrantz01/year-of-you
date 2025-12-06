@@ -10,9 +10,7 @@ import you.yearof.app.screens.account.AccountRouter
 import you.yearof.app.screens.account.LoginScreen
 
 @Composable
-fun ProfileLoginScreen(
-    modifier: Modifier = Modifier,
-) {
+fun ProfileLoginScreen(modifier: Modifier = Modifier) {
     val router = koinInject<ProfileLoginRouter>()
     LoginScreen(modifier = modifier, router = router)
 }

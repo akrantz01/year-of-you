@@ -27,8 +27,13 @@ import you.yearof.app.util.asOkioPath
 sealed interface ImageSource {
     val model: Any // coil handles the type internally
 
-    data class Remote(override val model: String) : ImageSource
-    class Local(path: Path) : ImageSource {
+    data class Remote(
+        override val model: String,
+    ) : ImageSource
+
+    class Local(
+        path: Path,
+    ) : ImageSource {
         constructor(path: String) : this(Path(path))
 
         // TODO: use kotlinx.io once supported by coil
@@ -40,8 +45,8 @@ sealed interface ImageSource {
 fun PictureInPicture(
     front: ImageSource,
     back: ImageSource,
-    initiallySwapped: Boolean = false,
     modifier: Modifier = Modifier,
+    initiallySwapped: Boolean = false,
 ) {
     var swapped by remember { mutableStateOf(initiallySwapped) }
 

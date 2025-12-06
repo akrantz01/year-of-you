@@ -11,6 +11,8 @@ import platform.CoreGraphics.CGRectZero
 import platform.UIKit.UIView
 import platform.UIKit.UIViewMeta
 
+private const val CornerRadius: Double = 16.0
+
 @Composable
 actual fun CameraPreview(
     controller: CameraController,
@@ -22,7 +24,7 @@ actual fun CameraPreview(
             factory = {
                 PreviewView().apply {
                     clipsToBounds = true
-                    layer.cornerRadius = 16.0
+                    layer.cornerRadius = CornerRadius
 
                     previewLayer.session = controller.camera.session
                     previewLayer.videoGravity = AVLayerVideoGravityResizeAspect

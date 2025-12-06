@@ -5,9 +5,9 @@ import io.ktor.server.http.content.LocalFileContent
 import io.ktor.server.resources.get
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
-import you.yearof.shared.api.Routes
 import you.yearof.server.exceptions.NotFoundException
 import you.yearof.server.repositories.CaptureRepository
+import you.yearof.shared.api.Routes
 import java.io.File
 
 fun Route.imagesRoutes(captures: CaptureRepository) {

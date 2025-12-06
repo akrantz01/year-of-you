@@ -45,8 +45,11 @@ import you.yearof.app.resources.globe
 import you.yearof.app.resources.mobile
 import kotlin.math.roundToInt
 
-enum class FeedType(val icon: DrawableResource) {
-    Local(Res.drawable.mobile), Shared(Res.drawable.globe);
+enum class FeedType(
+    val icon: DrawableResource,
+) {
+    Local(Res.drawable.mobile),
+    Shared(Res.drawable.globe),
 }
 
 @Composable
@@ -56,8 +59,8 @@ fun <T : Any> BaseCaptureFeed(
     captures: Flow<PagingData<T>>,
     key: (T) -> Any,
     item: @Composable (T) -> Unit,
-    showTabBar: Boolean = true,
     modifier: Modifier = Modifier,
+    showTabBar: Boolean = true,
 ) {
     if (showTabBar) {
         FloatingTabBar(
@@ -83,6 +86,7 @@ fun <T : Any> BaseCaptureFeed(
 }
 
 @Composable
+@Suppress("ktlint:compose:content-slot-reused", "ContentSlotReused")
 private fun <T : Any> CaptureFeedImpl(
     captures: Flow<PagingData<T>>,
     key: (T) -> Any,
@@ -93,14 +97,16 @@ private fun <T : Any> CaptureFeedImpl(
 
     val loadState = captures.loadState
     val isInitialLoading = loadState.refresh is LoadState.Loading && captures.itemCount == 0
-    val isEmpty = loadState.refresh is LoadState.NotLoading &&
-        loadState.append.endOfPaginationReached &&
-        captures.itemCount == 0
+    val isEmpty =
+        loadState.refresh is LoadState.NotLoading &&
+            loadState.append.endOfPaginationReached &&
+            captures.itemCount == 0
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 4.dp)
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(horizontal = 4.dp),
     ) {
         when {
             isInitialLoading -> {
@@ -127,10 +133,11 @@ private fun <T : Any> CaptureFeedImpl(
                     if (loadState.append is LoadState.Loading) {
                         item {
                             Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 12.dp),
-                                contentAlignment = Alignment.Center
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 12.dp),
+                                contentAlignment = Alignment.Center,
                             ) {
                                 CircularProgressIndicator()
                             }
@@ -147,7 +154,7 @@ private fun EmptyFeedState(modifier: Modifier = Modifier) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Text(
             text = "No captures yet",
@@ -168,49 +175,50 @@ private fun FloatingTabBar(
     shadowElevation: Dp = 8.dp,
     bottomMargin: Dp = 16.dp,
     maxBarWidth: Dp = 360.dp,
-    content: @Composable (PaddingValues) -> Unit
+    content: @Composable (PaddingValues) -> Unit,
 ) {
     SubcomposeLayout(modifier = modifier) { constraints ->
-        val barPlaceables = subcompose("bar") {
-            Box(
-                Modifier
-                    .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom))
-                    .padding(bottom = bottomMargin)
-            ) {
-                Surface(
-                    shape = barShape,
-                    tonalElevation = tonalElevation,
-                    shadowElevation = shadowElevation
+        val barPlaceables =
+            subcompose("bar") {
+                Box(
+                    Modifier
+                        .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom))
+                        .padding(bottom = bottomMargin),
                 ) {
-                    Box(Modifier.widthIn(max = maxBarWidth)) {
-                        SingleChoiceSegmentedButtonRow(
-                            modifier = Modifier.padding(6.dp),
-                        ) {
-                            options.forEachIndexed { index, label ->
-                                SegmentedButton(
-                                    selected = label == selected,
-                                    onClick = { onSelect(label) },
-                                    shape = SegmentedButtonDefaults.itemShape(index, options.size),
-                                    modifier = Modifier.defaultMinSize(minHeight = 48.dp),
-                                    icon = {
-                                        Icon(
-                                            painter = painterResource(label.icon),
-                                            contentDescription = null,
-                                            modifier = Modifier.size(SegmentedButtonDefaults.IconSize),
+                    Surface(
+                        shape = barShape,
+                        tonalElevation = tonalElevation,
+                        shadowElevation = shadowElevation,
+                    ) {
+                        Box(Modifier.widthIn(max = maxBarWidth)) {
+                            SingleChoiceSegmentedButtonRow(
+                                modifier = Modifier.padding(6.dp),
+                            ) {
+                                options.forEachIndexed { index, label ->
+                                    SegmentedButton(
+                                        selected = label == selected,
+                                        onClick = { onSelect(label) },
+                                        shape = SegmentedButtonDefaults.itemShape(index, options.size),
+                                        modifier = Modifier.defaultMinSize(minHeight = 48.dp),
+                                        icon = {
+                                            Icon(
+                                                painter = painterResource(label.icon),
+                                                contentDescription = null,
+                                                modifier = Modifier.size(SegmentedButtonDefaults.IconSize),
+                                            )
+                                        },
+                                    ) {
+                                        Text(
+                                            text = label.name,
+                                            style = MaterialTheme.typography.labelSmall,
                                         )
-                                    },
-                                ) {
-                                    Text(
-                                        text = label.name,
-                                        style = MaterialTheme.typography.labelSmall,
-                                    )
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
-        }.map { it.measure(constraints.copy(minWidth = 0, minHeight = 0)) }
+            }.map { it.measure(constraints.copy(minWidth = 0, minHeight = 0)) }
 
         val barW = barPlaceables.maxOfOrNull { it.width } ?: 0
         val barH = barPlaceables.maxOfOrNull { it.height } ?: 0

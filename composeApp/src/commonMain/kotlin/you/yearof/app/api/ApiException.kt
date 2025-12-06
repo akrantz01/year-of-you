@@ -1,7 +1,8 @@
 package you.yearof.app.api
 
-import io.ktor.http.*
-import you.yearof.shared.api.responses.*
+import io.ktor.http.HttpStatusCode
+import you.yearof.shared.api.responses.ErrorDetails
+import you.yearof.shared.api.responses.ErrorResponse
 
 sealed class ApiException(
     message: String,

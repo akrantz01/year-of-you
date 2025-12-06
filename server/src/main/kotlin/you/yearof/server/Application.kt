@@ -25,39 +25,40 @@ import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
-import you.yearof.shared.Greeting
-import you.yearof.shared.api.DefaultRealm
-import kotlin.uuid.Uuid
-import you.yearof.shared.api.responses.ErrorResponse
-import you.yearof.shared.api.responses.ValidationErrorDetails
 import you.yearof.server.exceptions.StructuredHttpException
 import you.yearof.server.services.TokenService
 import you.yearof.server.services.TokenUsage
+import you.yearof.shared.Greeting
+import you.yearof.shared.api.DefaultRealm
+import you.yearof.shared.api.responses.ErrorResponse
+import you.yearof.shared.api.responses.ValidationErrorDetails
+import kotlin.uuid.Uuid
 
 fun main(args: Array<String>) {
     EngineMain
         .main(args)
 }
 
-fun Application.plugins(
-    tokens: TokenService,
-) {
+@Suppress("LongMethod")
+fun Application.plugins(tokens: TokenService) {
     install(StatusPages) {
         exception<StructuredHttpException> { call, exception ->
             call.respond(
                 status = exception.statusCode,
-                message = ErrorResponse(
-                    message = exception.message,
-                    details = exception.details,
-                )
+                message =
+                    ErrorResponse(
+                        message = exception.message,
+                        details = exception.details,
+                    ),
             )
         }
 
         exception<BadRequestException> { call, exception ->
-            val message = when (val cause = exception.cause) {
-                is JsonConvertException -> cause.message?.lines()?.firstOrNull()
-                else -> null
-            }
+            val message =
+                when (val cause = exception.cause) {
+                    is JsonConvertException -> cause.message?.lines()?.firstOrNull()
+                    else -> null
+                }
 
             call.respond(
                 status = HttpStatusCode.BadRequest,
@@ -69,14 +70,18 @@ fun Application.plugins(
         exception<RequestValidationException> { call, exception ->
             call.respond(
                 status = HttpStatusCode.BadRequest,
-                message = ErrorResponse(
-                    message = "invalid request body",
-                    details = ValidationErrorDetails(
-                        errors = exception.reasons.mapIndexed { index, reason ->
-                            "error_$index" to reason
-                        }.toMap()
+                message =
+                    ErrorResponse(
+                        message = "invalid request body",
+                        details =
+                            ValidationErrorDetails(
+                                errors =
+                                    exception.reasons
+                                        .mapIndexed { index, reason ->
+                                            "error_$index" to reason
+                                        }.toMap(),
+                            ),
                     ),
-                )
             )
         }
 
@@ -85,11 +90,12 @@ fun Application.plugins(
         }
 
         exception<Throwable> { call, exception ->
-            call.application.environment.log.error("unhandled exception", exception)
+            call.application.environment.log
+                .error("unhandled exception", exception)
 
             call.respond(
                 status = HttpStatusCode.InternalServerError,
-                message = ErrorResponse(message = "an internal error occurred")
+                message = ErrorResponse(message = "an internal error occurred"),
             )
         }
     }

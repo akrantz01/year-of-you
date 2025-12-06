@@ -12,12 +12,12 @@ import io.ktor.server.routing.Route
 import io.ktor.util.cio.writeChannel
 import io.ktor.utils.io.copyAndClose
 import kotlinx.io.files.Path
-import you.yearof.shared.api.Routes
-import you.yearof.shared.api.requests.UploadRequest
 import you.yearof.server.exceptions.validate
 import you.yearof.server.exceptions.validateNotNull
 import you.yearof.server.repositories.AccountRepository
 import you.yearof.server.repositories.CaptureRepository
+import you.yearof.shared.api.Routes
+import you.yearof.shared.api.requests.UploadRequest
 import java.io.File
 import kotlin.collections.get
 import kotlin.time.Clock
@@ -36,8 +36,12 @@ internal fun Route.uploadRoute(
         val request = builder.finish()
 
         // TODO: make getting current account easier
-        val principal = call.principal<JWTPrincipal>()!!
-        val account = accounts.get(principal.subject!!.toUInt())
+        val account =
+            call
+                .principal<JWTPrincipal>()
+                ?.subject
+                ?.toUInt()
+                ?.let { id -> accounts.get(id) }
         checkNotNull(account)
 
         captures.create(
@@ -96,6 +100,7 @@ private class UploadRequestBuilder {
         frontPath = saveFile(item)
     }
 
+    @Suppress("RedundantSuspendModifier")
     private suspend fun setSwapped(item: PartData) {
         validate(item is PartData.FormItem) { "swapped must be a form item" }
 
@@ -103,6 +108,7 @@ private class UploadRequestBuilder {
         swapped = item.value.toBooleanStrict()
     }
 
+    @Suppress("RedundantSuspendModifier")
     private suspend fun setTaken(item: PartData) {
         validate(item is PartData.FormItem) { "timestamp must be a form item" }
 

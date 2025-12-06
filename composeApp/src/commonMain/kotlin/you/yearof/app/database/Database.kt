@@ -38,6 +38,7 @@ fun buildDatabase(
 @ConstructedBy(AppDatabaseConstructor::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun captures(): CaptureDao
+
     abstract fun remoteCaptures(): RemoteCaptureDao
 }
 

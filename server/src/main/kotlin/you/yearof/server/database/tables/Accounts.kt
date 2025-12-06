@@ -7,6 +7,7 @@ import org.jetbrains.exposed.v1.datetime.timestamp
 const val DisplayNameMaxLength = 64
 const val UsernameMaxLength = 64
 val UsernameRegex = Regex("^[a-z0-9_]+$")
+
 object Accounts : UIntIdTable(name = "accounts") {
     val displayName = varchar("display_name", DisplayNameMaxLength)
     val username = varchar("username", UsernameMaxLength).uniqueIndex()

@@ -85,18 +85,18 @@ internal class AndroidPermissionState(
         }
     }
 
-    private fun readStatus(alreadyRequested: Boolean): PermissionStatus {
-        if (androidPermission.isEmpty()) return PermissionStatus.Granted
-
-        val hasPermission =
+    private fun readStatus(alreadyRequested: Boolean): PermissionStatus =
+        if (androidPermission.isEmpty()) {
+            PermissionStatus.Granted
+        } else if (
             ContextCompat.checkSelfPermission(context, androidPermission) == PackageManager.PERMISSION_GRANTED
-        if (hasPermission) {
-            return PermissionStatus.Granted
+        ) {
+            PermissionStatus.Granted
         } else if (!alreadyRequested) {
-            return PermissionStatus.Unknown
+            PermissionStatus.Unknown
+        } else if (ActivityCompat.shouldShowRequestPermissionRationale(activity, androidPermission)) {
+            PermissionStatus.PermanentlyDenied
+        } else {
+            PermissionStatus.Denied
         }
-
-        val permanent = ActivityCompat.shouldShowRequestPermissionRationale(activity, androidPermission)
-        return if (permanent) PermissionStatus.PermanentlyDenied else PermissionStatus.Denied
-    }
 }

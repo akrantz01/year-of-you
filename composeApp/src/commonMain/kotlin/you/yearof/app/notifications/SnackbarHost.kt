@@ -1,5 +1,6 @@
 package you.yearof.app.notifications
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -21,7 +22,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.isSystemInDarkTheme
 import org.jetbrains.compose.resources.painterResource
 import you.yearof.app.resources.Res
 import you.yearof.app.resources.check
@@ -86,11 +86,14 @@ private fun AppSnackbar(
         ) {
             Icon(
                 modifier = Modifier.size(12.dp),
-                painter = painterResource(when (kind) {
-                    SnackbarKind.Success -> Res.drawable.check
-                    SnackbarKind.Error -> Res.drawable.xmark
-                    SnackbarKind.Info -> Res.drawable.info
-                }),
+                painter =
+                    painterResource(
+                        when (kind) {
+                            SnackbarKind.Success -> Res.drawable.check
+                            SnackbarKind.Error -> Res.drawable.xmark
+                            SnackbarKind.Info -> Res.drawable.info
+                        },
+                    ),
                 contentDescription = null,
                 tint = colors.content,
             )

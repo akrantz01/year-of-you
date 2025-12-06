@@ -16,14 +16,21 @@ import you.yearof.app.util.Preferences
 
 sealed interface AuthenticationState {
     data object Loading : AuthenticationState
+
     data object Unauthenticated : AuthenticationState
-    data class Authenticated(val id: UInt, val name: String, val username: String): AuthenticationState
+
+    data class Authenticated(
+        val id: UInt,
+        val name: String,
+        val username: String,
+    ) : AuthenticationState
 }
 
-fun AuthenticationState.isAuthenticated() = when (this) {
-    is AuthenticationState.Authenticated -> true
-    else -> false
-}
+fun AuthenticationState.isAuthenticated() =
+    when (this) {
+        is AuthenticationState.Authenticated -> true
+        else -> false
+    }
 
 @Single
 class UserService(
@@ -38,8 +45,7 @@ class UserService(
     fun authenticatedAsState(
         scope: CoroutineScope,
         started: SharingStarted = SharingStarted.Eagerly,
-    ): StateFlow<Boolean> =
-        authenticated.stateIn(scope = scope, started = started, initialValue = false)
+    ): StateFlow<Boolean> = authenticated.stateIn(scope = scope, started = started, initialValue = false)
 
     suspend fun load() {
         if (!api.authenticated()) {
@@ -57,13 +63,20 @@ class UserService(
         refresh()
     }
 
-    suspend fun register(displayName: String, username: String, password: String) {
+    suspend fun register(
+        displayName: String,
+        username: String,
+        password: String,
+    ) {
         api.register(displayName, username, password)
         // TODO: temporarily issues tokens until confirmation is sorted
         refresh()
     }
 
-    suspend fun login(username: String, password: String) {
+    suspend fun login(
+        username: String,
+        password: String,
+    ) {
         api.login(username, password)
         refresh()
     }
@@ -87,7 +100,10 @@ class UserService(
         }
     }
 
-    suspend fun update(displayName: String? = null, username: String? = null) {
+    suspend fun update(
+        displayName: String? = null,
+        username: String? = null,
+    ) {
         if (displayName == null && username == null) return
 
         val updated = api.updateAccount(displayName, username)

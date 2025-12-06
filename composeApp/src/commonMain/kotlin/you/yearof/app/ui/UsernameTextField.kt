@@ -19,9 +19,9 @@ import androidx.compose.ui.text.input.KeyboardType
 @Composable
 fun UsernameTextField(
     state: TextFieldState,
+    modifier: Modifier = Modifier,
     enabled: Boolean = true,
     label: @Composable (TextFieldLabelScope.() -> Unit)? = null,
-    modifier: Modifier = Modifier,
 ) {
     TextField(
         modifier = modifier,
@@ -34,27 +34,29 @@ fun UsernameTextField(
 }
 
 @OptIn(ExperimentalFoundationApi::class)
-private class UsernameTransformation() : InputTransformation {
-    override val keyboardOptions = KeyboardOptions(
-        capitalization = KeyboardCapitalization.None,
-        autoCorrectEnabled = false,
-        keyboardType = KeyboardType.Ascii,
-    )
+private class UsernameTransformation : InputTransformation {
+    override val keyboardOptions =
+        KeyboardOptions(
+            capitalization = KeyboardCapitalization.None,
+            autoCorrectEnabled = false,
+            keyboardType = KeyboardType.Ascii,
+        )
 
     override fun TextFieldBuffer.transformInput() {
         val src = asCharSequence()
         changes.forEachChange { range, _ ->
             if (!range.collapsed) {
                 var changed = false
-                val filtered = buildString(range.length) {
-                    for (i in range.min until range.max) {
-                        val c = src[i]
-                        val lower = c.lowercaseChar()
-                        val keep = lower in 'a'..'z' || lower in '0'..'9' || lower == '_'
-                        if (keep) append(lower)
-                        changed = changed || lower != c || !keep
+                val filtered =
+                    buildString(range.length) {
+                        for (i in range.min until range.max) {
+                            val c = src[i]
+                            val lower = c.lowercaseChar()
+                            val keep = lower in 'a'..'z' || lower in '0'..'9' || lower == '_'
+                            if (keep) append(lower)
+                            changed = changed || lower != c || !keep
+                        }
                     }
-                }
 
                 if (changed) replace(start = range.min, end = range.max, text = filtered)
             }

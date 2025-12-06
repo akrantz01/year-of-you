@@ -5,15 +5,15 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.util.decodeBase64String
 import io.ktor.util.encodeBase64
-import you.yearof.shared.api.Routes
 import you.yearof.server.exceptions.BadRequestException
-import you.yearof.shared.api.responses.CaptureListItem
-import you.yearof.shared.api.responses.CapturePage
 import you.yearof.server.exceptions.validate
 import you.yearof.server.repositories.CaptureCursor
 import you.yearof.server.repositories.CaptureRepository
 import you.yearof.server.util.href
+import you.yearof.shared.api.Routes
 import you.yearof.shared.api.responses.AccountListItem
+import you.yearof.shared.api.responses.CaptureListItem
+import you.yearof.shared.api.responses.CapturePage
 import kotlin.time.Instant
 
 internal fun Route.listRoute(captures: CaptureRepository) {
@@ -24,21 +24,31 @@ internal fun Route.listRoute(captures: CaptureRepository) {
             route.cursor?.let { encoded ->
                 runCatching { decodeCursor(encoded) }.getOrElse { throw BadRequestException("invalid cursor") }
             }
-        val all = captures.list(limit = route.limit, after = cursor).map {
-            val id = it.id.value
-            CaptureListItem(
-                id = id,
-                account = AccountListItem(
-                    id = it.account.id.value,
-                    username = it.account.username,
-                ),
-                front = href(Routes.Captures.Id.Front.make(id)),
-                back = href(Routes.Captures.Id.Back.make(id)),
-                swapped = it.swapped,
-                takenAt = it.takenAt,
-                uploadedAt = it.uploadedAt,
-            )
-        }
+        val all =
+            captures.list(limit = route.limit, after = cursor).map {
+                val id = it.id.value
+                CaptureListItem(
+                    id = id,
+                    account =
+                        AccountListItem(
+                            id = it.account.id.value,
+                            username = it.account.username,
+                        ),
+                    front =
+                        href(
+                            Routes.Captures.Id.Front
+                                .make(id),
+                        ),
+                    back =
+                        href(
+                            Routes.Captures.Id.Back
+                                .make(id),
+                        ),
+                    swapped = it.swapped,
+                    takenAt = it.takenAt,
+                    uploadedAt = it.uploadedAt,
+                )
+            }
 
         val nextCursor =
             if (all.size < route.limit) {

@@ -38,29 +38,31 @@ class RegisterViewModel(
     val passwordConfirmationState = TextFieldState(initialText = "")
 
     val canRegister: Boolean
-        get() = displayNameState.text.isNotBlank() && usernameState.text.isNotBlank()
-            && passwordState.text.isNotEmpty() && passwordConfirmationState.text.isNotEmpty()
-            && passwordsMatch
+        get() =
+            displayNameState.text.isNotBlank() && usernameState.text.isNotBlank() &&
+                passwordState.text.isNotEmpty() && passwordConfirmationState.text.isNotEmpty() &&
+                passwordsMatch
 
     val passwordsMatch: Boolean
         get() = passwordState.text == passwordConfirmationState.text
 
     val serverSelector = ServerSelectorController(viewModelScope, preferences, snackbarManager)
 
-    fun onRegister() = viewModelScope.launch {
-        _uiState.update { it.copy(loading = true) }
+    fun onRegister() =
+        viewModelScope.launch {
+            _uiState.update { it.copy(loading = true) }
 
-        try {
-            doRegister()
-        } catch (_: ConflictException) {
-            snackbarManager.error("Username is already in use")
-        } catch (e: ApiException) {
-            Log.error("RegisterViewModel", "api exception: $e")
-            snackbarManager.error("Unexpected server error, please try again later")
-        } finally {
-            _uiState.update { it.copy(loading = false) }
+            try {
+                doRegister()
+            } catch (_: ConflictException) {
+                snackbarManager.error("Username is already in use")
+            } catch (e: ApiException) {
+                Log.error("RegisterViewModel", "api exception: $e")
+                snackbarManager.error("Unexpected server error, please try again later")
+            } finally {
+                _uiState.update { it.copy(loading = false) }
+            }
         }
-    }
 
     private suspend fun doRegister() {
         userService.register(

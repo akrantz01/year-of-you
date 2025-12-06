@@ -3,9 +3,9 @@ package you.yearof.app.api
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
-import you.yearof.shared.api.responses.CaptureListItem
 import you.yearof.app.database.RemoteCapture
 import you.yearof.app.database.RemoteCaptureDao
+import you.yearof.shared.api.responses.CaptureListItem
 
 private const val DefaultPageSize = 20
 private const val CursorId = "remote-capture-feed"

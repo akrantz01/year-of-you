@@ -37,9 +37,10 @@ fun CapturePreviewScreen(
 
     Column(modifier = modifier.fillMaxSize().verticalScroll(containerScroll)) {
         PictureInPicture(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp),
             front = ImageSource.Local(capture.frontPath),
             back = ImageSource.Local(capture.backPath),
             initiallySwapped = capture.swapped,

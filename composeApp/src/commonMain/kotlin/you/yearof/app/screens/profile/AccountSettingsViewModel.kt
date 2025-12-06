@@ -46,39 +46,41 @@ class AccountSettingsViewModel(
         }
     }
 
-    fun onDisplayNameSave() = viewModelScope.launch {
-        _uiState.update { it.copy(displayNameSaving = true) }
+    fun onDisplayNameSave() =
+        viewModelScope.launch {
+            _uiState.update { it.copy(displayNameSaving = true) }
 
-        try {
-            userService.update(displayName = displayNameState.text.toString())
-            snackbarManager.success("Your display name has been saved!")
-        } catch (e: BadRequestException) {
-            snackbarManager.error("Invalid display name: ${e.message}")
-        } catch (e: ApiException) {
-            Log.error("AccountSettingsViewModel", "api exception: $e")
-            snackbarManager.error("Unexpected server error, please try again later")
-        } finally {
-            _uiState.update { it.copy(displayNameSaving = false) }
+            try {
+                userService.update(displayName = displayNameState.text.toString())
+                snackbarManager.success("Your display name has been saved!")
+            } catch (e: BadRequestException) {
+                snackbarManager.error("Invalid display name: ${e.message}")
+            } catch (e: ApiException) {
+                Log.error("AccountSettingsViewModel", "api exception: $e")
+                snackbarManager.error("Unexpected server error, please try again later")
+            } finally {
+                _uiState.update { it.copy(displayNameSaving = false) }
+            }
         }
-    }
 
-    fun onUsernameSave() = viewModelScope.launch {
-        _uiState.update { it.copy(usernameSaving = true) }
+    fun onUsernameSave() =
+        viewModelScope.launch {
+            _uiState.update { it.copy(usernameSaving = true) }
 
-        try {
-            userService.update(username = usernameState.text.toString())
-            snackbarManager.success("Your username has been saved!")
-        } catch (_: ConflictException) {
-            snackbarManager.error("Username already exists")
-        } catch (e: BadRequestException) {
-            snackbarManager.error("Invalid username: ${e.message}")
-        } catch (e: ApiException) {
-            Log.error("AccountSettingsViewModel", "api exception: $e")
-            snackbarManager.error("Unexpected server error, please try again later")
-        } finally {
-            _uiState.update { it.copy(usernameSaving = false) }
+            try {
+                userService.update(username = usernameState.text.toString())
+                snackbarManager.success("Your username has been saved!")
+            } catch (_: ConflictException) {
+                snackbarManager.error("Username already exists")
+            } catch (e: BadRequestException) {
+                snackbarManager.error("Invalid username: ${e.message}")
+            } catch (e: ApiException) {
+                Log.error("AccountSettingsViewModel", "api exception: $e")
+                snackbarManager.error("Unexpected server error, please try again later")
+            } finally {
+                _uiState.update { it.copy(usernameSaving = false) }
+            }
         }
-    }
 
     fun back() = viewModelScope.launch { navigationCoordinator.up() }
 }

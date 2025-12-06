@@ -55,7 +55,9 @@ fun NotificationPermissionsScreen(
             )
 
             Text(
-                text = "We'll send you notifications at most once a day reminding you to take a picture at a semi-random time.",
+                text =
+                    "We'll send you notifications at most once a day " +
+                        "reminding you to take a picture at a semi-random time.",
                 color = MaterialTheme.colorScheme.onBackground,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(horizontal = 8.dp),

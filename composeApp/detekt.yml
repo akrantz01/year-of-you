@@ -1,0 +1,7 @@
+complexity:
+  LongMethod:
+    active: false
+
+style:
+  MagicNumber:
+    active: false

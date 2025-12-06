@@ -1,8 +1,10 @@
 package you.yearof.app.camera
 
 import android.content.Context
+import android.os.Build
 import android.util.LayoutDirection
 import android.util.Rational
+import android.view.WindowManager
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.CameraState
 import androidx.camera.core.ImageCapture
@@ -51,6 +53,7 @@ actual class Camera(
     private val lifecycleOwner: LifecycleOwner,
 ) : AbstractCamera() {
     private val executor = Executors.newSingleThreadExecutor()
+    private val windowService = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
 
     internal val surfaceRequests = MutableStateFlow<SurfaceRequest?>(null)
 
@@ -83,6 +86,7 @@ actual class Camera(
 
     private fun bindCamera(config: CameraConfiguration): androidx.camera.core.Camera? {
         val cameraProvider = provider ?: return null
+        val displayRotation = displayRotation()
 
         val selector =
             when (config.position) {
@@ -100,7 +104,7 @@ actual class Camera(
             ImageCapture
                 .Builder()
                 .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
-                .setTargetRotation(context.display.rotation)
+                .setTargetRotation(displayRotation)
                 .setResolutionSelector(aspectRatioSelector)
                 .setFlashMode(
                     when (config.flashMode) {
@@ -125,7 +129,7 @@ actual class Camera(
         val aspectRatio = Rational(3, 4)
         val viewPort =
             ViewPort
-                .Builder(aspectRatio, context.display.rotation)
+                .Builder(aspectRatio, displayRotation)
                 .setLayoutDirection(LayoutDirection.LTR)
                 .setScaleType(ViewPort.FIT)
                 .build()
@@ -171,5 +175,13 @@ actual class Camera(
                     }
                 },
             )
+        }
+
+    private fun displayRotation(): Int =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            context.display.rotation
+        } else {
+            @Suppress("DEPRECATION")
+            windowService.defaultDisplay.rotation
         }
 }

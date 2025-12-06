@@ -28,14 +28,14 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.flow.first
 import org.koin.core.annotation.Provided
 import org.koin.core.annotation.Single
-import you.yearof.shared.api.requests.RefreshRequest
-import you.yearof.shared.api.responses.ErrorResponse
-import you.yearof.shared.api.responses.RefreshSuccess
 import you.yearof.app.util.Log
 import you.yearof.app.util.Preferences
 import you.yearof.app.util.SecureStorage
 import you.yearof.shared.api.DefaultRealm
 import you.yearof.shared.api.Routes
+import you.yearof.shared.api.requests.RefreshRequest
+import you.yearof.shared.api.responses.ErrorResponse
+import you.yearof.shared.api.responses.RefreshSuccess
 
 private const val AccessTokenKey = "access-token"
 private const val RefreshTokenKey = "refresh-token"
@@ -71,16 +71,20 @@ class HttpService(
                     loadTokens {
                         val accessToken = secureStorage.get(AccessTokenKey)
                         val refreshToken = secureStorage.get(RefreshTokenKey)
-                        if (accessToken != null && refreshToken != null) BearerTokens(accessToken, refreshToken)
-                        else null
+                        if (accessToken != null && refreshToken != null) {
+                            BearerTokens(accessToken, refreshToken)
+                        } else {
+                            null
+                        }
                     }
                     refreshTokens {
                         val refreshToken = oldTokens?.refreshToken ?: return@refreshTokens null
-                        val response = client.post(Routes.Refresh) {
-                            markAsRefreshTokenRequest()
-                            contentType(ContentType.Application.Json)
-                            setBody(RefreshRequest(token = refreshToken))
-                        }
+                        val response =
+                            client.post(Routes.Refresh) {
+                                markAsRefreshTokenRequest()
+                                contentType(ContentType.Application.Json)
+                                setBody(RefreshRequest(token = refreshToken))
+                            }
 
                         if (response.status.isSuccess()) {
                             val tokens = response.body<RefreshSuccess>()
@@ -122,7 +126,10 @@ class HttpService(
 
     suspend fun hasTokens(): Boolean = secureStorage.has(AccessTokenKey) && secureStorage.has(RefreshTokenKey)
 
-    suspend fun setTokens(access: String, refresh: String?) {
+    suspend fun setTokens(
+        access: String,
+        refresh: String?,
+    ) {
         secureStorage.put(AccessTokenKey, access)
         refresh?.let { secureStorage.put(RefreshTokenKey, it) }
     }
@@ -135,33 +142,42 @@ class HttpService(
     suspend inline fun <reified Route : Any, reified Response> get(route: Route): Response =
         client.get(route).body<Response>()
 
-    suspend inline fun <reified Route: Any, reified Request, reified Response> post(route: Route, body: Request): Response =
-        client.post(route) {
-            contentType(ContentType.Application.Json)
-            setBody(body)
-        }.body<Response>()
+    suspend inline fun <reified Route : Any, reified Request, reified Response> post(
+        route: Route,
+        body: Request,
+    ): Response =
+        client
+            .post(route) {
+                contentType(ContentType.Application.Json)
+                setBody(body)
+            }.body<Response>()
 
-    suspend inline fun <reified Route: Any, reified Request, reified Response> patch(route: Route, body: Request): Response =
-        client.patch(route) {
-            contentType(ContentType.Application.Json)
-            setBody(body)
-        }.body<Response>()
+    suspend inline fun <reified Route : Any, reified Request, reified Response> patch(
+        route: Route,
+        body: Request,
+    ): Response =
+        client
+            .patch(route) {
+                contentType(ContentType.Application.Json)
+                setBody(body)
+            }.body<Response>()
 }
 
 private class UrlPluginConfig {
     lateinit var preferencesStore: Preferences
 }
 
-private val UrlPlugin = createClientPlugin(name = "url", ::UrlPluginConfig) {
-    val preferences = pluginConfig.preferencesStore
+private val UrlPlugin =
+    createClientPlugin(name = "url", ::UrlPluginConfig) {
+        val preferences = pluginConfig.preferencesStore
 
-    onRequest { request, _ ->
-        val baseUrl = preferences.urlParsed.first()
-        request.url {
-            protocol = baseUrl.protocol
-            host = baseUrl.host
-            port = baseUrl.port
-            encodedPathSegments = (baseUrl.segments + request.url.pathSegments).map { it.encodeURLPath() }
+        onRequest { request, _ ->
+            val baseUrl = preferences.urlParsed.first()
+            request.url {
+                protocol = baseUrl.protocol
+                host = baseUrl.host
+                port = baseUrl.port
+                encodedPathSegments = (baseUrl.segments + request.url.pathSegments).map { it.encodeURLPath() }
+            }
         }
     }
-}

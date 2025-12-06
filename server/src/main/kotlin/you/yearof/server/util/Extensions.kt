@@ -9,13 +9,14 @@ import io.ktor.server.routing.RoutingContext
 import org.jetbrains.exposed.v1.exceptions.ExposedSQLException
 import java.sql.SQLException
 
-inline fun <reified T: Any> RoutingContext.href(resource: T): String {
+inline fun <reified T : Any> RoutingContext.href(resource: T): String {
     val origin = call.request.origin
-    val builder = URLBuilder(
-        protocol = checkNotNull(URLProtocol.byName[origin.scheme]) { "unknown protocol ${origin.scheme}" },
-        host = origin.serverHost,
-        port = origin.serverPort,
-    )
+    val builder =
+        URLBuilder(
+            protocol = checkNotNull(URLProtocol.byName[origin.scheme]) { "unknown protocol ${origin.scheme}" },
+            host = origin.serverHost,
+            port = origin.serverPort,
+        )
     href(
         resourcesFormat = call.route.plugin(Resources).resourcesFormat,
         resource = resource,

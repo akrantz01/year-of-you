@@ -25,6 +25,7 @@ data class OnboardingUiState(
 )
 
 @KoinViewModel
+@Suppress("TooManyFunctions")
 class OnboardingViewModel(
     private val navigationCoordinator: NavigationCoordinator,
     private val preferences: Preferences,
@@ -48,12 +49,12 @@ class OnboardingViewModel(
 
     val uiState: StateFlow<OnboardingUiState> =
         combine(coordinator.snapshot, accountOnboardingSeen) { snapshot, seen ->
-                OnboardingUiState(
-                    camera = snapshot.statuses[Permission.Camera] ?: PermissionStatus.Loading,
-                    notifications = snapshot.statuses[Permission.Notification] ?: PermissionStatus.Loading,
-                    accountOnboardingSeen = seen,
-                )
-            }.stateIn(viewModelScope, SharingStarted.Eagerly, OnboardingUiState())
+            OnboardingUiState(
+                camera = snapshot.statuses[Permission.Camera] ?: PermissionStatus.Loading,
+                notifications = snapshot.statuses[Permission.Notification] ?: PermissionStatus.Loading,
+                accountOnboardingSeen = seen,
+            )
+        }.stateIn(viewModelScope, SharingStarted.Eagerly, OnboardingUiState())
 
     val cameraStatus: StateFlow<PermissionStatus> = checkNotNull(coordinator.statusOf(Permission.Camera))
 
@@ -104,33 +105,35 @@ class OnboardingViewModel(
         }
     }
 
-    fun loginAccountRouter(): AccountRouter = object : AccountRouter {
-        override suspend fun onSuccess() {
-            completeAccountOnboarding()
+    fun loginAccountRouter(): AccountRouter =
+        object : AccountRouter {
+            override suspend fun onSuccess() {
+                completeAccountOnboarding()
+            }
+
+            override suspend fun toOpposite() {
+                navigationCoordinator.go(OnboardingRoute.AccountRegistration, singleTop = true)
+            }
+
+            override suspend fun onCancel() = completeAccountOnboarding()
         }
 
-        override suspend fun toOpposite() {
-            navigationCoordinator.go(OnboardingRoute.AccountRegistration, singleTop = true)
+    fun registrationAccountRouter(): AccountRouter =
+        object : AccountRouter {
+            override suspend fun onSuccess() {
+                // TODO: implement account confirmation
+                // navigationCoordinator.navigateTo(OnboardingRoute.AccountConfirmation) {
+                //    launchSingleTop = true
+                // }
+                completeAccountOnboarding()
+            }
+
+            override suspend fun toOpposite() {
+                navigationCoordinator.go(OnboardingRoute.AccountLogin, singleTop = true)
+            }
+
+            override suspend fun onCancel() = completeAccountOnboarding()
         }
-
-        override suspend fun onCancel() = completeAccountOnboarding()
-    }
-
-    fun registrationAccountRouter(): AccountRouter = object : AccountRouter {
-        override suspend fun onSuccess() {
-            // TODO: implement account confirmation
-            // navigationCoordinator.navigateTo(OnboardingRoute.AccountConfirmation) {
-            //    launchSingleTop = true
-            // }
-            completeAccountOnboarding()
-        }
-
-        override suspend fun toOpposite() {
-            navigationCoordinator.go(OnboardingRoute.AccountLogin, singleTop = true)
-        }
-
-        override suspend fun onCancel() = completeAccountOnboarding()
-    }
 
     fun onAccountPromptSkip() {
         viewModelScope.launch {

@@ -12,13 +12,17 @@ import org.koin.core.annotation.Single
  */
 @Single
 class NavigationCoordinator {
-    private val _commands = MutableSharedFlow<NavCommand>(
-        replay = 0,
-        extraBufferCapacity = 1,
-    )
+    private val _commands =
+        MutableSharedFlow<NavCommand>(
+            replay = 0,
+            extraBufferCapacity = 1,
+        )
     val commands: SharedFlow<NavCommand> = _commands.asSharedFlow()
 
-    fun go(route: NavigationRoute, singleTop: Boolean = true) = _commands.tryEmit(NavCommand.Go(route, singleTop))
+    fun go(
+        route: NavigationRoute,
+        singleTop: Boolean = true,
+    ) = _commands.tryEmit(NavCommand.Go(route, singleTop))
 
     fun replaceRoot(route: NavigationRoute) = _commands.tryEmit(NavCommand.ReplaceRoot(route))
 

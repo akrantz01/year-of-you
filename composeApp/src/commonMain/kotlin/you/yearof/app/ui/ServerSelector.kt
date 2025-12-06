@@ -46,7 +46,10 @@ import you.yearof.shared.api.DefaultHost
 import you.yearof.shared.api.DefaultUrl
 
 @Composable
-fun ServerSelector(modifier: Modifier = Modifier, controller: ServerSelectorController) {
+fun ServerSelector(
+    controller: ServerSelectorController,
+    modifier: Modifier = Modifier,
+) {
     val selected by controller.currentHost.collectAsState(DefaultHost)
 
     val state by controller.uiState.collectAsState()
@@ -73,7 +76,7 @@ fun ServerSelector(modifier: Modifier = Modifier, controller: ServerSelectorCont
 
         DropdownMenu(expanded = state.optionsExpanded, onDismissRequest = controller::closeMenu) {
             DropdownMenuItem(
-                text = { Text(DefaultHost)},
+                text = { Text(DefaultHost) },
                 onClick = controller::setDefault,
             )
             DropdownMenuItem(
@@ -109,7 +112,7 @@ fun ServerSelector(modifier: Modifier = Modifier, controller: ServerSelectorCont
                     TextButton(onClick = controller::closeDialog, enabled = !state.selfHostedLoading) {
                         Text("Nevermind")
                     }
-                }
+                },
             )
         }
     }
@@ -131,10 +134,11 @@ class ServerSelectorController(
     val uiState = _uiState.asStateFlow()
 
     val current = preferences.url.stateIn(scope = scope, started = SharingStarted.Eagerly, initialValue = DefaultUrl)
-    val currentHost = current.map {
-        val url = Url(it)
-        "${url.hostWithPortIfSpecified}${url.fullPath}"
-    }
+    val currentHost =
+        current.map {
+            val url = Url(it)
+            "${url.hostWithPortIfSpecified}${url.fullPath}"
+        }
 
     val userUrl = TextFieldState()
 
@@ -164,31 +168,34 @@ class ServerSelectorController(
         _uiState.update { it.copy(optionsExpanded = false, selfHostedDialogOpen = false, selfHostedUrlError = null) }
     }
 
-    fun setDefault() = scope.launch {
-        preferences.setUrl(DefaultUrl)
-        snackbarManager.success("Server updated to $DefaultUrl")
-        closeMenu()
-    }
-
-    fun setUser() = scope.launch {
-        _uiState.update { it.copy(selfHostedLoading = true) }
-
-        try {
-            doSetUser()
-        } finally {
-            _uiState.update { it.copy(selfHostedLoading = false) }
+    fun setDefault() =
+        scope.launch {
+            preferences.setUrl(DefaultUrl)
+            snackbarManager.success("Server updated to $DefaultUrl")
+            closeMenu()
         }
-    }
+
+    fun setUser() =
+        scope.launch {
+            _uiState.update { it.copy(selfHostedLoading = true) }
+
+            try {
+                doSetUser()
+            } finally {
+                _uiState.update { it.copy(selfHostedLoading = false) }
+            }
+        }
 
     private suspend fun doSetUser() {
         val provided = userUrl.text.toString().trim()
 
-        val validated = try {
-            parseUrl(provided)
-        } catch (e: IllegalArgumentException) {
-            _uiState.update { it.copy(selfHostedUrlError = e.message ?: "invalid URL") }
-            return
-        }
+        val validated =
+            try {
+                parseUrl(provided)
+            } catch (e: IllegalArgumentException) {
+                _uiState.update { it.copy(selfHostedUrlError = e.message ?: "invalid URL") }
+                return
+            }
 
         // TODO: verify URL is reachable
         preferences.setUrl(validated)
@@ -199,11 +206,12 @@ class ServerSelectorController(
     private fun parseUrl(raw: String): String {
         require(raw.isNotBlank()) { "URL must not be empty" }
 
-        val parsed = try {
-            Url(raw)
-        } catch (_: URLParserException) {
-            throw IllegalArgumentException("invalid URL format")
-        }
+        val parsed =
+            try {
+                Url(raw)
+            } catch (_: URLParserException) {
+                throw IllegalArgumentException("invalid URL format")
+            }
 
         require(parsed.protocol == URLProtocol.HTTPS) { "only HTTPS URLs are supported" }
 

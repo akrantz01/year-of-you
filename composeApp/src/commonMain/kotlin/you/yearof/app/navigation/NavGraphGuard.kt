@@ -9,7 +9,11 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import kotlin.reflect.KClass
 
 @Composable
-fun <T : NavigationRoute> NavGraphGuard(graph: KClass<T>, navController: NavHostController, content: @Composable () -> Unit) {
+fun <T : NavigationRoute> NavGraphGuard(
+    graph: KClass<T>,
+    navController: NavHostController,
+    content: @Composable () -> Unit,
+) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val show = backStackEntry?.destination?.hierarchy?.any { it.hasRoute(graph) } ?: false
 

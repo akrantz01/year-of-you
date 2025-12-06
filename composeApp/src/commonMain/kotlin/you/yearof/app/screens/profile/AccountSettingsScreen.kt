@@ -31,7 +31,10 @@ import you.yearof.app.resources.check
 import you.yearof.app.ui.UsernameTextField
 
 @Composable
-fun AccountSettingsScreen(modifier: Modifier = Modifier, viewModel: AccountSettingsViewModel = koinViewModel()) {
+fun AccountSettingsScreen(
+    modifier: Modifier = Modifier,
+    viewModel: AccountSettingsViewModel = koinViewModel(),
+) {
     val state by viewModel.uiState.collectAsState()
 
     Column(
@@ -102,7 +105,7 @@ private fun EditableField(
                     Icon(
                         painter = painterResource(Res.drawable.check),
                         contentDescription = "Save",
-                        modifier = Modifier.size(16.dp)
+                        modifier = Modifier.size(16.dp),
                     )
                 }
             }

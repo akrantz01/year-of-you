@@ -28,8 +28,8 @@ import you.yearof.app.ui.UsernameTextField
 
 @Composable
 fun LoginScreen(
-    modifier: Modifier = Modifier,
     router: AccountRouter,
+    modifier: Modifier = Modifier,
     viewModel: LoginViewModel = koinViewModel(parameters = { parametersOf(router) }),
 ) {
     val state by viewModel.uiState.collectAsState()
@@ -49,12 +49,12 @@ fun LoginScreen(
             UsernameTextField(
                 state = viewModel.usernameState,
                 label = { Text("Username") },
-                enabled = !state.loading
+                enabled = !state.loading,
             )
             PasswordTextField(
                 state = viewModel.passwordState,
                 label = { Text("Password") },
-                enabled = !state.loading
+                enabled = !state.loading,
             )
         }
 
@@ -81,12 +81,19 @@ fun LoginScreen(
 
         Text(
             modifier = Modifier.clickable { viewModel.toRegister() },
-            text = buildAnnotatedString {
-                append("Don't have an account? ")
-                withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)) {
-                    append("Sign up!")
-                }
-            },
+            text =
+                buildAnnotatedString {
+                    append("Don't have an account? ")
+                    withStyle(
+                        style =
+                            SpanStyle(
+                                color = MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.Bold,
+                            ),
+                    ) {
+                        append("Sign up!")
+                    }
+                },
         )
     }
 }

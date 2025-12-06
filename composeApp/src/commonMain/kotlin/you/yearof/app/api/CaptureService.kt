@@ -28,11 +28,12 @@ class CaptureService(
         at: Instant,
         onProgress: ((Float?) -> Unit)? = null,
     ) {
-        val onUpload = onProgress?.let { cb ->
-            { bytesSentTotal: Long, contentLength: Long? ->
-                if (contentLength != null) cb(bytesSentTotal.toFloat() / contentLength.toFloat())
+        val onUpload =
+            onProgress?.let { cb ->
+                { bytesSentTotal: Long, contentLength: Long? ->
+                    if (contentLength != null) cb(bytesSentTotal.toFloat() / contentLength.toFloat())
+                }
             }
-        }
 
         api.uploadCapture(front, back, swapped, at, onUpload)
     }

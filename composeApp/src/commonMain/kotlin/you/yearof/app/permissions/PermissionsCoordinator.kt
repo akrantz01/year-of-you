@@ -29,7 +29,7 @@ class PermissionsCoordinator(
     requirements: List<PermissionRequirement>,
 ) {
     init {
-        if (requirements.isEmpty()) throw IllegalArgumentException("requirements can't be empty")
+        require(requirements.isNotEmpty()) { "requirements can't be empty" }
     }
 
     private val permissions = requirements.map { it.permission }

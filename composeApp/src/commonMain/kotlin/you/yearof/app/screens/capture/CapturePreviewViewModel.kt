@@ -81,16 +81,17 @@ class CapturePreviewViewModel(
         val backPath = Path(base, "back.jpeg")
         SystemFileSystem.atomicMove(source = Path(capture.backPath), destination = backPath)
 
-        val created = captures.insert(
-            Capture(
-                frontPath = frontPath,
-                backPath = backPath,
-                at = capture.timestamp,
-                swapped = capture.swapped,
-                caption = captionState.text.toString(),
-                shared = state.share,
-            ),
-        )
+        val created =
+            captures.insert(
+                Capture(
+                    frontPath = frontPath,
+                    backPath = backPath,
+                    at = capture.timestamp,
+                    swapped = capture.swapped,
+                    caption = captionState.text.toString(),
+                    shared = state.share,
+                ),
+            )
 
         if (state.share) {
             try {

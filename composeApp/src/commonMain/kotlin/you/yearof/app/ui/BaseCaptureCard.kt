@@ -55,9 +55,9 @@ fun BaseCaptureCard(
     front: ImageSource,
     back: ImageSource,
     swapped: Boolean,
+    modifier: Modifier = Modifier,
     caption: String = "",
     statusLine: @Composable (() -> Unit)? = null,
-    modifier: Modifier = Modifier,
 ) {
     val timestamp = timestamp.toLocalDateTime(TimeZone.currentSystemDefault())
 

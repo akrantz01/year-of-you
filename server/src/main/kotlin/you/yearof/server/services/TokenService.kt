@@ -15,6 +15,7 @@ import kotlin.time.toJavaInstant
 import kotlin.uuid.Uuid
 
 private const val Audience = "app"
+private const val MinSecretLength = 32
 
 @Serializable
 data class TokenConfig(
@@ -27,7 +28,7 @@ fun provide(
 ): TokenService {
     check(config.issuer.isNotBlank()) { "issuer can not be blank" }
     check(config.secret.isNotBlank()) { "signing secret can not be blank" }
-    check(config.secret.length >= 32) { "signing secret must be at least 32 bytes" }
+    check(config.secret.length >= MinSecretLength) { "signing secret must be at least $MinSecretLength bytes" }
 
     return TokenService(config)
 }
@@ -86,21 +87,25 @@ class TokenService(
     fun refresh(
         account: Account,
         current: JWTPrincipal,
-    ): RefreshedTokens {
-        val id = current.jwtId!!
-
-        return RefreshedTokens(
-            accessToken = newToken(id = id, subject = account.id.value, lifetime = 7.days, type = TokenUsage.Access),
+    ): RefreshedTokens =
+        RefreshedTokens(
+            accessToken =
+                newToken(
+                    id = requireNotNull(current.jwtId),
+                    subject = account.id.value,
+                    lifetime = 7.days,
+                    type = TokenUsage.Access,
+                ),
             refreshToken = null, // TODO: re-generate refresh token when nearing expiration (within 1 week)
         )
-    }
 
     fun verifyRefresh(token: String): JWTPrincipal? {
-        val decoded = try {
-            verifier.verify(token)
-        } catch (t: Throwable) {
-            return null
-        }
+        val decoded =
+            try {
+                verifier.verify(token)
+            } catch (_: Throwable) {
+                return null
+            }
 
         return validate(TokenUsage.Refresh, JWTCredential(decoded))
     }

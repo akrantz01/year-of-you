@@ -16,12 +16,11 @@ import org.koin.compose.viewmodel.koinViewModel
  * Example: Share OnboardingViewModel across all onboarding screens
  */
 @Composable
-inline fun <reified T : ViewModel> NavBackStackEntry.sharedViewModel(
-    navController: NavHostController,
-): T {
+inline fun <reified T : ViewModel> NavBackStackEntry.sharedViewModel(navController: NavHostController): T {
     val navGraphRoute = destination.parent?.route ?: return koinViewModel()
-    val parentEntry = remember(navGraphRoute) {
-        navController.getBackStackEntry(navGraphRoute)
-    }
+    val parentEntry =
+        remember(navGraphRoute) {
+            navController.getBackStackEntry(navGraphRoute)
+        }
     return koinViewModel(viewModelStoreOwner = parentEntry)
 }

@@ -32,5 +32,8 @@ interface CaptureDao {
     fun all(): PagingSource<Int, Capture>
 
     @Query("UPDATE captures SET uploaded_at = :at WHERE id = :id")
-    suspend fun markUploaded(id: Int, at: Instant = Clock.System.now())
+    suspend fun markUploaded(
+        id: Int,
+        at: Instant = Clock.System.now(),
+    )
 }

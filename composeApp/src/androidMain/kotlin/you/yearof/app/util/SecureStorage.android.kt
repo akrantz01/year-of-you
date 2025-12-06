@@ -1,3 +1,5 @@
+@file:Suppress("ktlint:standard:filename")
+
 package you.yearof.app.util
 
 import android.content.Context
@@ -30,14 +32,14 @@ class AndroidSecureStorage(
         key: String,
         value: String?,
     ) {
-        val key = byteArrayPreferencesKey(key)
-        val value = value?.let { aead.encrypt(it.toByteArray(), null) }
+        val prefKey = byteArrayPreferencesKey(key)
+        val encValue = value?.let { aead.encrypt(it.toByteArray(), null) }
 
         datastore.edit { prefs ->
-            if (value == null) {
-                prefs.remove(key)
+            if (encValue == null) {
+                prefs.remove(prefKey)
             } else {
-                prefs[key] = value
+                prefs[prefKey] = encValue
             }
         }
     }
@@ -67,29 +69,29 @@ class AndroidSecureStorage(
         val masterAead = ensureMasterAead()
         val keysetFile = File(context.noBackupFilesDir, KeysetFileName)
 
-        val handle = runCatching {
-            val bytes = keysetFile.readBytes()
-            TinkProtoKeysetFormat.parseEncryptedKeyset(bytes, masterAead, ByteArray(0))
-        }.getOrElse {
-            KeysetHandle.generateNew(PredefinedAeadParameters.AES256_GCM).also { handle ->
-                val serialized = TinkProtoKeysetFormat.serializeEncryptedKeyset(handle, masterAead, ByteArray(0))
-                keysetFile.writeBytes(serialized)
+        val handle =
+            runCatching {
+                val bytes = keysetFile.readBytes()
+                TinkProtoKeysetFormat.parseEncryptedKeyset(bytes, masterAead, ByteArray(0))
+            }.getOrElse {
+                KeysetHandle.generateNew(PredefinedAeadParameters.AES256_GCM).also { handle ->
+                    val serialized = TinkProtoKeysetFormat.serializeEncryptedKeyset(handle, masterAead, ByteArray(0))
+                    keysetFile.writeBytes(serialized)
+                }
             }
-        }
 
         return handle.getPrimitive(RegistryConfiguration.get(), Aead::class.java)
     }
 
-    private fun ensureMasterAead(): Aead {
-        return try {
+    private fun ensureMasterAead(): Aead =
+        try {
             if (!AndroidKeystore.hasKey(MasterKeyAlias)) {
                 AndroidKeystore.generateNewAes256GcmKey(MasterKeyAlias)
             }
             AndroidKeystore.getAead(MasterKeyAlias)
-        } catch (e: GeneralSecurityException) {
+        } catch (_: GeneralSecurityException) {
             AndroidKeystore.deleteKey(MasterKeyAlias)
             AndroidKeystore.generateNewAes256GcmKey(MasterKeyAlias)
             AndroidKeystore.getAead(MasterKeyAlias)
         }
-    }
 }

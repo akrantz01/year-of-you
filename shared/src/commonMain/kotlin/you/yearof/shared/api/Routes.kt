@@ -26,16 +26,23 @@ object Routes {
         )
 
         @Resource("{id}")
-        class Id(val parent: Captures = Captures(), val id: UInt) {
+        class Id(
+            val parent: Captures = Captures(),
+            val id: UInt,
+        ) {
             @Resource("front")
-            class Front(val parent: Id) {
+            class Front(
+                val parent: Id,
+            ) {
                 companion object {
                     fun make(id: UInt) = Front(parent = Id(id = id))
                 }
             }
 
             @Resource("back")
-            class Back(val parent: Id) {
+            class Back(
+                val parent: Id,
+            ) {
                 companion object {
                     fun make(id: UInt) = Back(parent = Id(id = id))
                 }

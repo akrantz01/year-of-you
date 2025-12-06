@@ -35,7 +35,9 @@ fun AccountPromptScreen(
             )
 
             Text(
-                text = "Link an account to share photos, comment with friends, and sync your daily photo time — so everyone gets the same random moment to capture.",
+                text =
+                    "Link an account to share photos, comment with friends, " +
+                        "and sync your daily photo time — so everyone gets the same random moment to capture.",
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
             )

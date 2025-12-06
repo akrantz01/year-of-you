@@ -33,8 +33,8 @@ private const val SlideDuration = 300
 @Composable
 fun TopBar(
     navController: NavHostController,
-    scrollBehaviour: TopAppBarScrollBehavior? = null,
     modifier: Modifier = Modifier,
+    scrollBehaviour: TopAppBarScrollBehavior? = null,
 ) {
     NavGraphGuard(graph = MainGraph::class, navController = navController) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()

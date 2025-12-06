@@ -10,9 +10,7 @@ import you.yearof.app.screens.account.AccountRouter
 import you.yearof.app.screens.account.RegisterScreen
 
 @Composable
-fun ProfileRegistrationScreen(
-    modifier: Modifier = Modifier,
-) {
+fun ProfileRegistrationScreen(modifier: Modifier = Modifier) {
     val router = koinInject<ProfileRegisterRouter>()
     RegisterScreen(modifier = modifier, router = router)
 }

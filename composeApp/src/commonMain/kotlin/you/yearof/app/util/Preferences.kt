@@ -16,28 +16,38 @@ import you.yearof.shared.api.DefaultUrl
 class Preferences(
     @Provided private val paths: Paths,
 ) {
-    private val dataStore = PreferenceDataStoreFactory.createWithPath {
-        // TODO: look into effort required to use kotlinx instead of okio
-        paths.inDocuments(DataStoreName).asOkioPath()
-    }
+    private val dataStore =
+        PreferenceDataStoreFactory.createWithPath {
+            // TODO: look into effort required to use kotlinx instead of okio
+            paths.inDocuments(DataStoreName).asOkioPath()
+        }
 
-    val user: Flow<CurrentUserInfo?> = dataStore.data.map { prefs ->
-        val id = prefs[idKey]
-        val username = prefs[usernameKey]
-        val name = prefs[displayNameKey]
-        if (id != null && username != null && name != null) CurrentUserInfo(id.toUInt(), username, name)
-        else null
-    }
+    val user: Flow<CurrentUserInfo?> =
+        dataStore.data.map { prefs ->
+            val id = prefs[idKey]
+            val username = prefs[usernameKey]
+            val name = prefs[displayNameKey]
+            if (id != null && username != null && name != null) {
+                CurrentUserInfo(id.toUInt(), username, name)
+            } else {
+                null
+            }
+        }
 
-    val accountOnboardingSeen: Flow<Boolean> = dataStore.data.map { prefs ->
-        prefs[accountOnboardingSeenKey] ?: false
-    }
+    val accountOnboardingSeen: Flow<Boolean> =
+        dataStore.data.map { prefs ->
+            prefs[accountOnboardingSeenKey] ?: false
+        }
 
     val url: Flow<String> = dataStore.data.map { prefs -> prefs[urlKey] ?: DefaultUrl }
 
     val urlParsed: Flow<Url> = url.map(::Url)
 
-    suspend fun setUser(id: UInt, username: String, name: String) {
+    suspend fun setUser(
+        id: UInt,
+        username: String,
+        name: String,
+    ) {
         dataStore.edit { prefs ->
             prefs[idKey] = id.toInt()
             prefs[usernameKey] = username
@@ -76,4 +86,8 @@ class Preferences(
     }
 }
 
-data class CurrentUserInfo(val id: UInt, val username: String, val name: String)
+data class CurrentUserInfo(
+    val id: UInt,
+    val username: String,
+    val name: String,
+)

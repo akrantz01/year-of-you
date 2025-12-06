@@ -35,7 +35,10 @@ class SqlCaptureRepository(
             }
         }
 
-    override suspend fun list(limit: Int, after: CaptureCursor?): List<Capture> =
+    override suspend fun list(
+        limit: Int,
+        after: CaptureCursor?,
+    ): List<Capture> =
         suspendTransaction(db) {
             val base =
                 if (after == null) {
@@ -43,7 +46,7 @@ class SqlCaptureRepository(
                 } else {
                     Capture.find {
                         (Captures.uploadedAt less after.uploadedAt) or
-                        ((Captures.uploadedAt eq after.uploadedAt) and (Captures.id less after.id))
+                            ((Captures.uploadedAt eq after.uploadedAt) and (Captures.id less after.id))
                     }
                 }
 
@@ -52,8 +55,7 @@ class SqlCaptureRepository(
                 .orderBy(
                     Captures.uploadedAt to SortOrder.DESC,
                     Captures.id to SortOrder.DESC,
-                )
-                .limit(limit)
+                ).limit(limit)
                 .toList()
         }
 

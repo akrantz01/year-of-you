@@ -1,3 +1,5 @@
+@file:Suppress("ktlint:standard:filename")
+
 package you.yearof.app.util
 
 import kotlinx.io.files.Path

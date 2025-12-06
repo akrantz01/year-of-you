@@ -40,21 +40,22 @@ class LoginViewModel(
     val canLogin: Boolean
         get() = usernameState.text.isNotBlank() && passwordState.text.isNotEmpty()
 
-    fun onLogin() = viewModelScope.launch {
-        _uiState.update { it.copy(loading = true) }
+    fun onLogin() =
+        viewModelScope.launch {
+            _uiState.update { it.copy(loading = true) }
 
-        try {
-            userService.login(usernameState.text.toString(), passwordState.text.toString())
-            router.onSuccess()
-        } catch (_: UnauthorizedException) {
-            snackbarManager.error("Invalid username or password")
-        } catch (e: ApiException) {
-            Log.error("LoginViewModel", "api exception: $e")
-            snackbarManager.error("Unexpected server error, please try again later")
-        } finally {
-            _uiState.update { it.copy(loading = false) }
+            try {
+                userService.login(usernameState.text.toString(), passwordState.text.toString())
+                router.onSuccess()
+            } catch (_: UnauthorizedException) {
+                snackbarManager.error("Invalid username or password")
+            } catch (e: ApiException) {
+                Log.error("LoginViewModel", "api exception: $e")
+                snackbarManager.error("Unexpected server error, please try again later")
+            } finally {
+                _uiState.update { it.copy(loading = false) }
+            }
         }
-    }
 
     fun toRegister() = viewModelScope.launch { router.toOpposite() }
 

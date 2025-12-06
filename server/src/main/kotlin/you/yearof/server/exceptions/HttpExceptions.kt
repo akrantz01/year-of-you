@@ -1,6 +1,6 @@
 package you.yearof.server.exceptions
 
-import io.ktor.http.*
+import io.ktor.http.HttpStatusCode
 import you.yearof.shared.api.responses.ConflictErrorDetails
 import you.yearof.shared.api.responses.ErrorDetails
 import you.yearof.shared.api.responses.NotFoundErrorDetails

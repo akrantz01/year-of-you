@@ -89,7 +89,6 @@ class CameraController(
             }
         }
 
-    @Suppress("LongMethod")
     private suspend fun stateMachine(): StateMachine =
         createStateMachine(scope, name = "CaptureWorkflow") {
             val workflow = this@CameraController

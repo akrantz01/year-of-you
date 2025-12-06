@@ -25,17 +25,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
-import you.yearof.app.resources.Res
-import you.yearof.app.resources.chevron_right
-import you.yearof.app.resources.circle_user
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 import you.yearof.app.api.AuthenticationState
 import you.yearof.app.api.isAuthenticated
+import you.yearof.app.resources.Res
+import you.yearof.app.resources.chevron_right
+import you.yearof.app.resources.circle_user
 import you.yearof.app.ui.SkeletonText
 
 @Composable
-fun ProfileScreen(modifier: Modifier = Modifier, viewModel: ProfileViewModel = koinViewModel()) {
+fun ProfileScreen(
+    modifier: Modifier = Modifier,
+    viewModel: ProfileViewModel = koinViewModel(),
+) {
     val authState by viewModel.authState.collectAsState()
 
     Column(
@@ -44,8 +47,8 @@ fun ProfileScreen(modifier: Modifier = Modifier, viewModel: ProfileViewModel = k
     ) {
         ProfileCard(
             state = authState,
-            onClickAuthenticated = viewModel::toSettings,
-            onClickUnauthenticated = viewModel::toLogin,
+            onClickAuthenticate = viewModel::toSettings,
+            onClickUnauthenticate = viewModel::toLogin,
             modifier = Modifier.fillMaxWidth(),
         )
 
@@ -63,29 +66,34 @@ fun ProfileScreen(modifier: Modifier = Modifier, viewModel: ProfileViewModel = k
 @Composable
 private fun ProfileCard(
     state: AuthenticationState,
-    onClickUnauthenticated: () -> Unit,
-    onClickAuthenticated: () -> Unit,
+    onClickUnauthenticate: () -> Unit,
+    onClickAuthenticate: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     when (state) {
-        is AuthenticationState.Unauthenticated -> UnauthenticatedProfileCard(
-            modifier = modifier,
-            onClick = onClickUnauthenticated,
-        )
+        is AuthenticationState.Unauthenticated ->
+            UnauthenticatedProfileCard(
+                modifier = modifier,
+                onClick = onClickUnauthenticate,
+            )
 
-        is AuthenticationState.Authenticated -> AuthenticatedProfileCard(
-            username = state.username,
-            displayName = state.name,
-            onClick = onClickAuthenticated,
-            modifier = Modifier.fillMaxWidth(),
-        )
+        is AuthenticationState.Authenticated ->
+            AuthenticatedProfileCard(
+                username = state.username,
+                displayName = state.name,
+                onClick = onClickAuthenticate,
+                modifier = Modifier.fillMaxWidth(),
+            )
 
         is AuthenticationState.Loading -> SkeletonProfileCard(modifier = modifier)
     }
 }
 
 @Composable
-private fun UnauthenticatedProfileCard(onClick: () -> Unit, modifier: Modifier = Modifier) {
+private fun UnauthenticatedProfileCard(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     BaseProfileCard(modifier = modifier, onClick = onClick) {
         Icon(
             modifier = Modifier.size(80.dp),
@@ -95,7 +103,10 @@ private fun UnauthenticatedProfileCard(onClick: () -> Unit, modifier: Modifier =
 
         Column(modifier = Modifier.weight(1f)) {
             Text(text = "Share with friends!", style = MaterialTheme.typography.titleLarge)
-            Text(text = "Sign in or create an account to share your captures with friends!", style = MaterialTheme.typography.bodySmall)
+            Text(
+                text = "Sign in or create an account to share your captures with friends!",
+                style = MaterialTheme.typography.bodySmall,
+            )
         }
 
         Icon(
@@ -113,28 +124,30 @@ private fun AuthenticatedProfileCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val initials = remember(displayName) {
-        val words = displayName.split(" ")
-        buildString(2) {
-            val first = words.find { it.isNotBlank() }!!
-            append(first.trim().first())
+    val initials =
+        remember(displayName) {
+            val words = displayName.split(" ")
+            buildString(2) {
+                val first = words.find { it.isNotBlank() }!!
+                append(first.trim().first())
 
-            val last = words.findLast { it.isNotBlank() }!!
-            if (last != first) {
-                append(last.trim().first())
+                val last = words.findLast { it.isNotBlank() }!!
+                if (last != first) {
+                    append(last.trim().first())
+                }
             }
         }
-    }
 
     BaseProfileCard(modifier = modifier, onClick = onClick) {
         Box(
-            modifier = Modifier
-                .size(80.dp)
-                .padding(5.dp)
-                .background(
-                    color = MaterialTheme.colorScheme.primaryContainer,
-                    shape = CircleShape,
-                ),
+            modifier =
+                Modifier
+                    .size(80.dp)
+                    .padding(5.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.primaryContainer,
+                        shape = CircleShape,
+                    ),
             contentAlignment = Alignment.Center,
         ) {
             Text(

@@ -5,16 +5,18 @@ import io.ktor.server.resources.post
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import kotlinx.coroutines.delay
-import you.yearof.shared.api.Routes
-import you.yearof.shared.api.requests.LoginRequest
-import you.yearof.shared.api.responses.LoginSuccess
 import you.yearof.server.exceptions.UnauthorizedException
 import you.yearof.server.repositories.AccountRepository
 import you.yearof.server.services.PasswordService
 import you.yearof.server.services.TokenService
+import you.yearof.shared.api.Routes
+import you.yearof.shared.api.requests.LoginRequest
+import you.yearof.shared.api.responses.LoginSuccess
 import kotlin.random.Random
 import kotlin.random.nextInt
 import kotlin.time.Duration.Companion.milliseconds
+
+private val DummyHashDuration = 40..60
 
 internal fun Route.loginRoute(
     accounts: AccountRepository,
@@ -26,7 +28,7 @@ internal fun Route.loginRoute(
         if (account == null) {
             // simulate password hashing
             // TODO: use dummy hash comparison
-            delay(Random.nextInt(40..60).milliseconds)
+            delay(Random.nextInt(DummyHashDuration).milliseconds)
             throw UnauthorizedException("invalid username or password")
         }
 

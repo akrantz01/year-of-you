@@ -16,9 +16,9 @@ import androidx.compose.ui.unit.dp
 fun LoadingButton(
     text: String,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
     enabled: Boolean = true,
     loading: Boolean = false,
-    modifier: Modifier = Modifier,
 ) {
     Button(
         modifier = modifier,
@@ -27,7 +27,7 @@ fun LoadingButton(
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(text)
 

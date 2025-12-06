@@ -37,32 +37,38 @@ fun SkeletonText(
     val translation by transition.animateFloat(
         initialValue = 0f,
         targetValue = 1000f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(1200, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart,
-        ),
+        animationSpec =
+            infiniteRepeatable(
+                animation = tween(1200, easing = LinearEasing),
+                repeatMode = RepeatMode.Restart,
+            ),
     )
 
-    val brush = Brush.linearGradient(
-        colors = listOf(
-            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
-            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
-        ),
-        start = Offset(
-            x = translation - 200f * SkeletonShimmerCos,
-            y = -(translation - 200f) * SkeletonShimmerSin,
-        ),
-        end = Offset(
-            x = translation * SkeletonShimmerCos,
-            y = -translation * SkeletonShimmerSin,
-        ),
-    )
+    val brush =
+        Brush.linearGradient(
+            colors =
+                listOf(
+                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
+                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
+                ),
+            start =
+                Offset(
+                    x = translation - 200f * SkeletonShimmerCos,
+                    y = -(translation - 200f) * SkeletonShimmerSin,
+                ),
+            end =
+                Offset(
+                    x = translation * SkeletonShimmerCos,
+                    y = -translation * SkeletonShimmerSin,
+                ),
+        )
 
     Box(
-        modifier = modifier
-            .fillMaxWidth(widthFraction)
-            .height(style.fontSize.value.dp * 1.2f)
-            .background(brush = brush, shape = RoundedCornerShape(4.dp))
+        modifier =
+            modifier
+                .fillMaxWidth(widthFraction)
+                .height(style.fontSize.value.dp * 1.2f)
+                .background(brush = brush, shape = RoundedCornerShape(4.dp)),
     )
 }

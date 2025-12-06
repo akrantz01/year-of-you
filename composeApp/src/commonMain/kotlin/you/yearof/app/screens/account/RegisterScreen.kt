@@ -33,8 +33,8 @@ import you.yearof.app.util.then
 
 @Composable
 fun RegisterScreen(
-    modifier: Modifier = Modifier,
     router: AccountRouter,
+    modifier: Modifier = Modifier,
     viewModel: RegisterViewModel = koinViewModel(parameters = { parametersOf(router) }),
 ) {
     val state by viewModel.uiState.collectAsState()
@@ -61,7 +61,7 @@ fun RegisterScreen(
             UsernameTextField(
                 state = viewModel.usernameState,
                 label = { Text("Choose your handle") },
-                enabled = !state.loading
+                enabled = !state.loading,
             )
             PasswordTextField(
                 state = viewModel.passwordState,
@@ -101,12 +101,19 @@ fun RegisterScreen(
 
         Text(
             modifier = Modifier.clickable { viewModel.toLogin() },
-            text = buildAnnotatedString {
-                append("Already have an account? ")
-                withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)) {
-                    append("Sign in!")
-                }
-            },
+            text =
+                buildAnnotatedString {
+                    append("Already have an account? ")
+                    withStyle(
+                        style =
+                            SpanStyle(
+                                color = MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.Bold,
+                            ),
+                    ) {
+                        append("Sign in!")
+                    }
+                },
         )
     }
 }

@@ -15,19 +15,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.painterResource
 import you.yearof.app.resources.Res
 import you.yearof.app.resources.eye
 import you.yearof.app.resources.eye_slash
-import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun PasswordTextField(
     state: TextFieldState,
+    modifier: Modifier = Modifier,
     enabled: Boolean = true,
     label: @Composable (TextFieldLabelScope.() -> Unit)? = null,
     error: Boolean = false,
     supportingText: @Composable (() -> Unit)? = null,
-    modifier: Modifier = Modifier,
 ) {
     var showPassword by remember { mutableStateOf(false) }
 
@@ -40,7 +40,7 @@ fun PasswordTextField(
                 Icon(
                     painter = painterResource(if (showPassword) Res.drawable.eye_slash else Res.drawable.eye),
                     contentDescription = if (showPassword) "Hide password" else "Show password",
-                    modifier = Modifier.requiredSize(40.dp).padding(8.dp)
+                    modifier = Modifier.requiredSize(40.dp).padding(8.dp),
                 )
             }
         },

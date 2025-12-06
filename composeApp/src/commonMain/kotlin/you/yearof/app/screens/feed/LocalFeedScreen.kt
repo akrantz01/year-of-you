@@ -5,12 +5,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import org.koin.compose.viewmodel.koinViewModel
+import you.yearof.app.database.Capture
 import you.yearof.app.resources.Res
 import you.yearof.app.resources.globe
 import you.yearof.app.resources.globe_wifi
 import you.yearof.app.resources.mobile
-import org.koin.compose.viewmodel.koinViewModel
-import you.yearof.app.database.Capture
 import you.yearof.app.ui.BaseCaptureCard
 import you.yearof.app.ui.ImageSource
 import you.yearof.app.ui.StatusLine
@@ -67,6 +67,6 @@ private fun CaptureCard(
                     description = "Local only",
                 )
             }
-        }
+        },
     )
 }
